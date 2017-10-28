@@ -51,7 +51,7 @@ return array(
     'LOAD_EXT_FILE'         => 'functions,head,sendmsg,encrypt,redis,arraydeal,business,map,apiCall,files',
     'LOAD_EXT_CONFIG'       => 'weixin',
     'DATA_AUTH'             => true, //是否加密
-    'DATA_AUTH_KEY'         => 'CFKJ', //系统密钥
+    'DATA_AUTH_KEY'         => 'CLH', //系统密钥
     'LAST_URL_NAME'         => 'PLU', //上次访问地址的cookie键值
     'LAST_POST_NAME'        => 'PLP', //上次post参数的cookie键值
 
