@@ -15,7 +15,7 @@ class AdminController extends BaseController {
 	public function loginOut(){
 		session(null);
 		$this->success('您已经安全退出!');
-	}
+	} 
 	/**
 	 * 异步获取管理员用户
 	 * @return [type] [description]
