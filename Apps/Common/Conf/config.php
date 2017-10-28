@@ -1,6 +1,6 @@
 <?php
 return array(
-	'SHOW_PAGE_TRACE'=>true,
+	'SHOW_PAGE_TRACE'=>false,
 	//应用设定
 	'APP_USE_NAMESPACE'     =>  true,    // 应用类库是否使用命名空间 3.2.1新增
 	'APP_SUB_DOMAIN_DEPLOY' =>  false,   // 是否开启子域名部署
