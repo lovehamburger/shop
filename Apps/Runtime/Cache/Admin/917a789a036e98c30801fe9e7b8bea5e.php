@@ -1,30 +1,31 @@
 <?php if (!defined('THINK_PATH')) exit();?><!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-            <title>
-                陈龙辉
-            </title>
-            <meta content="Dashboard" name="description"></meta>
-            <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
-            <meta content="IE=edge" http-equiv="X-UA-Compatible"></meta>
-            <meta content="text/html; charset=utf-8" http-equiv="Content-Type"></meta>
-            <!--Basic Styles-->
-            <link href="Public/Admin/css/bootstrap.css" rel="stylesheet"></link>
-            <link href="Public/Admin/css/font-awesome.css" rel="stylesheet"></link>
-            <link href="Public/Admin/css/weather-icons.css" rel="stylesheet"></link>
-            <!--Beyond styles-->
-            <link href="Public/Admin/css/beyond.css" id="beyond-link" rel="stylesheet" type="text/css"></link>
-            <link href="Public/Admin/css/demo.css" rel="stylesheet"></link>
-            <link href="Public/Admin/css/typicons.css" rel="stylesheet"></link>
-            <link href="Public/Admin/css/animate.css" rel="stylesheet"></link>
-            <link href="Public/layer/skin/layui.css" rel="stylesheet"></link>
-            <link rel="stylesheet" href="Public/laypage/laypage.css" />
-        </meta>
-    </head>
-    <body>
-        <!-- 头部 -->
-        <div class="navbar">
+<head>
+<meta charset="utf-8">
+	<title>
+		童老师ThinkPHP交流群：484519446
+	</title>
+	<meta content="Dashboard" name="description"></meta>
+	<meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
+	<meta content="IE=edge" http-equiv="X-UA-Compatible"></meta>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type"></meta>
+	<!--Basic Styles-->
+	<link href="Public/Admin/css/bootstrap.css" rel="stylesheet"></link>
+	<link href="Public/Admin/css/font-awesome.css" rel="stylesheet"></link>
+	<link href="Public/Admin/css/weather-icons.css" rel="stylesheet"></link>
+	<!--Beyond styles-->
+	<link href="Public/Admin/css/beyond.css" id="beyond-link" rel="stylesheet" type="text/css"></link>
+	<link href="Public/Admin/css/demo.css" rel="stylesheet"></link>
+	<link href="Public/Admin/css/typicons.css" rel="stylesheet"></link>
+	<link href="Public/Admin/css/animate.css" rel="stylesheet"></link>
+	<link href="Public/layer/skin/layui.css" rel="stylesheet"></link>
+	<link rel="stylesheet" href="Public/laypage/laypage.css" />
+
+</meta>
+</head>
+<body>
+<!-- 头部 -->
+<div class="navbar">
             <div class="navbar-inner">
                 <div class="navbar-container">
                     <!-- Navbar Barnd -->
@@ -94,10 +95,11 @@
                 </div>
             </div>
         </div>
-        <!-- /头部 -->
-        <div class="main-container container-fluid">
-            <div class="page-container">
-                <div class="page-sidebar" id="sidebar">
+<!-- /头部 -->
+<div class="main-container container-fluid">
+	<div class="page-container">
+		<!-- Page Sidebar -->
+		<div class="page-sidebar" id="sidebar">
     <!-- Page Sidebar Header-->
     <div class="sidebar-header-wrapper">
         <input class="searchinput" type="text">
@@ -312,98 +314,78 @@
     </ul>
     <!-- /Sidebar Menu -->
 </div>
-                <!-- /Page Sidebar -->
-                <!-- Page Content -->
-                <div class="page-content">
-                    <!-- Page brandcrumb -->
-                    <div class="page-breadcrumbs">
-                        <ul class="breadcrumb">
-                            <li>
-                                <a href="#">
-                                    品牌
-                                </a>
-                            </li>
-                            <li class="active">
-                                品牌管理
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- /Page brandcrumb -->
-                    <!-- Page Body -->
-                    <div class="page-body">
-                        <div class="row">
-                            <div class="col-lg-12 col-sm-12 col-xs-12">
-                                <div class="widget">
-                                <input type="hidden" id=brandId value="<?php echo ($brandRes["id"]); ?>">
-                                    <div class="widget-header bordered-bottom bordered-blue">
-                                        <span class="widget-caption">
-                                        <?php if($publishInfo): echo ($publishInfo); ?>
-                                        <?php else: ?>
-                                            新增品牌<?php endif; ?>
-                                        </span>
-                                    </div>
-                                    <div class="widget-body">
-                                        <div id="horizontal-form">
-                                            <div class="form-horizontal" method="post" role="form">
-                                                <div class="form-group row">
-                                                    <label class="col-md-2 control-label no-padding-right" for="brand_logo">
-                                                        品牌LOGO:
-                                                    </label>
-                                                    <div class="col-md-3">
-                                                        <input  name="brand_logo"  type="file">
-                                                        </input>
-                                                        <input type="hidden" value='<?php echo ($brandRes["brand_logo"]); ?>' id="imgurl">
-                                                        <iframe style="display: none"  src="" name="up" width="100%" style="border:1px solid red"></iframe>
-                                                    </div>
-                                                    <div class="col-md-6" class="img"><img  class="img-responsive" style="max-width: 70%;max-height: 90px;" src='<?php echo ($brandRes["brand_logo"]); ?>'  id="imgid"/></div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-sm-2 control-label no-padding-right" for="brand_name">
-                                                        品牌名称:
-                                                    </label>
-                                                    <div class="col-sm-6">
-                                                        <input class="form-control" id="brand_name" name="brand_name" placeholder="" value="<?php echo ($brandRes["brand_name"]); ?>" required="" type="text">
-                                                        </input>
-                                                    </div>
-                                                    <p class="help-block col-sm-4 red">
-                                                        * 必填
-                                                    </p>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-sm-2 control-label no-padding-right" for="password">
-                                                        品牌链接:
-                                                    </label>
-                                                    <div class="col-sm-6">
-                                                        <input class="form-control" id="brand_url" name="brand_url" value='<?php echo ($brandRes["brand_url"]); ?>' placeholder="品牌链接"  type="text">
-                                                        </input>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <div class="col-sm-offset-2 col-sm-10">
-                                                        <button class="btn btn-default sub_btn brand">
-                                                            保存信息
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /Page Body -->
-                </div>
-                <!-- /Page Content -->
-            </div>
-        </div>
-        <!--Basic Scripts-->
-        <script src="Public/Admin/js/jquery_002.js"></script>
-        <script src="Public/Admin/js/bootstrap.js"></script>
-        <script src="Public/Admin/js/jquery.js"></script>
-        <!--Beyond Scripts-->
-        <script src="Public/Admin/js/beyond.js"></script>
-        <script src="Public/Admin/js/brand/add.js"></script>
-        <script src="Public/layer/layer.js"></script>
-    </body>
+		<!-- /Page Sidebar -->
+		<!-- Page Content -->
+		<div class="page-content">
+			<!-- Page Breadcrumb -->
+			<div class="page-breadcrumbs">
+				<ul class="breadcrumb">
+					<li>
+						<a href="#">
+							文章
+						</a>
+					</li>
+					<li class="active">
+						文章管理
+					</li>
+				</ul>
+			</div>
+			<!-- /Page Breadcrumb -->
+			<!-- Page Body -->
+			<div class="page-body">
+				<button class="btn btn-sm btn-azure btn-addon" onclick="javascript:window.location.href = '<?php echo U('article-publish');?>'" tooltip="添加用户" type="button">
+					<i class="fa fa-plus">
+					</i>
+					Add
+				</button>
+				<div class="row">
+					<div class="col-lg-12 col-sm-12 col-xs-12">
+						<div class="widget">
+							<div class="widget-body">
+								<div class="flip-scroll">
+									<table class="table table-bordered table-hover">
+										<thead class="">
+											<tr>
+												<th class="text-center">
+													ID
+												</th>
+												<th class="text-center">
+													文章标题
+												</th>
+												<th class="text-center">
+													文章类目
+												</th>
+												<th class="text-center">
+													操作
+												</th>
+											</tr>
+										</thead>
+										<tbody class="Article-list">
+										</tbody>
+									</table>
+								</div>
+								<div>
+								</div>
+							</div>
+						</div>
+						<div id='biuuu_list'></div>
+					</div>
+				</div>
+			</div>
+			<!-- /Page Body -->
+		</div>
+		<!-- /Page Content -->
+	</div>
+</div>
+<!--Basic Scripts-->
+<!--Basic Scripts-->
+<script src="Public/Admin/js/jquery_002.js"></script>
+<script src="Public/Admin/js/bootstrap.js"></script>
+<script src="Public/Admin/js/jquery.js"></script>
+<!--Beyond Scripts-->
+<script src="Public/Admin/js/beyond.js"></script>
+<script src="Public/Admin/js/article/list.js"></script>
+<script src="Public/layer/layer.js"></script>
+<script src="Public/laypage/laypage.js"></script>
+</body>
 </html>

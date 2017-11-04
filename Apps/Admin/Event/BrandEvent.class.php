@@ -2,7 +2,7 @@
 
 /**
  * 资金管理事件
- * luofc 2017.2.20
+ * chenlh 2017.2.20
  * @abstract 全部查询的数据都要从主库走
  */
 namespace Admin\Event;

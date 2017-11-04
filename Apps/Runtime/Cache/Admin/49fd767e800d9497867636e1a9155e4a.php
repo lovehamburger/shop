@@ -20,6 +20,13 @@
             <link href="Public/Admin/css/animate.css" rel="stylesheet"></link>
             <link href="Public/layer/skin/layui.css" rel="stylesheet"></link>
             <link rel="stylesheet" href="Public/laypage/laypage.css" />
+            <script src="Public/Admin/js/jquery_002.js"></script>
+            <script src="Public/Admin/js/bootstrap.js"></script>
+            <script src="Public/Admin/js/jquery.js"></script>
+            <!-- 引入ueditor -->
+            <script src="Public/ueditor/ueditor.config.js"></script>
+            <script src="Public/ueditor/ueditor.all.min.js"></script>
+            <script src="Public/ueditor/lang/zh-cn/zh-cn.js"></script>
         </meta>
     </head>
     <body>
@@ -315,54 +322,42 @@
                 <!-- /Page Sidebar -->
                 <!-- Page Content -->
                 <div class="page-content">
-                    <!-- Page brandcrumb -->
+                    <!-- Page articlecrumb -->
                     <div class="page-breadcrumbs">
                         <ul class="breadcrumb">
                             <li>
                                 <a href="#">
-                                    品牌
+                                    文章
                                 </a>
                             </li>
                             <li class="active">
-                                品牌管理
+                                文章管理
                             </li>
                         </ul>
                     </div>
-                    <!-- /Page brandcrumb -->
+                    <!-- /Page articlecrumb -->
                     <!-- Page Body -->
                     <div class="page-body">
                         <div class="row">
                             <div class="col-lg-12 col-sm-12 col-xs-12">
                                 <div class="widget">
-                                <input type="hidden" id=brandId value="<?php echo ($brandRes["id"]); ?>">
+                                <input type="hidden" id=articleId value="<?php echo ($articleRes["id"]); ?>">
                                     <div class="widget-header bordered-bottom bordered-blue">
                                         <span class="widget-caption">
                                         <?php if($publishInfo): echo ($publishInfo); ?>
                                         <?php else: ?>
-                                            新增品牌<?php endif; ?>
+                                            新增文章<?php endif; ?>
                                         </span>
                                     </div>
                                     <div class="widget-body">
                                         <div id="horizontal-form">
                                             <div class="form-horizontal" method="post" role="form">
-                                                <div class="form-group row">
-                                                    <label class="col-md-2 control-label no-padding-right" for="brand_logo">
-                                                        品牌LOGO:
-                                                    </label>
-                                                    <div class="col-md-3">
-                                                        <input  name="brand_logo"  type="file">
-                                                        </input>
-                                                        <input type="hidden" value='<?php echo ($brandRes["brand_logo"]); ?>' id="imgurl">
-                                                        <iframe style="display: none"  src="" name="up" width="100%" style="border:1px solid red"></iframe>
-                                                    </div>
-                                                    <div class="col-md-6" class="img"><img  class="img-responsive" style="max-width: 70%;max-height: 90px;" src='<?php echo ($brandRes["brand_logo"]); ?>'  id="imgid"/></div>
-                                                </div>
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label no-padding-right" for="brand_name">
-                                                        品牌名称:
+                                                    <label class="col-sm-2 control-label no-padding-right" for="article_name">
+                                                        文章标题:
                                                     </label>
                                                     <div class="col-sm-6">
-                                                        <input class="form-control" id="brand_name" name="brand_name" placeholder="" value="<?php echo ($brandRes["brand_name"]); ?>" required="" type="text">
+                                                        <input class="form-control" id="title" name="title" placeholder="" value="<?php echo ($articleRes["title"]); ?>" required="" type="text">
                                                         </input>
                                                     </div>
                                                     <p class="help-block col-sm-4 red">
@@ -370,17 +365,29 @@
                                                     </p>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label no-padding-right" for="password">
-                                                        品牌链接:
+                                                    <label class="col-sm-2 control-label no-padding-right" for="article_name">
+                                                        文章栏目:
                                                     </label>
                                                     <div class="col-sm-6">
-                                                        <input class="form-control" id="brand_url" name="brand_url" value='<?php echo ($brandRes["brand_url"]); ?>' placeholder="品牌链接"  type="text">
-                                                        </input>
+                                                        <select name='articleCate' id='cate_id'>
+                                                            <?php if(is_array($articleCate)): $i = 0; $__LIST__ = $articleCate;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$vo): $mod = ($i % 2 );++$i;?><option value='<?php echo ($vo["id"]); ?>'><?php echo ($vo["catename"]); ?></option><?php endforeach; endif; else: echo "" ;endif; ?>
+                                                        </select>
+                                                    </div>
+                                                    <p class="help-block col-sm-4 red">
+                                                        * 必填
+                                                    </p>
+                                                </div>
+                                                <div class="form-group span4">
+                                                    <label class="col-sm-2 control-label no-padding-right" for="article_name">
+                                                        文章内容:
+                                                    </label>
+                                                    <div class="tab-pane" id="profile11">
+                                                        <textarea class="textarea_editor span4" id="article_desc" name="article_desc"><?php echo ($articleRes["content"]); ?></textarea>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <div class="col-sm-offset-2 col-sm-10">
-                                                        <button class="btn btn-default sub_btn brand">
+                                                        <button class="btn btn-default sub_btn article">
                                                             保存信息
                                                         </button>
                                                     </div>
@@ -397,13 +404,9 @@
                 <!-- /Page Content -->
             </div>
         </div>
-        <!--Basic Scripts-->
-        <script src="Public/Admin/js/jquery_002.js"></script>
-        <script src="Public/Admin/js/bootstrap.js"></script>
-        <script src="Public/Admin/js/jquery.js"></script>
         <!--Beyond Scripts-->
         <script src="Public/Admin/js/beyond.js"></script>
-        <script src="Public/Admin/js/brand/add.js"></script>
+        <script src="Public/Admin/js/article/add.js"></script>
         <script src="Public/layer/layer.js"></script>
     </body>
 </html>

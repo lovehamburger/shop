@@ -261,7 +261,7 @@
             </a>
             <ul class="submenu">
                 <li>
-                    <a href="/admin/document/index.html">
+                    <a href="<?php echo U('Article-index');?>">
                         <span class="menu-text">
                             文章列表
                         </span>
