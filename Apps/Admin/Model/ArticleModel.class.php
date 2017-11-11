@@ -3,7 +3,7 @@ namespace Admin\Model;
 use Admin\Model\BaseModel;
 class ArticleModel extends BaseModel{
 	/**
-	 * 查找品牌单条数据
+	 * 查找文章单条数据
 	 * @param [type] $data [description]
 	 */
 	public function getArticle($param,$lock = false,$field = '*'){
@@ -15,7 +15,7 @@ class ArticleModel extends BaseModel{
 	}
 
 	/**
-	 * 获取所有的品牌列表
+	 * 获取所有的文章列表
 	 * @return [type] [description]
 	 */
 	public function getArticles($param){
@@ -25,10 +25,10 @@ class ArticleModel extends BaseModel{
 	}
 
 	/**
-	 * 获取所有的品牌列表
+	 * 获取所有的文章列表
 	 * @return [type] [description]
 	 */
-	public function getBrandsLock($param = '',$lock = false){
+	public function getArticlesLock($param = '',$lock = false){
 		if($lock){
 			return $this->lock(true)->where($this->_makeParam($param))->select();
 		}else{
@@ -38,14 +38,14 @@ class ArticleModel extends BaseModel{
 	}
 
 	/**
-	 * 删除品牌
+	 * 删除文章
 	 */
-	public function delBrand($param){
+	public function delArticle($param){
 		return $this->where($this->_makeParam($param))->delete();
 	}
 
 	/**
-	 * 获取所有的品牌列表
+	 * 获取所有的文章列表
 	 * @return [type] [description]
 	 */
 	public function getArticleCount($param){
@@ -54,7 +54,7 @@ class ArticleModel extends BaseModel{
 	}
 
 	/**
-	 * 添加品牌数据
+	 * 添加文章数据
 	 * @param [type] $data [description]
 	 */
 	public function setArticle($data){
@@ -62,7 +62,7 @@ class ArticleModel extends BaseModel{
 	}
 
 	/**
-	 * 修改品牌
+	 * 修改文章
 	 */
 	public function editArticle($data){
 		return $this->save($data);
@@ -83,8 +83,8 @@ class ArticleModel extends BaseModel{
 		if(!empty($param['title'])){
 			$code[$prefix.'title'] = $param['title'];
 		}
-		if(!empty($param['brandId'])){
-			$code[$prefix.'id'] = $this->getIDParamExt($param['brandId']);
+		if(!empty($param['articleId'])){
+			$code[$prefix.'id'] = $this->getIDParamExt($param['articleId']);
 		}
 		return $code;
 	}

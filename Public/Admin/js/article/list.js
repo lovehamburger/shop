@@ -69,7 +69,7 @@ init_html=function (data){
 	 	url: 'Admin-Article-del',
 	 	type: 'post',
 	 	dataType: 'json',
-	 	data: {ArticleId: JSON.stringify(ArticleId)},
+	 	data: {articleId: JSON.stringify(ArticleId)},
 	 	success:function(data){
 	 		if(data.err_code == 0){
 	 			layer.msg(data.err_msg, {icon: 6});

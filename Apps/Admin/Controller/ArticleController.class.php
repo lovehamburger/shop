@@ -3,12 +3,15 @@ namespace Admin\Controller;
 use Admin\Controller\BaseController;
 class ArticleController extends BaseController {
 
+	//文章栏目待开发
+
 	public function index(){
 		$this->display('Article/index');
 	}
 
 	public function list(){
 		//权限和ajax验证
+		$this->_inputAjax();
 		$param['page'] = I('post.currPage',1);
 		$param['limit'] = I('post.pageCount',10);
 		$count = D('Article')->getArticleCount($param);
@@ -80,7 +83,6 @@ class ArticleController extends BaseController {
 			$this->ajaxReturn(array_err(0,'修改文章成功'));
 		}
 		$mArticle->rollback();
-		echo D()->getLastSql();
 		$this->ajaxReturn(array_err(991,'修改文章失败'));
 	}
 
@@ -90,7 +92,7 @@ class ArticleController extends BaseController {
 		$param['articleId'] = $articleIdRes;
 		$mArticle = D('Article');
 		$mArticle->startTrans();
-		$res = $mArticle->getArticlesLock($param,true);
+		$res = $mArticle->getArticlesLock($param,true);   
 		if(count($res) != count($articleIdRes)) $this->ajaxReturn(array_err(776,'存在非法标识,请核实'));
 		$flag = $mArticle->delArticle($param);
 
@@ -98,20 +100,11 @@ class ArticleController extends BaseController {
 			$mArticle->rollback();
 			$this->ajaxReturn(array_err(555,'删除文章失败哦'));
 		}
-		foreach ($res as $key => $value) {
-			if($value['brand_logo']){
-				if(file_exists($value['brand_logo'])){
-					unlink($value['brand_logo']);
-				}
-			}
-		}
 		$mArticle->commit();
 		$this->ajaxReturn(array_err(0,'删除文章成功'));
 
 	}
-
-
-
+	
 	public function _checkDate(&$data,$articleId){
 		$cate_id = I('post.cate_id');
 		$title = I('post.title');
@@ -124,24 +117,5 @@ class ArticleController extends BaseController {
 		$data['title'] = $title;
 		$data['content'] = $article_desc;
 		return array_err(0,'success');
-	}
-	/**
-	 * 上传图片
-	 * @return [type] [description]
-	 */
-	public function upload(){
-		$info = upload(C('ADMIN_UPLOAD_BRAND'));
-		$up_img=$info['brand_logo']['savepath'].$info['brand_logo']['savename'];
-		//设置小图片
-		$width = C('GOOD_BREAD.WIDTH');
-		$height = C('GOOD_BREAD.HEIGHT');
-		$open = C('ADMIN_UPLOAD_BRAND.rootPath').$up_img;
-		$fileName = pathinfo($up_img ,PATHINFO_FILENAME);
-		$saveDir = C('ADMIN_UPLOAD_BRAND.rootPath').$info['brand_logo']['savepath'];
-		if(!is_dir($saveDir)) mkdir($saveDir);
-		$save = $saveDir.$fileName.'.'.pathinfo($up_img ,PATHINFO_EXTENSION);
-		setThumb($width,$height,$open,$save);
-		echo"<script>imgid=parent.document.getElementById('imgid');imgid.src='".C('ADMIN_UPLOAD_BRAND.rootPath')."{$up_img}'</script>";//将图片显示到页面
-		echo"<script>imgurl=parent.document.getElementById('imgurl');imgurl.value='{$save}'</script>"; 
 	}
 }
