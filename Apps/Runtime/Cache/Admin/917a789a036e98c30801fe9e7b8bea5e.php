@@ -276,6 +276,37 @@
                 <i class="menu-icon fa fa-gear">
                 </i>
                 <span class="menu-text">
+                    广告管理
+                </span>
+                <i class="menu-expand">
+                </i>
+            </a>
+            <ul class="submenu">
+                <li>
+                    <a href="<?php echo U('Article-index');?>">
+                        <span class="menu-text">
+                            广告位管理
+                        </span>
+                        <i class="menu-expand">
+                        </i>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo U('Article-index');?>">
+                        <span class="menu-text">
+                            广告管理
+                        </span>
+                        <i class="menu-expand">
+                        </i>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a class="menu-dropdown" href="#">
+                <i class="menu-icon fa fa-gear">
+                </i>
+                <span class="menu-text">
                     系统
                 </span>
                 <i class="menu-expand">
