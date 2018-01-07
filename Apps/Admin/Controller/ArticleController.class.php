@@ -3,7 +3,7 @@ namespace Admin\Controller;
 use Admin\Controller\BaseController;
 class ArticleController extends BaseController {
 
-	//文章栏目待开发1
+	//文章栏目待开发
 
 	public function index(){
 		$this->display('Article/index');
