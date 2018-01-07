@@ -3,7 +3,7 @@ namespace Admin\Controller;
 use Admin\Controller\BaseController;
 class ArticleController extends BaseController {
 
-	//文章栏目待开发
+	//文章栏目待开发1
 
 	public function index(){
 		$this->display('Article/index');
@@ -75,11 +75,6 @@ class ArticleController extends BaseController {
 		$flag = $mArticle->editArticle($data);
 		if($flag !== false){
 			$mArticle->commit();
-			if($checkRes['brand_logo']){
-				if(file_exists($checkRes['brand_logo'])){
-					unlink($checkRes['brand_logo']);
-				}
-			}
 			$this->ajaxReturn(array_err(0,'修改文章成功'));
 		}
 		$mArticle->rollback();
