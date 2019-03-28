@@ -37,6 +37,7 @@ class ArticleController extends BaseController {
 		$this->assign('articleCate',$articleCate);
 		$this->display('Article/add');
 	}
+	
 	/**
 	 * 文章添加
 	 */
@@ -54,6 +55,7 @@ class ArticleController extends BaseController {
 		}
 		$this->ajaxReturn(array_err(991,'添加文章失败'));
 	}
+	
 	/**
 	 * 文章修改
 	 * @return [type] [description]
