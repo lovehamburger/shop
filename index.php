@@ -12,13 +12,20 @@
 // 应用入口文件
 
 // 检测PHP环境
+$touch = $_GET['touch'];
+$version = $_GET['version'];
+if(empty($touch)){
+    echo "合并的文件不能为空";
+    return;
+}
 
+if(empty($version)){
+    echo "版本号不能为空";
+    return;
+}
 
-$shell = "sudo git pull 2>&1";
-#$shell = "git --git-dir=/var/www/html/test/shop/.git pull 2>&1";
-#$shell = "ls 2>&1";
-exec($shell, $result, $status);
-var_dump($result, $status);
+$updataShell = "sudo git fetch 2>&1";
+exec($updataShell, $result, $status);
 
 if ($status) {
     echo "更新命令执行失败";
@@ -28,6 +35,7 @@ if ($status) {
     echo'<pre>';
     print_r('状态'.$status);
     echo'</pre>';
+    return;
 } else {
     echo "更新命令成功执行";
     echo'<pre>';
@@ -35,6 +43,30 @@ if ($status) {
     echo'</pre>';
     echo'<pre>';
     print_r('状态'.$status);
+    echo'</pre>';
+}
+$shell = "sudo git checkout -m ".$version $touch."2>&1";
+#$shell = "git --git-dir=/var/www/html/test/shop/.git pull 2>&1";
+#$shell = "ls 2>&1";
+exec($shell, $result, $status);
+var_dump($result, $status);
+
+if ($status) {
+    echo "合并文件失败";
+    echo'<pre>';
+    print_r($result);
+    echo'</pre>';
+    echo'<pre>';
+    print_r('合并状态'.$status);
+    echo'</pre>';
+    return;
+} else {
+    echo "合并文件成功":$touch;
+    echo'<pre>';
+    print_r($result);
+    echo'</pre>';
+    echo'<pre>';
+    print_r('合并状态'.$status);
     echo'</pre>';
 }
 die();
