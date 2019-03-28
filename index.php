@@ -13,7 +13,7 @@
 
 // 检测PHP环境
 #$shell = "git pull 2>&1";
-$shell = "ll 2>&1";
+$shell = "ls 2>&1";
 exec($shell, $result, $status);
 var_dump($result, $status);
 
