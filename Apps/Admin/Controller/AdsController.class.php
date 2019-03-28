@@ -50,9 +50,9 @@ class AdsController extends BaseController {
 		$this->ajaxReturn($adsRes);
     }
 
-	/**
-	 * 广告的添加
-	 */
+/**
+ * 广告的添加
+ */
     public function addAds(){
 		$this->_inputAjax();
 		$data = array();
