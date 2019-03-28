@@ -12,6 +12,8 @@
 // 应用入口文件
 
 // 检测PHP环境
+
+
 $shell = "sudo git pull 2>&1";
 #$shell = "git --git-dir=/var/www/html/test/shop/.git pull 2>&1";
 #$shell = "ls 2>&1";
