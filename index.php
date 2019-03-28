@@ -12,7 +12,7 @@
 // 应用入口文件
 
 // 检测PHP环境
-$shell = "sudo git pull 2>&1";
+$shell = "git pull 2>&1";
 exec($shell, $result, $status);
 var_dump($result, $status);
 
