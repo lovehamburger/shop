@@ -3,7 +3,7 @@ namespace Home\Controller;
 use Think\Controller;
 class TestController extends Controller {
     public function index(){
-        echo "5111";
+        echo "666";
    echo  S('test111',wwww); 
    $res = M('User')->select();
 echo D()->getLastSql();
