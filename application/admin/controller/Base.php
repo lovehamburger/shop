@@ -15,6 +15,15 @@ class Base extends Controller
     }
 
     /**
+     * 判断是否是AJAX
+     */
+    public function _inputAjax(){
+        if(!$this->request->isAjax()){
+            return array_err(8000,'非法请求');
+        }
+    }
+
+    /**
      * 全局输出数据
      */
     public function globalAssign(){

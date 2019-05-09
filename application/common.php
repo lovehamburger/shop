@@ -10,3 +10,6 @@
 // +----------------------------------------------------------------------
 
 // 应用公共文件
+function array_err($errCode,$errMsg){
+    return array('code'=>$errCode,'msg'=>$errMsg);
+}
