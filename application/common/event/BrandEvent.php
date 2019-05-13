@@ -39,7 +39,7 @@ class BrandEvent extends BaseEvent
             return array_err(1951296, '修改状态失败');
         }
 
-        return array_err(11, '修改状态成功');
+        return array_err(0, '修改状态成功');
     }
 
 }
