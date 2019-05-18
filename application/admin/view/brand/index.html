@@ -102,7 +102,7 @@
                                             <div class="layui-upload layui-input-block">
                                                 <button type="button" class="layui-btn" id="test-upload-normal">上传图片</button>
                                                 <div class="layui-upload-list">
-                                                    <img class="layui-upload-img" id="test-upload-normal-img">
+                                                    <img class="layui-upload-img" src="" id="test-upload-normal-img">
                                                     <p id="test-upload-demoText"></p>
                                                 </div>
                                             </div>
@@ -219,6 +219,17 @@
             $("textarea[data-name="+dataName+"]").val(data[dataName]);
           })
 
+          console.log(data);
+          $('.brand-input #test-upload-normal-img').prop('src',data['brand_img']);
+          if(data['status'] == 1){
+            $('.brand-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
+            $('.brand-input .item-checkbox').parent().find('.layui-unselect em').html('是');
+          }else{
+            $('.brand-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
+            $('.brand-input .item-checkbox').parent().find('.layui-unselect em').html('否');
+          }
+
+
           // $('.data-search .item-input').each(function () {
           //   var dataName = $(this).attr('id');
           //   var val = $.trim($(this).val());
@@ -293,7 +304,8 @@
       //普通图片上传
       var uploadInst = upload.render({
         elem: '#test-upload-normal'
-        ,url: '/upload/'
+        ,url: 'upload'
+        ,field:'image'
         ,before: function(obj){
           //预读本地文件示例，不支持ie8
           obj.preview(function(index, file, result){

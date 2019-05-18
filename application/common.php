@@ -21,7 +21,7 @@ function dealPage(&$param, $defaultPage = 20) {
         $param['curr_page'] = 1;
     }
 
-    if (empty($param['page_count']) || $param['page_count'] < 0 || $param['page_count'] > 100) {
+    if (empty($param['page_count']) || $param['page_count'] < 0 || $param['page_count'] > 90) {
         $param['page_count'] = $defaultPage;
     }
 }
