@@ -12,9 +12,9 @@ class Brand extends BaseModel
      * @param string $field
      * @return Brand
      */
-    public function getBreadByKV($brandID,$lock= false,$field='id,brand_name,brand_url,brand_img,brand_description,sort,status'){
-        $where['id'] = ['=',$brandID];
-        if($lock){
+    public function getBreadByKV($brandID, $lock = false, $field = 'id,brand_name,brand_url,brand_img,brand_description,sort,status') {
+        $where['id'] = ['in', $brandID];
+        if ($lock) {
             return $this->where($where)->master()->lock($lock)->column($field);
         }
         return $this->where($where)->column($field);
@@ -25,7 +25,7 @@ class Brand extends BaseModel
      * @param array $param
      * @return int|string
      */
-    public function getBrandByParamCnt($param = array()){
+    public function getBrandByParamCnt($param = array()) {
         $where = $this->_makeParam($param);
         return $this->where($where)->count();
     }
@@ -48,7 +48,7 @@ class Brand extends BaseModel
     public function _makeParam($param) {
         $where = array();
         if (!empty($param['id'])) {
-            $where['id'] = ['=',$param['id']];
+            $where['id'] = ['=', $param['id']];
         }
 
         if (!empty($param['brand_name'])) {

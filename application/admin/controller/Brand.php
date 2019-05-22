@@ -8,6 +8,7 @@ namespace app\admin\controller;
 use think\Db;
 use app\common\model\Brand as BrandModel;
 use app\common\event\BrandEvent;
+use app\common\util\FilesUtil;
 
 class Brand extends Base
 {
@@ -53,42 +54,69 @@ class Brand extends Base
      * 修改品牌状态
      * @return array
      */
-    public function setState(){
+    public function setState() {
         $this->_inputAjax();
         $state = input('state/d');
         $brandID = input('id/d');
         $mBrand = new BrandEvent();
 
         Db::startTrans();
-        $flag = $mBrand->setState($brandID,$state);
+        $flag = $mBrand->setState($brandID, $state);
 
-        if($flag['err_code'] > 0){
+        if ($flag['code'] > 0) {
             Db::rollback();
-        }else{
+        } else {
             Db::commit();
         }
         return $flag;
     }
 
-    public function upload(){
-        // 获取表单上传文件 例如上传了001.jpg
-        $file = request()->file('image');
+    /**
+     * 修改品牌数据
+     * @return array
+     */
+    public function editBrand() {
+        $this->_inputAjax();
+        $data = json_decode_html(input('data'));
+        $brandID = input('id/d');
+        Db::startTrans();
+        $mBrand = new BrandEvent();
 
-        // 移动到框架应用根目录/public/uploads/ 目录下
-        if($file){
-            $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
-            if($info){
-                // 成功上传后 获取上传信息
-                // 输出 jpg
-                echo $info->getExtension();
-                // 输出 20160820/42a79759f284b767dfcb2a0197904287.jpg
-                echo $info->getSaveName();
-                // 输出 42a79759f284b767dfcb2a0197904287.jpg
-                echo $info->getFilename();
-            }else{
-                // 上传失败获取错误信息
-                echo $file->getError();
-            }
+        $flag = $mBrand->editBrand($brandID, $data);
+        if ($flag['code'] > 0) {
+            Db::rollback();
+        } else {
+            Db::commit();
         }
+        return $flag;
+    }
+
+    public function delBrand() {
+        $this->_inputAjax();
+        $brandID = json_decode_html(input('id'));
+        Db::startTrans();
+        $mBrand = new BrandEvent();
+
+        $flag = $mBrand->delBrand($brandID);
+        if ($flag['code'] > 0) {
+            Db::rollback();
+        } else {
+            Db::commit();
+        }
+        return $flag;
+    }
+
+    /**
+     * 图片文件上传
+     * @return array
+     */
+    public function upload() {
+        $this->_inputAjax();
+        $files = new FilesUtil();
+        $files->size = config('uploads.goods_brand')['size'];
+        $files->saveDir = config('uploads.goods_brand')['save_dir'];
+        $files->ext = config('uploads.goods_brand')['ext'];
+        $files->thumb = config('uploads.goods_brand')['thumb'];
+        return $flag = $files->uploads('image');
     }
 }

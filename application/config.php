@@ -238,4 +238,14 @@ return [
         'var_page'  => 'page',
         'list_rows' => 15,
     ],
+
+    //图片文件配置
+    'uploads' =>[
+        'goods_brand' => [
+            'size' =>'1242880',
+            'save_dir' =>'brands',
+            'ext' =>'png,jpg,jpeg',
+            'thumb' =>true,
+        ],
+    ]
 ];
