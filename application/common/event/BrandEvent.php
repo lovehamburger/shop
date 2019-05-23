@@ -75,7 +75,7 @@ class BrandEvent extends BaseEvent
             return $flag;
         }
 
-        $flag = $this->checkBrandData($brandID, $data);
+        $flag = $this->checkBrandData($data, $brandID);
 
         if ($flag['code'] > 0) {
             return $flag;
@@ -103,6 +103,66 @@ class BrandEvent extends BaseEvent
         return array_err(0, '修改品牌数据成功');
     }
 
+
+    /**
+     * 数据排序
+     * @param $data
+     * @return array
+     * @throws \Exception
+     */
+    public function setSort($data) {
+        $brandRes = array();
+
+        $brandID = array_keys($data);
+        $flag = $this->checkBrandID($brandID, $brandRes, true);
+        if ($flag['code'] > 0) {
+            return $flag;
+        }
+
+        $mBrand = new Brand();
+        $sortRes = array();
+        //
+        foreach ($data as $k => $v) {
+            if ($v == $brandRes[$k]['sort']) {
+                continue;
+            }
+            $sortRes[$k]['id'] = $k;
+            $sortRes[$k]['sort'] = $v;
+        }
+
+        $editFlag = $mBrand->isUpdate()->saveAll($sortRes);
+
+        if ($editFlag === false) {
+            return array_err(1951296, '修改品牌数据失败');
+        }
+
+        return array_err(0, '修改品牌数据成功');
+    }
+
+    /**
+     * 添加品牌数据
+     * @param $brandID
+     * @param $data
+     * @return array
+     */
+    public function addBrand($data) {
+        $flag = $this->checkBrandData($data);
+
+        if ($flag['code'] > 0) {
+            return $flag;
+        }
+
+        $mBrand = new Brand();
+
+        $editFlag = $mBrand->save($data);
+
+        if ($editFlag === false) {
+            return array_err(1951296, '添加品牌数据失败');
+        }
+
+        return array_err(0, '添加品牌数据成功');
+    }
+
     /**
      * 删除品牌数据
      * @param $brandID
@@ -127,7 +187,7 @@ class BrandEvent extends BaseEvent
         return array_err(0, '删除品牌数据成功');
     }
 
-    public function checkBrandData($brandID = '', &$data) {
+    public function checkBrandData(&$data, $brandID = '') {
 
         if (empty($data['brand_name'])) {
             return array_err(1952199, '品牌名称不能为空');

@@ -71,6 +71,21 @@ class Brand extends Base
         return $flag;
     }
 
+    public function setSort(){
+        $this->_inputAjax();
+        $sort = json_decode_html(input('sort'));
+        Db::startTrans();
+        $mBrand = new BrandEvent();
+
+        $flag = $mBrand->setSort($sort);
+        if ($flag['code'] > 0) {
+            Db::rollback();
+        } else {
+            Db::commit();
+        }
+        return $flag;
+    }
+
     /**
      * 修改品牌数据
      * @return array
@@ -91,6 +106,21 @@ class Brand extends Base
         return $flag;
     }
 
+    public function addBrand() {
+        $this->_inputAjax();
+        $data = json_decode_html(input('data'));
+
+        $mBrand = new BrandEvent();
+
+        $flag = $mBrand->addBrand($data);
+
+        return $flag;
+    }
+
+    /**
+     * 删除品牌
+     * @return array
+     */
     public function delBrand() {
         $this->_inputAjax();
         $brandID = json_decode_html(input('id'));
