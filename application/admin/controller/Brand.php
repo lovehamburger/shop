@@ -71,7 +71,12 @@ class Brand extends Base
         return $flag;
     }
 
-    public function setSort(){
+    /**
+     * 设置排序
+     * @return array
+     * @throws \Exception
+     */
+    public function setSort() {
         $this->_inputAjax();
         $sort = json_decode_html(input('sort'));
         Db::startTrans();
