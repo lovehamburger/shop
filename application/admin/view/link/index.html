@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>友情链接</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="__PLUGINS__/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="__PLUGINS__/layuiadmin/style/admin.css" media="all">
+    <style>
+        .layui-upload-img {
+            width: 92px;
+            height: 92px;
+            margin: 0 10px 10px 0;
+        }
+    </style>
+<body layadmin-themealias="default">
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>组件</cite></a>
+        <a><cite>数据表格</cite></a>
+        <a><cite>数据操作</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">数据操作</div>
+                <div class="layui-card-body">
+                    <div class="layui-btn-group test-table-operate-btn" style="margin-bottom: 10px;">
+                        <button class="layui-btn" data-type="delLink">删除链接</button>
+
+                        <button class="layui-btn layui-btn-normal" data-type="addLink">新增链接</button>
+<!--                        <button class="layui-btn layui-btn-danger" data-type="setSort">保存排序</button>-->
+                        <!--                        <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>-->
+                        <!--                        <button class="layui-btn" data-type="isAll">验证是否全选</button>-->
+                    </div>
+                    <div class="test-table-reload-btn data-search" style="margin-bottom: 10px;">
+                        搜索ID：
+                        <div class="layui-inline">
+                            <input class="layui-input item-input" name="id" id="id" autocomplete="off">
+                        </div>
+                        链接名称：
+                        <div class="layui-inline">
+                            <input class="layui-input item-input" name="id" id="title" autocomplete="off">
+                        </div>
+
+                        <button class="layui-btn" id="search" data-type="reload">搜索</button>
+                    </div>
+                    <table class="layui-hide" id="brand-data" lay-filter="brand-data"></table>
+
+
+                    <script type="text/html" id="test-table-switchTpl">
+                        <!-- 这里的 checked 的状态只是演示 -->
+                        <input type="checkbox" name="状态" lay-skin="switch" lay-text="是|否"
+                               lay-filter="test-table-status"
+                               value="{{ d.status }}" data-json="{{ encodeURIComponent(JSON.stringify(d)) }}" {{
+                               d.status==
+                               1 ? 'checked' : '' }}>
+                    </script>
+
+                    <script type="text/html" id="test-table-operate-barDemo">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    </script>
+
+                    <div class="layui-card link-input" hidden>
+                        <div class="layui-card-body">
+                            <from class="layui-form" lay-filter="component-form-element">
+                                <input type="hidden" value="" name="brand_id" data-name="id"
+                                       class="layui-input brand_id">
+                                <div class="layui-row layui-col-space10 layui-form-item">
+                                    <div class="layui-col-lg6">
+                                        <label class="layui-form-label">链接名称：</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" value="" name="brand_name" lay-verify="required"
+                                                   placeholder="" autocomplete="off" data-name="title"
+                                                   class="layui-input item-input">
+                                        </div>
+                                    </div>
+                                    <div class="layui-col-lg6">
+                                        <label class="layui-form-label">链接地址：</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" name="link_url" data-name="link_url"
+                                                   placeholder="" autocomplete="off"
+                                                   class="layui-input item-input link_url">
+                                        </div>
+                                    </div>
+                                </div>
+
+
+<!--                                <div class="layui-unselect layui-form-radio layui-form-radioed"><i-->
+<!--                                        class="layui-anim layui-icon layui-anim-scaleSpring"></i>-->
+<!--                                    <div>图片1</div>-->
+<!--                                </div>-->
+<!--                                <div class="layui-unselect layui-form-radio layui-form-radioed"><i-->
+<!--                                        class="layui-anim layui-icon layui-anim-scaleSpring"></i>-->
+<!--                                    <div>文本1</div>-->
+<!--                                </div>-->
+                                <div class="layui-row layui-col-space10 layui-form-item">
+                                    <div class="layui-col-lg6">
+                                        <label class="layui-form-label">是否开启：</label>
+                                        <div class="layui-input-block">
+                                            <input type="checkbox" class="item-checkbox" name="status"
+                                                   data-name="status"
+                                                   lay-skin="switch" lay-filter="status" lay-text="是|否">
+                                            <div class="layui-unselect layui-form-switch layui-form-onswitch"
+                                                 lay-skin="_switch"><em>是</em><i></i></div>
+                                        </div>
+
+
+                                        <!-- 这里的 checked 的状态只是演示 -->
+
+                                    </div>
+                                    <div class="layui-col-lg6" >
+                                        <label class="layui-form-label"> 链接类型：</label>
+                                        <input type="radio" data-name="type" class="item-checkradio" name="type" value="1" title="文本">
+                                        <input type="radio" data-name="type" class="item-checkradio" name="type" value="2" title="图片">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item layui-col-lg12">
+                                    <label class="layui-form-label">链接图片：</label>
+                                    <div class="layui-col-md12">
+                                        <div class="layui-card">
+
+                                            <div class="layui-upload layui-input-block">
+                                                <button type="button" class="layui-btn" id="test-upload-normal">上传图片
+                                                </button>
+                                                <div class="layui-upload-list">
+                                                    <img class="layui-upload-img"
+                                                         src="/public/static/common/img/default.png" id="logo">
+                                                    <p id="test-upload-demoText"></p>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">链接描述：</label>
+                                    <div class="layui-input-block">
+                                        <textarea name="brand_description" data-name="description" placeholder=""
+                                                  class="layui-textarea item-textarea"></textarea>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <div class="layui-input-block">
+                                        <button class="layui-btn data-send" lay-submit="">立即提交</button>
+                                    </div>
+                                </div>
+                            </from>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="__PLUGINS__/layuiadmin/layui/layui.js"></script>
+
+<script>
+
+  layui.config({
+    base: '/public/plugins/layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'table', 'form', 'upload'], function () {
+    var table = layui.table
+      , form = layui.form
+      , upload = layui.upload
+      , admin = layui.admin;
+
+
+    function Link() {
+      var self = this;
+      self.param = {}
+      self.data = {}
+
+      layer.ready(function () {
+        self.getList();
+      });
+
+      //监听表格复选框选择
+      table.on('checkbox(brand-data)', function (obj) {
+        console.log(obj)
+      });
+
+      //弹出新增 修改框中checkbox的状态
+      form.on('switch(status)', function (data) {
+        $('.item-checkbox').val(data.elem.checked);
+      });
+
+      //监听状态操作
+      form.on('switch(test-table-status)', function (obj) {
+
+        var json = JSON.parse(decodeURIComponent($(this).data('json')));
+        layer.tips(this.value + ' ' + this.name + '：' + obj.elem.checked, obj.othis);
+        json = table.clearCacheKey(json);
+        if (obj.elem.checked) {
+          var state = 1
+        } else {
+          var state = 0
+        }
+        var index = layer.load(2);
+        $.ajax({
+          url: 'setState',
+          data: {
+            id: json.id,
+            state: state,
+          },
+          type: 'post',
+          dataType: 'json',
+          success: function (msg) {
+            if (msg.code > 0) {
+              layer.msg(msg.msg, {icon: 5});
+              if (obj.value == 1) {
+                obj.othis.parent().find('.layui-unselect').addClass('layui-form-onswitch')
+                obj.othis.parent().find('.layui-unselect em').html('关')
+              } else {
+                obj.othis.parent().find('.layui-unselect').removeClass('layui-form-onswitch')
+                obj.othis.parent().find('.layui-unselect em').html('开')
+              }
+            }
+            self.getList();
+            layer.close(index)
+          }
+        });
+      });
+
+      //监听工具条
+      table.on('tool(brand-data)', function (obj) {
+        var data = obj.data;
+        if (obj.event === 'detail') {
+          layer.msg('ID：' + data.id + ' 的查看操作');
+        } else if (obj.event === 'del') {
+          layer.confirm('真的删除行么', function (index) {
+            obj.del();
+            $delArr = [];
+            $delArr.push(obj['data']['id']);
+            $.ajax({
+              url: 'delLink',
+              data: {
+                id: JSON.stringify($delArr),
+              },
+              type: 'post',
+              dataType: 'json',
+              success: function (msg) {
+                if (msg.code > 0) {
+                  layer.msg(msg.msg, {icon: 5});
+
+                } else {
+                  layer.msg(msg.msg, {icon: 1});
+                }
+              }
+            });
+            layer.close(index);
+          });
+        } else if (obj.event === 'edit') {
+          $('.link-input .item-input').each(function () {
+            var dataName = $(this).attr('data-name');
+            $("input[data-name=" + dataName + "]").val(data[dataName]);
+          })
+
+          $('.link-input .item-textarea').each(function () {
+            var dataName = $(this).attr('data-name');
+            $("textarea[data-name=" + dataName + "]").val(data[dataName]);
+          })
+
+
+
+           $("input[data-name=type][value="+data.type_key+"]").prop("checked", true);
+          form.render('radio');
+          $('.link-input #logo').prop('src', data['logo']);
+
+          $('.link-input .brand_id').val(data['id']);
+          console.log(data);
+          if (data['status'] == 1) {
+            $('.link-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
+            $('.link-input .item-checkbox').parent().find('.layui-unselect em').html('是');
+          } else {
+            $('.link-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
+            $('.link-input .item-checkbox').parent().find('.layui-unselect em').html('否');
+          }
+
+
+          // $('.data-search .item-input').each(function () {
+          //   var dataName = $(this).attr('id');
+          //   var val = $.trim($(this).val());
+          //   self.param[dataName] = val
+          //   if (self.param[dataName] == '') {
+          //     delete self.param[dataName];
+          //   }
+          // })
+          layer.open({
+            type: 1,
+            title: '链接修改',
+            area: ['50%'],
+            closeBtn: 0,
+            shadeClose: true,
+            skin: 'yourClass',
+            content: $(".link-input"),
+          });
+        }
+      });
+
+      var $ = layui.$, active = {
+        reload: function () {
+          $('.data-search .item-input').each(function () {
+            var dataName = $(this).attr('id');
+            var val = $.trim($(this).val());
+            self.param[dataName] = val
+            if (self.param[dataName] == '') {
+              delete self.param[dataName];
+            }
+          })
+          //执行重载
+          table.reload('brand-data', {
+            page: {
+              curr: 1 //重新从第 1 页开始
+            }
+            , where: {
+              param: JSON.stringify(self.param)
+            }
+          });
+        }
+        , delLink: function () { //获取选中数据
+          layer.confirm('真的删除全部吗?', function (index) {
+            var checkStatus = table.checkStatus('brand-data')
+              , data = checkStatus.data;
+            var $id = [];
+            $.each(data, function (i, el) {
+              $id.push(el.id);
+            })
+            if ($id) {
+              $.ajax({
+                url: 'delLink',
+                data: {
+                  id: JSON.stringify($id),
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function (msg) {
+                  if (msg.code > 0) {
+                    layer.msg(msg.msg, {icon: 5});
+                  } else {
+                    layer.msg(msg.msg, {icon: 1});
+                    self.getList();
+                  }
+                  layer.close(index)
+                }
+              });
+            }
+          })
+        }
+        , setSort: function () { //获取选中数据
+          var allLinkData = table.cache['brand-data']
+          var $id = {};
+
+          $.each(allLinkData, function (i, el) {
+            $id[el.id] = el.sort;
+          })
+
+          if ($id) {
+            $.ajax({
+              url: 'setSort',
+              data: {
+                sort: JSON.stringify($id),
+              },
+              type: 'post',
+              dataType: 'json',
+              success: function (msg) {
+                if (msg.code > 0) {
+                  layer.msg(msg.msg, {icon: 5});
+                } else {
+                  layer.msg(msg.msg, {icon: 1});
+                  self.getList();
+                }
+                layer.close(index)
+              }
+            });
+          }
+        }
+        , addLink: function () {
+          $('.link-input .item-input').each(function () {
+            var dataName = $(this).attr('data-name');
+            $("input[data-name=" + dataName + "]").val('');
+          })
+
+          $('.link-input .item-textarea').each(function () {
+            var dataName = $(this).attr('data-name');
+            $("textarea[data-name=" + dataName + "]").val('');
+          })
+
+          $('.link-input #logo').prop('src', '/public/static/common/img/default.png');
+
+          $('.link-input .brand_id').val('');
+          layer.open({
+            type: 1,
+            title: '链接新增',
+            area: ['50%'],
+            closeBtn: 0,
+            shadeClose: true,
+            skin: 'yourClass',
+            content: $(".link-input"),
+          });
+        }
+        , getCheckLength: function () { //获取选中数目
+          var checkStatus = table.checkStatus('brand-data')
+            , data = checkStatus.data;
+          layer.msg('选中了：' + data.length + ' 个');
+        }
+        , isAll: function () { //验证是否全选
+          var checkStatus = table.checkStatus('brand-data');
+          layer.msg(checkStatus.isAll ? '全选' : '未全选')
+        }
+      };
+
+      $('.test-table-operate-btn .layui-btn').on('click', function () {
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+      });
+
+      //提交数据
+      $('.data-send').click(function () {
+        var flag = false;
+
+        $('.link-input .item-input').each(function () {
+          var dataName = $(this).attr('data-name');
+          self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
+          if (dataName == 'brand_name' && self['data'][dataName] == '') {
+            $("input[data-name=" + dataName + "]").addClass('layui-form-danger');
+            flag = true;
+          }
+        })
+
+        $('.link-input .item-checkbox').each(function () {
+          var dataName = $(this).attr('data-name');
+          self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
+          console.log(self['data'][dataName]);
+          if (self['data'][dataName] == "true") {
+            self['data'][dataName] = 1;
+          } else {
+            self['data'][dataName] = 0;
+          }
+        })
+
+
+        $('.link-input .item-textarea').each(function () {
+          var dataName = $(this).attr('data-name');
+          self['data'][dataName] = $("textarea[data-name=" + dataName + "]").val();
+        })
+
+        $('.link-input .item-checkradio').each(function () {
+          var dataName = $(this).attr('data-name');
+          self['data'][dataName] = $("input[data-name=" + dataName + "]:checked").val();
+        })
+
+        self['data']['logo'] = $('.link-input #logo').attr('src');
+
+        var $brand_id = $('.brand_id').val();
+
+        if ($brand_id) {
+          var $url = 'editLink';
+        } else {
+          var $url = 'addLink';
+        }
+
+        if (flag) {
+          return;
+        }
+
+        $.ajax({
+          url: $url,
+          data: {
+            data: JSON.stringify(self.data),
+            id: $brand_id,
+          },
+          type: 'post',
+          dataType: 'json',
+          success: function (msg) {
+            if (msg.code > 0) {
+              layer.msg(msg.msg, {icon: 2});
+            } else {
+              layer.msg(msg.msg, {icon: 1});
+              self.getList();
+            }
+          }
+        });
+      })
+
+      //搜索
+      $('.test-table-reload-btn .layui-btn').on('click', function () {
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+      });
+
+      //普通图片上传
+      var uploadInst = upload.render({
+        elem: '#test-upload-normal'
+        , url: 'upload'
+        , field: 'image'
+        , before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+          layer.load('loading'); //上传loading
+        }
+        , done: function (res) {
+          //如果上传失败
+          layer.closeAll('loading'); //关闭loading
+          if (res.code > 0) {
+            return layer.msg('上传失败');
+          }
+          $('#logo').attr('src', res.file.saveFiles); //图片链接（base64）
+          //上传成功
+        }
+
+        , error: function () {
+          //演示失败状态，并实现重传
+          var demoText = $('#test-upload-demoText');
+          demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+          demoText.find('.demo-reload').on('click', function () {
+            uploadInst.upload();
+          });
+        }
+      });
+    }
+
+    Link.prototype = {
+      constructor: Link,
+      getList: function () {
+        table.render({
+          elem: '#brand-data'
+          , method: 'post'
+          , url: 'getData'
+          , cols: [[
+            {type: 'checkbox', fixed: 'left'}
+            , {field: 'id', width: 92, title: 'ID', sort: true, fixed: 'left'}
+            , {field: 'title', width: 300, title: '链接名称'}
+            , {field: 'link_url', width: 350, title: '链接地址'}
+            , {field: 'description', width: 450, title: '链接描述'}
+            , {field: 'type', width: 80, title: '类型', sort: true}
+            , {field: 'status', title: '状态', width: 100, templet: '#test-table-switchTpl', unresize: true}
+            , {width: 210, align: 'center', toolbar: '#test-table-operate-barDemo'}
+          ]]
+          , page: true
+        })
+      },
+    }
+
+    new Link();
+  });
+</script>
+</body>
+

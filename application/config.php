@@ -247,5 +247,11 @@ return [
             'ext' =>'png,jpg,jpeg',
             'thumb' =>true,
         ],
+        'link' => [
+            'size' =>'1242880',
+            'save_dir' =>'links',
+            'ext' =>'png,jpg,jpeg',
+            'thumb' =>true,
+        ],
     ]
 ];
