@@ -162,8 +162,74 @@ class Config extends Base
     /**
      * 配置展示列表
      * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function lst() {
+        //todo权限
+        if($this->_inputPost()['code'] == 0){
+            $baseData = input('post.');
+            $fileData = input('file.');
+            if(!empty($fileData)){//todo 这边因为使用ename所以需要优化
+                $files = new FilesUtil();
+                foreach ($fileData as $k=>$v){
+                    $files->saveDir = $k;
+                    $imgData = $files->uploads($k);
+                    if($imgData['code'] > 0){
+                        $this->error($imgData['msg']);
+                        return;
+                    }
+                    $flag = Db::name('config')->where('ename', $k)->update(['value' => $imgData['file']['saveFiles']]);
+                    if($flag === false){
+                        Db::rollback();
+                        $this->error('修改失败');
+                    }
+                }
+            }
+
+            if(!empty($baseData)){
+                $mConfig = new ConfigEvent();
+                Db::startTrans();
+                $configRes = array();
+                $keys = array_keys($baseData);
+                $checkFlag = $mConfig->checkConfigID($keys,$configRes,true);
+                if($checkFlag['code'] > 0){
+                    $this->error($checkFlag['msg']);
+                }
+
+                foreach($baseData as $k=>$v){
+                    if(is_array($v)){
+                        $v = trim(implode(',',$v),',');
+                    }
+                    if($v == $configRes[$k]['value']){
+                        continue;
+                    }
+
+                    $flag = Db::name('config')->where('id', $k)->update(['value' => $v]);
+                    if($flag === false){
+                        Db::rollback();
+                        $this->error('修改失败');
+                    }
+                }
+                Db::commit();
+                $this->success('修改成功');
+            }
+        }
+        $mConfig = new ConfigModel();
+        //条数的限制
+        //dealPage();
+        $data = array_err(0, 'success');
+        $count = $mConfig->getConfigByParamCnt();
+        $data['count'] = $count;
+        $brandRes = array();
+        if ($count) {
+            $field = 'id,ename,cname,form_type,conf_type,conf_type conf_type_name,values,value,sort,status';
+            $brandRes = $mConfig->getConfigByParam(array(), $field);
+        }
+
+        $data['data'] = $brandRes;
+        $this->assign('config_data',$data);
         return $this->fetch();
     }
 }

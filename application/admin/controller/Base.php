@@ -21,6 +21,17 @@ class Base extends Controller
         if(!$this->request->isAjax()){
             return array_err(8000,'非法请求');
         }
+        return array_err(0,'success');
+    }
+
+    /**
+     * 判断是否是POST
+     */
+    public function _inputPost(){
+        if(!$this->request->isPost()){
+            return array_err(8000,'非法请求');
+        }
+        return array_err(0,'success');
     }
 
     /**

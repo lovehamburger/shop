@@ -141,8 +141,8 @@ return [
     // 视图输出字符串内容替换
     'view_replace_str'       => [],
     // 默认跳转页面对应的模板文件
-    'dispatch_success_tmpl'  => THINK_PATH . 'tpl' . DS . 'dispatch_jump.tpl',
-    'dispatch_error_tmpl'    => THINK_PATH . 'tpl' . DS . 'dispatch_jump.tpl',
+    'dispatch_success_tmpl'  => APP_PATH . 'admin' . DS . 'view/common/success.tpl',
+    'dispatch_error_tmpl'    => APP_PATH . 'admin' . DS . 'view/common/success.html',
 
     // +----------------------------------------------------------------------
     // | 异常及错误设置
@@ -178,7 +178,7 @@ return [
     // +----------------------------------------------------------------------
     'trace'                  => [
         // 内置Html Console 支持扩展
-        'type' => 'Html',
+        'type' => 'console',
     ],
 
     // +----------------------------------------------------------------------
@@ -250,6 +250,12 @@ return [
         'link' => [
             'size' =>'1242880',
             'save_dir' =>'links',
+            'ext' =>'png,jpg,jpeg',
+            'thumb' =>true,
+        ],
+        'logo' => [
+            'size' =>'1242880',
+            'save_dir' =>'logo',
             'ext' =>'png,jpg,jpeg',
             'thumb' =>true,
         ],
