@@ -265,13 +265,19 @@ class Goods extends Base
 
         $eGoods = new GoodsEvent();
         $cateGoryRes = array();
+        Db::startTrans();
         $checkCateFlag = $eGoods->checkCateGoryID($cateGoryID,true,$cateGoryRes);
         if($checkCateFlag['code'] > 0){
+            Db::rollback();
             return $checkCateFlag;
         }
 
-
         $flag = $eGoods->editCateGory($cateGoryData,$cateGoryID);
+        if($flag['code'] > 0){
+            Db::rollback();
+
+        }
+        Db::commit();
         return $flag;
     }
 
@@ -310,4 +316,10 @@ class Goods extends Base
         $files->thumb = config('uploads.category')['thumb'];
         return $flag = $files->uploads('image');
     }
+
+
+
+    /***************************************************************************************************************
+     * 商品类型开始
+     **************************************************************************************************************/
 }

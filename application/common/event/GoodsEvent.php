@@ -183,6 +183,13 @@ class GoodsEvent extends BaseEvent
         return array_err(0, '删除品牌数据成功');
     }
 
+    /**
+     * 检查商品分类是否正确
+     * @param $cateID
+     * @param bool $lock
+     * @param $cateGoryRes
+     * @return array
+     */
     public function checkCateGoryID($cateID,$lock = false,&$cateGoryRes){
         if(empty($cateID)){
             return array_err(19869, '分类标识不能为空');
@@ -226,6 +233,11 @@ class GoodsEvent extends BaseEvent
         return array_err(0, 'success');
     }
 
+    /**
+     * 添加商品分类数据
+     * @param $data
+     * @return array
+     */
     public function addCateGory($data) {
         $checkFlag = $this->_checkCateGory($data);
         if ($checkFlag['code'] > 0) {
@@ -240,7 +252,14 @@ class GoodsEvent extends BaseEvent
         return array_err(0, '添加分类数据成功');
     }
 
-
+    /**
+     * 修改商品分类数据
+     * @param $data
+     * @param $cateGoryID
+     * @return array
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
     public function editCateGory($data,$cateGoryID) {
         $checkFlag = $this->_checkCateGory($data,$cateGoryID);
         if ($checkFlag['code'] > 0) {
