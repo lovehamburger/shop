@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>商品配置</title>
+    <title>商品商品分类</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport"
@@ -14,6 +14,16 @@
             width: 92px;
             height: 92px;
             margin: 0 10px 10px 0;
+        }
+        #cate_tree{
+            position: absolute;
+            z-index: 1;
+            border: 1px solid #ccc;
+            left: 0px;
+            top: 37px;
+            background-color: #eee;
+            display: none;
+            width: 100%;
         }
     </style>
 <body layadmin-themealias="default">
@@ -28,52 +38,28 @@
 </div>
 
 <div class="layui-fluid">
-    <div class="layui-row layui-form layui-col-space15">
+    <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">
             <div class="layui-card">
                 <div class="layui-card-header">数据操作</div>
                 <div class="layui-card-body">
                     <div class="layui-btn-group test-table-operate-btn" style="margin-bottom: 10px;">
-                        <button class="layui-btn" data-type="delConfig">删除配置</button>
+                        <button class="layui-btn" data-type="delCateGory">删除商品分类</button>
 
-                        <button class="layui-btn layui-btn-normal" data-type="addConfig">新增配置</button>
+                        <button class="layui-btn layui-btn-normal" data-type="addCategory">新增商品分类</button>
                         <button class="layui-btn layui-btn-danger" data-type="setSort">保存排序</button>
                         <!--                        <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>-->
                         <!--                        <button class="layui-btn" data-type="isAll">验证是否全选</button>-->
                     </div>
-                    <div class="test-table-reload-btn data-search" style="margin-bottom: 10px;">
-                        搜索ID：
-                        <div class="layui-inline">
-                            <input class="layui-input item-input" name="id" id="id" autocomplete="off">
-                        </div>
-                        英文名称：
-                        <div class="layui-inline">
-                            <input class="layui-input item-input" name="id" id="ename" autocomplete="off">
-                        </div>
-                        中文名称：
-                        <div class="layui-inline">
-                            <input class="layui-input item-input" name="id" id="cname" autocomplete="off">
-                        </div>
-                        配置类型：
-                        <div class="layui-inline">
-                            <select name="type" class="item-select" id="conf_type"  lay-filter="conf_type">
-                                <option value="">全部</option>
-                                <option value="1">网店类型</option>
-                                <option value="2">商品类型</option>
-                            </select>
-                        </div>
-
-                        <button class="layui-btn" id="search" data-type="reload">搜索</button>
-                    </div>
-                    <table class="layui-hide" id="config-data" lay-filter="config-data"></table>
+                    <table class="layui-hide" id="category-data" lay-filter="category-data"></table>
 
 
                     <script type="text/html" id="test-table-switchTpl">
                         <!-- 这里的 checked 的状态只是演示 -->
                         <input type="checkbox" name="状态" lay-skin="switch" lay-text="是|否"
                                lay-filter="test-table-status"
-                               value="{{ d.status }}" data-json="{{ encodeURIComponent(JSON.stringify(d)) }}" {{
-                               d.status==
+                               value="{{ d.show_cate }}" data-json="{{ encodeURIComponent(JSON.stringify(d)) }}" {{
+                               d.show_cate==
                                1 ? 'checked' : '' }}>
                     </script>
 
@@ -82,50 +68,47 @@
                         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
                         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
                     </script>
-
-                    <div class="layui-card config-input" hidden>
+                    <div class="layui-card category-input" hidden>
                         <div class="layui-card-body">
                             <from class="layui-form" lay-filter="component-form-element">
-                                <input type="hidden" value="" name="config_id" data-name="id"
-                                       class="layui-input config_id">
+                                <input type="hidden" value="" name="category_id" data-name="id"
+                                       class="layui-input category_id">
                                 <div class="layui-row layui-col-space10 layui-form-item">
                                     <div class="layui-col-lg6">
-                                        <label class="layui-form-label">中文名称：</label>
+                                        <label class="layui-form-label">分类名称：</label>
                                         <div class="layui-input-block">
-                                            <input type="text" value="" name="config_name" lay-verify="required"
-                                                   placeholder="" autocomplete="off" data-name="cname"
-                                                   class="layui-input item-input">
+                                            <input type="text" value="" name="category_name" lay-verify="required"
+                                                   placeholder="" autocomplete="off" data-name="cate_name"
+                                                   class="layui-input item-input" >
                                         </div>
                                     </div>
                                     <div class="layui-col-lg6">
-                                        <label class="layui-form-label">英文名称：</label>
-                                        <div class="layui-input-block">
-                                            <input type="text" value="" name="config_name"
-                                                   placeholder="" autocomplete="off" data-name="ename"
-                                                   class="layui-input item-input">
-                                        </div>
-                                    </div>
-                                    <div class="layui-col-lg6">
-                                        <label class="layui-form-label">表单类型：</label>
-                                        <div class="layui-input-block">
-                                            <select name="type" lay-search="" class="item-select" data-name="form_type" lay-verify="required" lay-filter="conf_type">
-                                                <option value="input">input</option>
-                                                <option value="select">select</option>
-                                                <option value="checkbox">checkbox</option>
-                                                <option value="radio">radio</option>
-                                                <option value="textarea">textarea</option>
-                                                <option value="file">file</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                                        <label class="layui-form-label">上级分类：</label>
 
-                                    <div class="layui-col-lg6">
-                                        <label class="layui-form-label">配置类型：</label>
                                         <div class="layui-input-block">
-                                            <select name="type" class="item-select" data-name="conf_type" lay-verify="required" lay-filter="conf_type">
-                                                <option value="1">网店类型</option>
-                                                <option value="2">商品类型</option>
-                                            </select>
+                                            <div id="cate_gory">
+                                            <input type="text" value="顶级分类" readonly  name="cate_gory" data-name="pid"
+                                                 placeholder="" autocomplete="off"
+                                                 class="layui-input item-input" cate_id="0">
+                                                <div id="cate_tree"></div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="layui-col-lg6">
+                                        <label class="layui-form-label">关键词：</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" name="category_url" data-name="keywords"
+                                                   placeholder="" autocomplete="off"
+                                                   class="layui-input item-input">
+                                        </div>
+                                    </div>
+                                    <div class="layui-col-lg6">
+                                        <label class="layui-form-label">排序：</label>
+                                        <div class="layui-input-block" style="width: 20%">
+                                            <input type="text" name="sort" data-name="sort"
+                                                   placeholder="" autocomplete="off" class="layui-input item-input">
                                         </div>
                                     </div>
                                 </div>
@@ -133,32 +116,55 @@
                                 <div class="layui-form-item layui-col-lg6">
                                     <label class="layui-form-label">是否开启：</label>
                                     <div class="layui-input-block">
-                                        <input type="checkbox" class="item-checkbox" name="status" data-name="status"
-                                               lay-skin="switch" lay-filter="config-status" lay-text="是|否" checked="" value="true">
-                                        <div class="layui-unselect layui-form-switch"
+                                        <input type="checkbox" class="item-checkbox" name="status" data-name="show_cate"
+                                               lay-skin="switch" lay-filter="category-status" lay-text="是|否">
+                                        <div class="layui-unselect layui-form-switch layui-form-onswitch"
                                              lay-skin="_switch"><em>是</em><i></i></div>
                                     </div>
+
+                                    <!-- 这里的 checked 的状态只是演示 -->
                                 </div>
-                                <div class="layui-col-lg6">
-                                    <label class="layui-form-label">配置排序：</label>
-                                    <div class="layui-input-block" style="width: 20%">
-                                        <input type="text" name="sort" data-name="sort"
-                                               placeholder="" autocomplete="off" class="layui-input item-input">
+
+                                <div class="layui-form-item layui-col-lg6">
+                                    <label class="layui-form-label">分类图片：</label>
+                                    <div class="layui-col-md12">
+                                        <div class="layui-card">
+
+                                            <div class="layui-upload layui-input-block">
+                                                <button type="button" class="layui-btn" id="test-upload-normal">上传图片
+                                                </button>
+                                                <div class="layui-upload-list">
+                                                    <img class="layui-upload-img"
+                                                         src="/public/static/common/img/default.png" id="cate_img">
+                                                    <p id="test-upload-demoText"></p>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div><div class="layui-col-lg6">
+                                    <label class="layui-form-label">分类icon：</label>
+                                    <div class="layui-col-md12">
+                                        <div class="layui-card">
+
+                                            <div class="layui-upload layui-input-block">
+                                                <button type="button" class="layui-btn" id="upload-normal-icon">上传icon
+                                                </button>
+                                                <div class="layui-upload-list">
+                                                    <img class="layui-upload-img"
+                                                         src="/public/static/common/img/default.png" id="iconfont">
+                                                    <p id="test-upload-iconText"></p>
+                                                </div>
+                                            </div>
+
+                                        </div>
                                     </div>
                                 </div>
+
                                 <div class="layui-form-item">
-                                    <label class="layui-form-label">默认值：</label>
+                                    <label class="layui-form-label">分类描述：</label>
                                     <div class="layui-input-block">
-                                        <textarea name="value" data-name="value"
-                                                  placeholder=""
-                                                  class="layui-textarea item-textarea"></textarea>
-                                    </div>
-                                </div>
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">可选值：</label>
-                                    <div class="layui-input-block">
-                                        <textarea name="values" data-name="values"
-                                                  placeholder=""
+                                        <textarea name="category_description" data-name="description" placeholder=""
                                                   class="layui-textarea item-textarea"></textarea>
                                     </div>
                                 </div>
@@ -177,7 +183,7 @@
 </div>
 
 
-<script src="__PLUGINS__/layuiadmin/layui/layui.js"></script>
+<script src="__PLUGINS__/layuiadmin/layui/layui.js?=111"></script>
 
 <script>
 
@@ -189,10 +195,10 @@
     var table = layui.table
       , form = layui.form
       , upload = layui.upload
-      , admin = layui.admin;
+      , admin = layui.admin
 
 
-    function Config() {
+    function Category() {
       var self = this;
       self.param = {}
       self.data = {}
@@ -202,12 +208,12 @@
       });
 
       //监听表格复选框选择
-      table.on('checkbox(config-data)', function (obj) {
+      table.on('checkbox(category-data)', function (obj) {
         console.log(obj)
       });
 
       //弹出新增 修改框中checkbox的状态
-      form.on('switch(config-status)', function (data) {
+      form.on('switch(category-status)', function (data) {
         $('.item-checkbox').val(data.elem.checked);
       });
 
@@ -224,7 +230,7 @@
         }
         var index = layer.load(2);
         $.ajax({
-          url: 'setState',
+          url: 'setCategoryState',
           data: {
             id: json.id,
             state: state,
@@ -234,21 +240,18 @@
           success: function (msg) {
             if (msg.code > 0) {
               layer.msg(msg.msg, {icon: 5});
-              if (obj.value == 1) {
-                obj.othis.parent().find('.layui-unselect').addClass('layui-form-onswitch')
-                obj.othis.parent().find('.layui-unselect em').html('关')
-              } else {
-                obj.othis.parent().find('.layui-unselect').removeClass('layui-form-onswitch')
-                obj.othis.parent().find('.layui-unselect em').html('开')
-              }
+
             }
             layer.close(index)
+            self.getList();
           }
         });
       });
 
+
+
       //监听工具条
-      table.on('tool(config-data)', function (obj) {
+      table.on('tool(category-data)', function (obj) {
         var data = obj.data;
         if (obj.event === 'detail') {
           layer.msg('ID：' + data.id + ' 的查看操作');
@@ -258,7 +261,7 @@
             $delArr = [];
             $delArr.push(obj['data']['id']);
             $.ajax({
-              url: 'delConfig',
+              url: 'delCateGory',
               data: {
                 id: JSON.stringify($delArr),
               },
@@ -276,32 +279,33 @@
             layer.close(index);
           });
         } else if (obj.event === 'edit') {
-          $('.config-input .item-input').each(function () {
+          $('.category-input .item-input').each(function () {
             var dataName = $(this).attr('data-name');
-            $("input[data-name=" + dataName + "]").val(data[dataName]);
+            if(dataName == 'pid'){
+              $("input[data-name=" + dataName + "]").val();
+              var _html = $("#cate_tree").find("div[data-id=" + data[dataName] + "]").find('.layui-tree-txt').html();
+              $("input[data-name=" + dataName + "]").val(_html).attr('cate_id',data[dataName]);
+            }else{
+              $("input[data-name=" + dataName + "]").val(data[dataName]);
+            }
+
           })
 
-          $('.config-input .item-textarea').each(function () {
+          $('.category-input .item-textarea').each(function () {
             var dataName = $(this).attr('data-name');
             $("textarea[data-name=" + dataName + "]").val(data[dataName]);
           })
 
-          $('.config-input .item-select').each(function () {
-            var dataName = $(this).attr('data-name');
-            var select = $(this).parent().find('dd[lay-value=' + data[dataName] + ']');
-            $(this).siblings("div.layui-form-select").find('dl').find(select).click();//select选中使用模拟点击事件
-          })
+          $('.category-input #cate_img').prop('src', data['cate_img']);
+          $('.category-input #iconfont').prop('src', data['iconfont']);
 
-
-          $('.config-input #config_img').prop('src', data['config_img']);
-
-          $('.config-input .config_id').val(data['id']);
-          if (data['status'] == 1) {
-            $('.config-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
-            $('.config-input .item-checkbox').parent().find('.layui-unselect em').html('是');
+          $('.category-input .category_id').val(data['id']);
+          if (data['show_cate'] == 1) {
+            $('.category-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
+            $('.category-input .item-checkbox').parent().find('.layui-unselect em').html('是');
           } else {
-            $('.config-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
-            $('.config-input .item-checkbox').parent().find('.layui-unselect em').html('否');
+            $('.category-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
+            $('.category-input .item-checkbox').parent().find('.layui-unselect em').html('否');
           }
 
 
@@ -315,13 +319,14 @@
           // })
           layer.open({
             type: 1,
-            title: '配置修改',
+            title: '商品分类修改',
             area: ['50%'],
             closeBtn: 0,
             shadeClose: true,
             skin: 'yourClass',
-            content: $(".config-input"),
+            content: $(".category-input"),
           });
+
         }
       });
 
@@ -335,17 +340,8 @@
               delete self.param[dataName];
             }
           })
-
-          $('.data-search .item-select').each(function () {
-            var dataName = $(this).attr('id');
-            var val = $.trim($(this).val());
-            self.param[dataName] = val
-            if (self.param[dataName] == '') {
-              delete self.param[dataName];
-            }
-          })
           //执行重载
-          table.reload('config-data', {
+          table.reload('category-data', {
             page: {
               curr: 1 //重新从第 1 页开始
             }
@@ -354,9 +350,9 @@
             }
           });
         }
-        , delConfig: function () { //获取选中数据
+        , delCateGory: function () { //获取选中数据
           layer.confirm('真的删除全部吗?', function (index) {
-            var checkStatus = table.checkStatus('config-data')
+            var checkStatus = table.checkStatus('category-data')
               , data = checkStatus.data;
             var $id = [];
             $.each(data, function (i, el) {
@@ -364,7 +360,7 @@
             })
             if ($id) {
               $.ajax({
-                url: 'delConfig',
+                url: 'delCateGory',
                 data: {
                   id: JSON.stringify($id),
                 },
@@ -384,16 +380,17 @@
           })
         }
         , setSort: function () { //获取选中数据
-          var allConfigData = table.cache['config-data']
+          var allCategoryData = table.cache['category-data']
           var $id = {};
 
-          $.each(allConfigData, function (i, el) {
+          $.each(allCategoryData, function (i, el) {
             $id[el.id] = el.sort;
           })
 
           if ($id) {
+            var index = layer.load(2)
             $.ajax({
-              url: 'setSort',
+              url: 'setCateSort',
               data: {
                 sort: JSON.stringify($id),
               },
@@ -411,66 +408,85 @@
             });
           }
         }
-        , addConfig: function () {
-          $('.config-input .item-input').each(function () {
+        , addCategory: function () {
+          $('.category-input .item-input').each(function () {
             var dataName = $(this).attr('data-name');
+
             $("input[data-name=" + dataName + "]").val('');
+
+            $("input[data-name=pid]").val('顶级分类').attr('cate_id',0);
           })
 
-          $('.config-input .item-textarea').each(function () {
+          $('.category-input .item-textarea').each(function () {
             var dataName = $(this).attr('data-name');
             $("textarea[data-name=" + dataName + "]").val('');
           })
 
-          $('.config-input #config_img').prop('src', '/public/static/common/img/default.png');
+          $('.category-input #category_img').prop('src', '/public/static/common/img/default.png');
 
-          $('.config-input .config_id').val('');
+          $('.category-input .category_id').val('');
           layer.open({
             type: 1,
-            title: '配置新增',
+            title: '商品分类新增',
             area: ['50%'],
             closeBtn: 0,
             shadeClose: true,
             skin: 'yourClass',
-            content: $(".config-input"),
+            content: $(".category-input"),
           });
         }
         , getCheckLength: function () { //获取选中数目
-          var checkStatus = table.checkStatus('config-data')
+          var checkStatus = table.checkStatus('category-data')
             , data = checkStatus.data;
           layer.msg('选中了：' + data.length + ' 个');
         }
         , isAll: function () { //验证是否全选
-          var checkStatus = table.checkStatus('config-data');
+          var checkStatus = table.checkStatus('category-data');
           layer.msg(checkStatus.isAll ? '全选' : '未全选')
         }
       };
 
-        //刘列表页的搜索按钮、删除、新增等按钮获取data-type的事件
-      $('.test-table-operate-btn .layui-btn,.test-table-reload-btn .layui-btn').on('click', function () {
+      $('.test-table-operate-btn .layui-btn').on('click', function () {
         var type = $(this).data('type');
         active[type] ? active[type].call(this) : '';
       });
+
+      $('.layui-card-body').on('click','#cate_gory',function(e){
+
+        e.stopPropagation();//阻止冒泡
+        $(this).parent().find('#cate_tree').show();
+      })
+
+      $('.layui-card-body').on('click','#cate_tree',function(e){
+        e.stopPropagation();//阻止冒泡
+      })
+
+      $(document).on('click','body',function(e){
+        $(this).parent().find('#cate_tree').hide();
+        e.stopPropagation();//阻止冒泡
+      })
+
+
 
       //提交数据
       $('.data-send').click(function () {
         var flag = false;
 
-        $('.config-input .item-input').each(function () {
+        $('.category-input .item-input').each(function () {
           var dataName = $(this).attr('data-name');
-          self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
-          if (dataName == 'cname' && self['data'][dataName] == '') {
+
+          if(dataName == 'pid'){
+            self['data'][dataName] = $("input[data-name=" + dataName + "]").attr('cate_id');
+          }else{
+            self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
+          }
+          if (dataName == 'category_name' && self['data'][dataName] == '') {
             $("input[data-name=" + dataName + "]").addClass('layui-form-danger');
             flag = true;
           }
         })
 
-        $('.config-input .item-select').each(function () {
-          var dataName = $(this).attr('data-name');
-          self['data'][dataName] = $(this).val();
-        })
-
-        $('.config-input .item-checkbox').each(function () {
+        $('.category-input .item-checkbox').each(function () {
           var dataName = $(this).attr('data-name');
           self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
           console.log(self['data'][dataName]);
@@ -482,19 +498,20 @@
         })
 
 
-        $('.config-input .item-textarea').each(function () {
+        $('.category-input .item-textarea').each(function () {
           var dataName = $(this).attr('data-name');
           self['data'][dataName] = $("textarea[data-name=" + dataName + "]").val();
         })
 
-        self['data']['config_img'] = $('.config-input #config_img').attr('src');
+        self['data']['cate_img'] = $('.category-input #cate_img').attr('src');
+        self['data']['iconfont'] = $('.category-input #iconfont').attr('src');
 
-        var $config_id = $('.config_id').val();
+        var $category_id = $('.category_id').val();
 
-        if ($config_id) {
-          var $url = 'editConfig';
+        if ($category_id) {
+          var $url = 'editCategory';
         } else {
-          var $url = 'addConfig';
+          var $url = 'addCategory';
         }
 
         if (flag) {
@@ -505,7 +522,7 @@
           url: $url,
           data: {
             data: JSON.stringify(self.data),
-            id: $config_id,
+            id: $category_id,
           },
           type: 'post',
           dataType: 'json',
@@ -515,10 +532,17 @@
             } else {
               layer.msg(msg.msg, {icon: 1});
               self.getList();
+              getChild();
             }
           }
         });
       })
+
+      //搜索
+      $('.test-table-reload-btn .layui-btn').on('click', function () {
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+      });
 
 
 
@@ -528,6 +552,7 @@
         , url: 'upload'
         , field: 'image'
         , before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+          console.log(obj);
           layer.load('loading'); //上传loading
         }
         , done: function (res) {
@@ -536,11 +561,12 @@
           if (res.code > 0) {
             return layer.msg('上传失败');
           }
-          $('#config_img').attr('src', res.file.saveFiles); //图片链接（base64）
+          $('#cate_img').attr('src', res.file.saveFiles); //图片链接（base64）
           //上传成功
         }
 
-        , error: function () {
+        , error: function (obj) {
+
           //演示失败状态，并实现重传
           var demoText = $('#test-upload-demoText');
           demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
@@ -549,31 +575,102 @@
           });
         }
       });
+
+
+      //普通icon上传
+      var uploadInst = upload.render({
+        elem: '#upload-normal-icon'
+        , url: 'upload'
+        , field: 'image'
+        , before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+          console.log(obj);
+          layer.load('loading'); //上传loading
+        }
+        , done: function (res) {
+          //如果上传失败
+          layer.closeAll('loading'); //关闭loading
+          if (res.code > 0) {
+            return layer.msg('上传失败');
+          }
+          $('#iconfont').attr('src', res.file.saveFiles); //图片链接（base64）
+          //上传成功
+        }
+
+        , error: function (obj) {
+
+          //演示失败状态，并实现重传
+          var demoText = $('#test-upload-iconText');
+          demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+          demoText.find('.demo-reload').on('click', function () {
+            uploadInst.upload();
+          });
+        }
+      });
+      getChild();
+      function getChild() {
+        var index = layer.load(2);
+        $.ajax({
+          url: 'cateGoryChild',
+          data: {
+
+          },
+          type: 'post',
+          dataType: 'json',
+          success: function (msg) {
+            if (msg.code == 0) {
+              var frist = {id: 0, cate_name: "顶级分类",title:"顶级分类", cate_img: "", iconfont: "icon-clothes", keywords: "",children:[]}
+              msg.data.unshift(frist);
+              layui.use(['tree'], function(){
+                var tree = layui.tree
+                  //模拟数据1
+                  ,data = msg.data;
+                //无连接线风格
+                tree.render({
+                  elem: '#cate_tree'
+                  ,data: data
+                  ,onlyIconControl: true  //是否仅允许节点左侧图标控制展开收缩
+                  ,click: function(obj){
+                    $("input[data-name=pid]").val(obj.data.cate_name).attr("cate_id",obj.data.id);
+                  }
+                });
+              });
+            }
+            layer.close(index)
+          }
+        });
+      }
+
     }
 
-    Config.prototype = {
-      constructor: Config,
+
+
+    Category.prototype = {
+      constructor: Category,
       getList: function () {
         table.render({
-          elem: '#config-data'
+          elem: '#category-data'
           , method: 'post'
-          , url: 'getData'
+          , url: 'cateGory'
           , cols: [[
             {type: 'checkbox', fixed: 'left'}
-            , {field: 'id', width: 92, title: 'ID', sort: true, fixed: 'left'}
-            , {field: 'ename', width: 300, title: '英文名称'}
-            , {field: 'cname', width: 350, title: '中文名称'}
-            , {field: 'form_type', width: 150, title: '表单类型'}
-            , {field: 'conf_type_name', width: 150, title: '配置类型'}
+            , {field: 'id', width: 92, title: 'ID', fixed: 'left'}
+            , {field: 'level_name', width: 300, title: '分类名称'}
+            , {field: 'keywords', width: 100, title: '关键词'}
+            , {field: 'description', width: 100, title: '分类描述'}
+            , {field: 'search_attr_ids', width: 150, title: '属性筛选'}
+            , {field: 'ps_num', width: 100, title: '价格区间数'}
             , {field: 'sort', width: 80, title: '排序', sort: true, edit: 'text'}
-            , {width: 450, align: 'center', toolbar: '#test-table-operate-barDemo'}
+            , {field: 'show_cate', title: '状态', width: 100, templet: '#test-table-switchTpl', unresize: true}
+            , {width: 550, align: 'center', toolbar: '#test-table-operate-barDemo'}
           ]]
           , page: true
         })
       },
+
+
     }
 
-    new Config();
+    new Category();
   });
 </script>
 </body>
