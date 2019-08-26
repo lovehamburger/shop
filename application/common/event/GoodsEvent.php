@@ -290,6 +290,10 @@ class GoodsEvent extends BaseEvent
         $param['cate_name'] = $data['cate_name'];
         $param['pid'] = $data['pid'];
         if($cateID){
+            if($cateID == $data['pid']){
+                return array_err(197314, '不能选择自身分类');
+            }
+
             $param['id'] = array('neq', $cateID);
         }
 
