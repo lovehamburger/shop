@@ -94,10 +94,64 @@
                         </div>
                     </div>
 
+                    <div class="layui-card attr-input" hidden>
+                        <div class="layui-card-body">
+                            <from class="layui-form" lay-filter="component-form-element">
+                                <input type="hidden" value="" name="type_id" data-name="id"
+                                       class="layui-input type_id">
+                                <div class="layui-row layui-col-space10 layui-form-item">
+                                    <div class="layui-col-lg12">
+                                        <label class="layui-form-label">所属类型：</label>
+                                        <div class="layui-input-block">
+                                            <select name="attr" class="all-attr" lay-verify="" lay-search>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="layui-row layui-col-space10 layui-form-item">
+                                    <div class="layui-col-lg12">
+                                        <label class="layui-form-label">属性名称：</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" value="" name="type_name" lay-verify="required"
+                                                   placeholder="" autocomplete="off" data-name="type_name"
+                                                   class="layui-input item-input">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="layui-row layui-col-space10 layui-form-item">
+                                    <div class="layui-col-lg12">
+                                        <label class="layui-form-label">属性类型：</label>
+                                        <div class="layui-input-block">
+                                            <input type="radio" name="sex" value="nan" title="单选" checked>
+                                            <input type="radio" name="sex" value="nv" title="唯一" >
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="layui-row layui-col-space10 layui-form-item">
+                                    <div class="layui-col-lg12">
+                                        <label class="layui-form-label">属性值：</label>
+                                        <div class="layui-input-block">
+                                            <textarea name="desc" placeholder="请输入内容" class="layui-textarea"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <div class="layui-input-block">
+                                        <button class="layui-btn data-send" lay-submit="">立即提交</button>
+                                    </div>
+                                </div>
+                            </from>
+                        </div>
+                    </div>
+
                     <div class="attr-box" hidden>
                         <div class="layui-card-body">
                             <div class="test-table-reload-btn data-search" style="margin-bottom: 10px;">
-                                <button class="layui-btn" id="" data-type="reload">新增属性</button>
+                                <button class="layui-btn" id="" data-type="addAttr">新增属性</button>
                             </div>
                             <script type="text/html" id="attr-tool">
                                 <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="attr_detail">查看</a>
@@ -124,7 +178,7 @@
     base: '/public/plugins/layuiadmin/' //静态资源所在路径
   }).extend({
     index: 'lib/index' //主入口模块
-  }).use(['index', 'table', 'form', 'upload'], function () {
+  }).use(['index', 'table', 'form', 'upload','layer'], function () {
     var table = layui.table
       , form = layui.form
       , upload = layui.upload
@@ -186,6 +240,26 @@
         });
       });
 
+      function getAllList() {
+        $.ajax({
+          url: 'getData',
+          type: 'post',
+          dataType: 'json',
+          success: function (msg) {
+            if (msg.code == 0) {
+              if(msg.count > 0){
+                var str = '';
+                $.each(msg.data, function (i, el) {
+                  str += '<option value = '+el.id+'>'+el.type_name+'</option>';
+                });
+                $('.all-attr').html(str);
+              }
+            }
+            form.render();//!!
+          }
+        });
+      }
+
       //监听工具条
       table.on('tool(type-data)', function (obj) {
         var data = obj.data;
@@ -193,6 +267,7 @@
         console.log(data)
         if (obj.event === 'attr') {
           self.getAttr(data.id);
+          getAllList();
           layer.open({
             type: 1,
             maxmin: true, //开启最大化最小化按钮
@@ -440,6 +515,16 @@
             shadeClose: true,
             skin: 'yourClass',
             content: $(".type-input"),
+          });
+        }
+        , addAttr: function () {
+          layer.open({
+            type: 1,
+            title: '属性新增',
+            area: ['30%'],
+            closeBtn: 0,
+            shadeClose: true,
+            content: $(".attr-input"),
           });
         }
         , getCheckLength: function () { //获取选中数目
