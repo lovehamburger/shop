@@ -169,8 +169,7 @@ class Type extends Base
 
         return $flag;
     }
-
-
+    
     /**
      * 修改属性数据
      * @return array
