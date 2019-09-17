@@ -153,4 +153,58 @@ class Type extends Base
         $data['data'] = $AttrRes;
         return $data;
     }
+
+    /**
+     * 添加类型属性
+     */
+    public function addAttr(){
+        //todo权限
+        $this->_inputAjax();
+
+        $data = json_decode_html(input('data'));
+
+        $mType = new TypeEvent();
+
+        $flag = $mType->addType($data);
+
+        return $flag;
+    }
+    
+    /**
+     * 修改属性数据
+     * @return array
+     */
+    public function editAttr() {
+        $this->_inputAjax();
+        $data = json_decode_html(input('data'));
+        $attrID = input('id/d');
+        Db::startTrans();
+        $mType = new TypeEvent();
+
+        $flag = $mType->editType($attrID, $data);
+        if ($flag['code'] > 0) {
+            Db::rollback();
+        } else {
+            Db::commit();
+        }
+        return $flag;
+    }
+    /**
+     * 删除属性
+     * @return array
+     */
+    public function delAttr() {
+        $this->_inputAjax();
+        $attrID = json_decode_html(input('id'));
+        Db::startTrans();
+        $mType = new TypeEvent();
+
+        $flag = $mType->delType($attrID);
+        if ($flag['code'] > 0) {
+            Db::rollback();
+        } else {
+            Db::commit();
+        }
+        return $flag;
+    }
 }
