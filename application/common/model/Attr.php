@@ -15,15 +15,27 @@ class Attr extends BaseModel
 
     /**
      * 根据主键查询类型属性数据
-     * @param $typeID
+     * @param $attrID
      * @param string $field
      * @return Attr
      */
-    public function getAttrByKV($typeID, $lock = false, $field = 'id,attr_name') {
-        $where['id'] = ['in', $typeID];
+    public function getAttrByKV($attrID, $lock = false, $field = 'id,attr_name') {
+        $where['id'] = ['in', $attrID];
         if ($lock) {
             return $this->where($where)->master()->lock($lock)->column($field);
         }
+        return $this->where($where)->column($field);
+    }
+
+    /**
+     * 根据主键查询类型属性数据
+     * @param $param
+     * @param string $field
+     * @return Attr
+     */
+    public function getAttrByParam($param, $field = 'id,attr_name') {
+        $where['type_id'] = $param['type_id'];
+        $where['attr_name'] = $param['attr_name'];
         return $this->where($where)->column($field);
     }
 
