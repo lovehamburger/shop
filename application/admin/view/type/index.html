@@ -114,8 +114,8 @@
                                     <div class="layui-col-lg12">
                                         <label class="layui-form-label">属性名称：</label>
                                         <div class="layui-input-block">
-                                            <input type="text" value="" name="type_name" lay-verify="required"
-                                                   placeholder="" autocomplete="off" data-name="type_name"
+                                            <input type="text"  name="attr_name" lay-verify="required"
+                                                   placeholder="" autocomplete="off" data-name="attr_name"
                                                    class="layui-input item-input">
                                         </div>
                                     </div>
@@ -125,8 +125,8 @@
                                     <div class="layui-col-lg12">
                                         <label class="layui-form-label">属性类型：</label>
                                         <div class="layui-input-block">
-                                            <input type="radio" name="sex" value="nan" title="单选" checked>
-                                            <input type="radio" name="sex" value="nv" title="唯一" >
+                                            <input type="radio" name="attr_type" value="1" title="单选" checked>
+                                            <input type="radio" name="attr_type" value="2" title="唯一">
                                         </div>
                                     </div>
                                 </div>
@@ -135,13 +135,13 @@
                                     <div class="layui-col-lg12">
                                         <label class="layui-form-label">属性值：</label>
                                         <div class="layui-input-block">
-                                            <textarea name="desc" placeholder="请输入内容" class="layui-textarea"></textarea>
+                                            <textarea data-name="attr_values" placeholder="请输入内容" class="item-textarea layui-textarea"></textarea>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="layui-form-item">
                                     <div class="layui-input-block">
-                                        <button class="layui-btn data-send" lay-submit="">立即提交</button>
+                                        <button class="layui-btn attr-data-send" lay-submit="">立即提交</button>
                                     </div>
                                 </div>
                             </from>
@@ -159,7 +159,7 @@
                                 <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="attr_del">删除</a>
                             </script>
 
-                            <table  id="type-attr" lay-filter="type-attr"></table>
+                            <table id="type-attr" lay-filter="type-attr"></table>
                         </div>
                     </div>
 
@@ -169,8 +169,9 @@
     </div>
 </div>
 
-
+<script src="__PLUGINS__/jquery.min.js"></script>
 <script src="__PLUGINS__/layuiadmin/layui/layui.js"></script>
+
 
 <script>
 
@@ -178,7 +179,7 @@
     base: '/public/plugins/layuiadmin/' //静态资源所在路径
   }).extend({
     index: 'lib/index' //主入口模块
-  }).use(['index', 'table', 'form', 'upload','layer'], function () {
+  }).use(['index', 'table', 'form', 'upload', 'layer'], function () {
     var table = layui.table
       , form = layui.form
       , upload = layui.upload
@@ -240,116 +241,23 @@
         });
       });
 
-      function getAllList() {
-        $.ajax({
-          url: 'getData',
-          type: 'post',
-          dataType: 'json',
-          success: function (msg) {
-            if (msg.code == 0) {
-              if(msg.count > 0){
-                var str = '';
-                $.each(msg.data, function (i, el) {
-                  str += '<option value = '+el.id+'>'+el.type_name+'</option>';
-                });
-                $('.all-attr').html(str);
-              }
-            }
-            form.render();//!!
-          }
-        });
-      }
-
       //监听工具条
       table.on('tool(type-data)', function (obj) {
         var data = obj.data;
 
-        console.log(data)
         if (obj.event === 'attr') {
-          self.getAttr(data.id);
-          getAllList();
+          attrObj.getAttr(data.id);
+          attrObj.getAllList();
           layer.open({
             type: 1,
             maxmin: true, //开启最大化最小化按钮
-            title: '('+data.type_name+')类型属性',
+            title: '(' + data.type_name + ')类型属性',
             area: '50%',
             offset: '100px',
             closeBtn: 1,
             shadeClose: true,
             content: $(".attr-box"),
           });
-
-
-        } else if (obj.event === 'del') {
-          layer.confirm('真的删除行么', function (index) {
-            obj.del();
-            $delArr = [];
-            $delArr.push(obj['data']['id']);
-            $.ajax({
-              url: 'delType',
-              data: {
-                id: JSON.stringify($delArr),
-              },
-              type: 'post',
-              dataType: 'json',
-              success: function (msg) {
-                if (msg.code > 0) {
-                  layer.msg(msg.msg, {icon: 5});
-
-                } else {
-                  layer.msg(msg.msg, {icon: 1});
-                }
-              }
-            });
-            layer.close(index);
-          });
-        } else if (obj.event === 'edit') {
-          $('.type-input .item-input').each(function () {
-            var dataName = $(this).attr('data-name');
-            $("input[data-name=" + dataName + "]").val(data[dataName]);
-          })
-
-          $('.type-input .item-textarea').each(function () {
-            var dataName = $(this).attr('data-name');
-            $("textarea[data-name=" + dataName + "]").val(data[dataName]);
-          })
-
-          $('.type-input #type_img').prop('src', data['type_img']);
-
-          $('.type-input .type_id').val(data['id']);
-          if (data['status'] == 1) {
-            $('.type-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
-            $('.type-input .item-checkbox').parent().find('.layui-unselect em').html('是');
-          } else {
-            $('.type-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
-            $('.type-input .item-checkbox').parent().find('.layui-unselect em').html('否');
-          }
-
-
-          // $('.data-search .item-input').each(function () {
-          //   var dataName = $(this).attr('id');
-          //   var val = $.trim($(this).val());
-          //   self.param[dataName] = val
-          //   if (self.param[dataName] == '') {
-          //     delete self.param[dataName];
-          //   }
-          // })
-          layer.open({
-            type: 1,
-            title: '类型修改',
-            area: ['30%'],
-            closeBtn: 0,
-            shadeClose: true,
-            skin: 'yourClass',
-            content: $(".type-input"),
-          });
-        }
-      });
-      table.on('tool(type-attr)', function (obj) {
-        var data = obj.data;
-        console.log(data)
-        if (obj.event === 'attr_detail') {
-          layer.msg('ID：' + data.id + ' 的查看操作');
         } else if (obj.event === 'del') {
           layer.confirm('真的删除行么', function (index) {
             obj.del();
@@ -658,12 +566,177 @@
         })
       },
 
-      getAttr: function (attr_id) {
+    }
 
+
+    function Attr() {
+      var self = this;
+      self.param = {}
+      self.data = {}
+
+      //监听表格复选框选择
+      table.on('checkbox(type-data)', function (obj) {
+        console.log(obj)
+      });
+
+      //弹出新增 修改框中checkbox的状态
+      form.on('switch(type-status)', function (data) {
+        $('.item-checkbox').val(data.elem.checked);
+      });
+
+      var $ = layui.$, active = {
+        addAttr: function () {
+          layer.open({
+            type: 1,
+            title: '属性新增',
+            area: ['30%'],
+            closeBtn: 0,
+            shadeClose: true,
+            content: $(".attr-input"),
+          });
+        }
+      };
+
+      table.on('tool(type-attr)', function (obj) {
+        var data = obj.data;
+        console.log(data)
+        if (obj.event === 'attr_detail') {
+          layer.msg('ID：' + data.id + ' 的查看操作');
+        } else if (obj.event === 'del') {
+          layer.confirm('真的删除行么', function (index) {
+            obj.del();
+            $delArr = [];
+            $delArr.push(obj['data']['id']);
+            $.ajax({
+              url: 'delType',
+              data: {
+                id: JSON.stringify($delArr),
+              },
+              type: 'post',
+              dataType: 'json',
+              success: function (msg) {
+                if (msg.code > 0) {
+                  layer.msg(msg.msg, {icon: 5});
+
+                } else {
+                  layer.msg(msg.msg, {icon: 1});
+                }
+              }
+            });
+            layer.close(index);
+          });
+        } else if (obj.event === 'edit') {
+          $('.type-input .item-input').each(function () {
+            var dataName = $(this).attr('data-name');
+            $("input[data-name=" + dataName + "]").val(data[dataName]);
+          })
+
+          $('.type-input .item-textarea').each(function () {
+            var dataName = $(this).attr('data-name');
+            $("textarea[data-name=" + dataName + "]").val(data[dataName]);
+          })
+
+          $('.type-input #type_img').prop('src', data['type_img']);
+
+          $('.type-input .type_id').val(data['id']);
+          if (data['status'] == 1) {
+            $('.type-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
+            $('.type-input .item-checkbox').parent().find('.layui-unselect em').html('是');
+          } else {
+            $('.type-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
+            $('.type-input .item-checkbox').parent().find('.layui-unselect em').html('否');
+          }
+
+
+          // $('.data-search .item-input').each(function () {
+          //   var dataName = $(this).attr('id');
+          //   var val = $.trim($(this).val());
+          //   self.param[dataName] = val
+          //   if (self.param[dataName] == '') {
+          //     delete self.param[dataName];
+          //   }
+          // })
+          layer.open({
+            type: 1,
+            title: '类型修改',
+            area: ['30%'],
+            closeBtn: 0,
+            shadeClose: true,
+            skin: 'yourClass',
+            content: $(".type-input"),
+          });
+        }
+      });
+
+      $('.test-table-operate-btn .layui-btn').on('click', function () {
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+      });
+
+
+      //提交数据
+      $('.attr-data-send').click(function () {
+        var flag = false;
+
+        $('.attr-input .item-input').each(function () {
+          var dataName = $(this).attr('data-name');
+          self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
+          if (dataName == 'attr_name' && self['data'][dataName] == '') {
+            $("input[data-name=" + dataName + "]").addClass('layui-form-danger');
+            flag = true;
+          }
+        })
+
+        self['data']['attr_type'] = $("input[name='attr_type']:checked").val();
+        self['data']['type_id'] = $(".all-attr").val();
+
+
+        $('.attr-input .item-textarea').each(function () {
+          var dataName = $(this).attr('data-name');
+          self['data'][dataName] = $("textarea[data-name=" + dataName + "]").val();
+        })
+
+
+        var $type_id = $('.type_id').val();
+
+        if ($type_id) {
+          var $url = 'editAttr';
+        } else {
+          var $url = 'addAttr';
+        }
+
+        if (flag) {
+          return;
+        }
+
+        $.ajax({
+          url: $url,
+          data: {
+            data: JSON.stringify(self.data),
+            id: $type_id,
+          },
+          type: 'post',
+          dataType: 'json',
+          success: function (msg) {
+            if (msg.code > 0) {
+              layer.msg(msg.msg, {icon: 2});
+            } else {
+              layer.msg(msg.msg, {icon: 1});
+              self.getList();
+            }
+          }
+        });
+      })
+    }
+
+    Attr.prototype = {
+      constructor: Attr,
+
+      getAttr: function (attr_id) {
         table.render({
           elem: '#type-attr'
           , method: 'post'
-          ,where: {
+          , where: {
             type_id: attr_id
           }
           , url: 'getAttr'
@@ -678,9 +751,30 @@
           , page: true
         })
       },
+
+      getAllList:function () {
+        $.ajax({
+          url: 'getData',
+          type: 'post',
+          dataType: 'json',
+          success: function (msg) {
+            if (msg.code == 0) {
+              if (msg.count > 0) {
+                var str = '';
+                $.each(msg.data, function (i, el) {
+                  str += '<option value = ' + el.id + '>' + el.type_name + '</option>';
+                });
+                $('.all-attr').html(str);
+              }
+            }
+            form.render();//!!
+          }
+        });
+      }
     }
 
-    new Type();
+    var typeObj = new Type();
+    var attrObj = new Attr();
   });
 </script>
 </body>

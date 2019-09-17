@@ -165,7 +165,7 @@ class Type extends Base
 
         $mType = new TypeEvent();
 
-        $flag = $mType->addType($data);
+        $flag = $mType->addAttr($data);
 
         return $flag;
     }
@@ -181,7 +181,7 @@ class Type extends Base
         Db::startTrans();
         $mType = new TypeEvent();
 
-        $flag = $mType->editType($attrID, $data);
+        $flag = $mType->editAttr($attrID, $data);
         if ($flag['code'] > 0) {
             Db::rollback();
         } else {
@@ -199,7 +199,7 @@ class Type extends Base
         Db::startTrans();
         $mType = new TypeEvent();
 
-        $flag = $mType->delType($attrID);
+        $flag = $mType->delAttr($attrID);
         if ($flag['code'] > 0) {
             Db::rollback();
         } else {

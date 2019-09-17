@@ -342,12 +342,11 @@ class TypeEvent extends BaseEvent
 
         //验证值是否合法 todo
         if($data['attr_type'] == 1){
+            $data['attr_values'] = trim(str_replace("，",",",$data['attr_values']),',');
+        }elseif ($data['attr_type'] == 2){
             if (!count_words($data['type_name'], 30, 'lt')) {
                 return array_err(1952197, '描述文字不能大于30');
             }
-        }elseif ($data['attr_type'] == 2){
-            str_replace("，",",",$data['attr_values']);
-            $data['attr_values'] = trim($data['attr_values'],',');
         }else{
             return array_err(19915, '属性类型设置错误');
         }
@@ -359,7 +358,7 @@ class TypeEvent extends BaseEvent
 
         $param['type_id'] = $data['type_id'];
         $param['attr_name'] = $data['attr_name'];
-        $attrRes = $mAttr->getAttrByTypeID($param);
+        $attrRes = $mAttr->getAttrByParam($param);
         if($attrRes){
             return array_err(19914, '该商品类型下存在相同的名称属性,请更换');
         }

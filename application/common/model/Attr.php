@@ -66,7 +66,7 @@ class Attr extends BaseModel
         }
 
         if (!empty($param['attr_name'])) {
-            $where['attr_name'] = ['LIKE', "%" . $param['attr_name'] . "%"];
+            $where['attr_name'] = $param['attr_name'];
         }
 
         return $where;
