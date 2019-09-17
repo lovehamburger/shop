@@ -27,15 +27,6 @@ class Attr extends BaseModel
         return $this->where($where)->column($field);
     }
 
-    /**
-     * 根据主键查询类型属性数据
-     * @param $param
-     * @param string $field
-     * @return Attr
-     */
-    public function getAttrByParam($param, $field = 'id,attr_name') {
-        return $this->where($param)->column($field);
-    }
 
     /**
      * 查询类型属性数据的数量
