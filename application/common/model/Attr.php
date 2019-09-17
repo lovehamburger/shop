@@ -34,9 +34,7 @@ class Attr extends BaseModel
      * @return Attr
      */
     public function getAttrByParam($param, $field = 'id,attr_name') {
-        $where['type_id'] = $param['type_id'];
-        $where['attr_name'] = $param['attr_name'];
-        return $this->where($where)->column($field);
+        return $this->where($param)->column($field);
     }
 
     /**
