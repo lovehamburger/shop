@@ -259,12 +259,13 @@ class TypeEvent extends BaseEvent
 
         //这边判断数据是否有变化
         foreach ($data as $k => $v) {
-            if ($v == $attrRes[$attrID]) {
+            if ($v == $attrRes[$attrID][$k]) {
                 unset($data[$k]);
             }
         }
+
         if (empty($data)) {
-            return array_err(0, '数据没有发生变化无需要修改');
+            return array_err(9189, '数据没有发生变化无需要修改');
         }
 
         $mAttr = new Attr();
@@ -310,11 +311,11 @@ class TypeEvent extends BaseEvent
      * @return array
      */
     public function checkAttrID($attrID, &$attrRes, $lock = false) {
-        $mAttr = new Type();
+        $mAttr = new Attr();
         if (empty($attrID)) {
             return array_err(1951298, '属性标识不能为空');
         }
-        $attrRes = $mAttr->getAttrByKV($attrID, $lock);
+        $attrRes = $mAttr->getAttrByKV($attrID, $lock,'id,attr_name,attr_values,attr_type,type_id');
 
         if (count($attrID) != count($attrRes)) {
             return array_err(1951297, '存在非法数据');
@@ -352,13 +353,15 @@ class TypeEvent extends BaseEvent
         }
 
         $mAttr = new Attr();
+
         if($attrID){
-            $param['attr_id'] = array('not',$data['type_id']);
+            $param['not_id'] = array('neq',$attrID);
         }
 
         $param['type_id'] = $data['type_id'];
         $param['attr_name'] = $data['attr_name'];
         $attrRes = $mAttr->getAttrByParam($param);
+
         if($attrRes){
             return array_err(19914, '该商品类型下存在相同的名称属性,请更换');
         }

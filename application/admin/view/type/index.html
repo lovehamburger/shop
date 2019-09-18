@@ -97,6 +97,9 @@
                     <div class="layui-card attr-input" hidden>
                         <div class="layui-card-body">
                             <from class="layui-form" lay-filter="component-form-element">
+                                <input type="hidden" value="" name="attr_id" data-name="id"
+                                       class="layui-input attr_id">
+
                                 <input type="hidden" value="" name="type_id" data-name="id"
                                        class="layui-input type_id">
                                 <div class="layui-row layui-col-space10 layui-form-item">
@@ -114,7 +117,7 @@
                                     <div class="layui-col-lg12">
                                         <label class="layui-form-label">属性名称：</label>
                                         <div class="layui-input-block">
-                                            <input type="text"  name="attr_name" lay-verify="required"
+                                            <input type="text" name="attr_name" lay-verify="required"
                                                    placeholder="" autocomplete="off" data-name="attr_name"
                                                    class="layui-input item-input">
                                         </div>
@@ -135,7 +138,8 @@
                                     <div class="layui-col-lg12">
                                         <label class="layui-form-label">属性值：</label>
                                         <div class="layui-input-block">
-                                            <textarea data-name="attr_values" placeholder="请输入内容" class="item-textarea layui-textarea"></textarea>
+                                            <textarea data-name="attr_values" placeholder="请输入内容"
+                                                      class="item-textarea layui-textarea"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -150,7 +154,7 @@
 
                     <div class="attr-box" hidden>
                         <div class="layui-card-body">
-                            <div class="test-table-reload-btn data-search" style="margin-bottom: 10px;">
+                            <div class="add-attr-btn data-search" style="margin-bottom: 10px;">
                                 <button class="layui-btn" id="" data-type="addAttr">新增属性</button>
                             </div>
                             <script type="text/html" id="attr-tool">
@@ -425,16 +429,6 @@
             content: $(".type-input"),
           });
         }
-        , addAttr: function () {
-          layer.open({
-            type: 1,
-            title: '属性新增',
-            area: ['30%'],
-            closeBtn: 0,
-            shadeClose: true,
-            content: $(".attr-input"),
-          });
-        }
         , getCheckLength: function () { //获取选中数目
           var checkStatus = table.checkStatus('type-data')
             , data = checkStatus.data;
@@ -584,31 +578,20 @@
         $('.item-checkbox').val(data.elem.checked);
       });
 
-      var $ = layui.$, active = {
-        addAttr: function () {
-          layer.open({
-            type: 1,
-            title: '属性新增',
-            area: ['30%'],
-            closeBtn: 0,
-            shadeClose: true,
-            content: $(".attr-input"),
-          });
-        }
-      };
+
 
       table.on('tool(type-attr)', function (obj) {
         var data = obj.data;
         console.log(data)
         if (obj.event === 'attr_detail') {
           layer.msg('ID：' + data.id + ' 的查看操作');
-        } else if (obj.event === 'del') {
+        } else if (obj.event === 'attr_del') {
           layer.confirm('真的删除行么', function (index) {
             obj.del();
             $delArr = [];
             $delArr.push(obj['data']['id']);
             $.ajax({
-              url: 'delType',
+              url: 'delAttr',
               data: {
                 id: JSON.stringify($delArr),
               },
@@ -617,35 +600,33 @@
               success: function (msg) {
                 if (msg.code > 0) {
                   layer.msg(msg.msg, {icon: 5});
-
                 } else {
                   layer.msg(msg.msg, {icon: 1});
+                  self.getAttr(data.type_id);
                 }
               }
             });
             layer.close(index);
           });
-        } else if (obj.event === 'edit') {
-          $('.type-input .item-input').each(function () {
+        } else if (obj.event === 'attr_edit') {
+          $('.attr-input .item-input').each(function () {
             var dataName = $(this).attr('data-name');
             $("input[data-name=" + dataName + "]").val(data[dataName]);
           })
 
-          $('.type-input .item-textarea').each(function () {
+          $('.attr-input .item-textarea').each(function () {
             var dataName = $(this).attr('data-name');
             $("textarea[data-name=" + dataName + "]").val(data[dataName]);
           })
 
-          $('.type-input #type_img').prop('src', data['type_img']);
+          $('.attr-input .attr_id').val(data['id']);
 
-          $('.type-input .type_id').val(data['id']);
-          if (data['status'] == 1) {
-            $('.type-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
-            $('.type-input .item-checkbox').parent().find('.layui-unselect em').html('是');
-          } else {
-            $('.type-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
-            $('.type-input .item-checkbox').parent().find('.layui-unselect em').html('否');
-          }
+          $('.attr-input .type_id').val(data['type_id']);
+
+          $('.all-attr').find("option[value= "+data.type_id+"]").prop('selected', 'selected');
+
+          $('.attr-input').find("input[value="+data.attr_type+"]").prop('checked', 'checked');
+          form.render();//!!
 
 
           // $('.data-search .item-input').each(function () {
@@ -658,17 +639,47 @@
           // })
           layer.open({
             type: 1,
-            title: '类型修改',
+            title: '属性修改',
             area: ['30%'],
             closeBtn: 0,
             shadeClose: true,
             skin: 'yourClass',
-            content: $(".type-input"),
+            content: $(".attr-input"),
           });
         }
       });
 
-      $('.test-table-operate-btn .layui-btn').on('click', function () {
+      var $ = layui.$, active = {
+        addAttr: function () {
+          $('.attr-input .item-input').each(function () {
+            var dataName = $(this).attr('data-name');
+            $("input[data-name=" + dataName + "]").val('');
+          })
+
+          $('.attr-input .item-textarea').each(function () {
+            var dataName = $(this).attr('data-name');
+            $("textarea[data-name=" + dataName + "]").val('');
+          })
+
+          $('.all-attr').find("option:eq(0)").prop('selected', 'selected');
+
+          $('.attr-input').find("input[value=1]").prop('checked', 'checked');
+
+          $('.attr-input .attr_id').val('');
+          form.render();//!!
+
+          layer.open({
+            type: 1,
+            title: '属性新增',
+            area: ['30%'],
+            closeBtn: 0,
+            shadeClose: true,
+            content: $(".attr-input"),
+          });
+        }
+      };
+
+      $('.add-attr-btn .layui-btn').on('click', function () {
         var type = $(this).data('type');
         active[type] ? active[type].call(this) : '';
       });
@@ -691,15 +702,17 @@
         self['data']['type_id'] = $(".all-attr").val();
 
 
+
+
         $('.attr-input .item-textarea').each(function () {
           var dataName = $(this).attr('data-name');
           self['data'][dataName] = $("textarea[data-name=" + dataName + "]").val();
         })
 
 
-        var $type_id = $('.type_id').val();
-
-        if ($type_id) {
+        var $attr_id = $('.attr_id').val();
+        var type_id = $('.attr-input .type_id').val();
+        if ($attr_id) {
           var $url = 'editAttr';
         } else {
           var $url = 'addAttr';
@@ -713,7 +726,7 @@
           url: $url,
           data: {
             data: JSON.stringify(self.data),
-            id: $type_id,
+            id: $attr_id,
           },
           type: 'post',
           dataType: 'json',
@@ -722,7 +735,7 @@
               layer.msg(msg.msg, {icon: 2});
             } else {
               layer.msg(msg.msg, {icon: 1});
-              self.getList();
+              self.getAttr(type_id);
             }
           }
         });
@@ -752,7 +765,7 @@
         })
       },
 
-      getAllList:function () {
+      getAllList: function () {
         $.ajax({
           url: 'getData',
           type: 'post',

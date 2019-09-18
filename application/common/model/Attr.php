@@ -61,6 +61,10 @@ class Attr extends BaseModel
             $where['id'] = ['in', $param['id']];
         }
 
+        if (!empty($param['not_id'])) {
+            $where['id'] = $param['not_id'];
+        }
+
         if (!empty($param['type_id'])) {
             $where['type_id'] = ['in', $param['type_id']];
         }

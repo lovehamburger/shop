@@ -181,7 +181,7 @@ class Type extends Base
         Db::startTrans();
         $mType = new TypeEvent();
 
-        $flag = $mType->editAttr($attrID, $data);
+        $flag = $mType->editAttr($data,$attrID);
         if ($flag['code'] > 0) {
             Db::rollback();
         } else {
