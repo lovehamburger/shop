@@ -24,9 +24,12 @@ class Goods extends BaseModel
 
     /**
      * 根据主键查询数据
-     * @param $brandID
+     * @param $param
      * @param string $field
-     * @return Goods
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function cateGoryParam($param, $field = '*') {
         return Db::name('category')->field($field)->where($param)->select();
