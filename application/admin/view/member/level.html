@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>商品会员等级</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="__PLUGINS__/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="__PLUGINS__/layuiadmin/style/admin.css" media="all">
+    <style>
+        .layui-upload-img {
+            width: 92px;
+            height: 92px;
+            margin: 0 10px 10px 0;
+        }
+    </style>
+<body layadmin-themealias="default">
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>组件</cite></a>
+        <a><cite>数据表格</cite></a>
+        <a><cite>数据操作</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">数据操作</div>
+                <div class="layui-card-body">
+                    <div class="layui-btn-group test-table-operate-btn" style="margin-bottom: 10px;">
+                        <button class="layui-btn" data-type="delLevel">删除会员等级</button>
+
+                        <button class="layui-btn layui-btn-normal" data-type="addLevel">新增会员等级</button>
+                        <!--                        <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>-->
+                        <!--                        <button class="layui-btn" data-type="isAll">验证是否全选</button>-->
+                    </div>
+                    <div class="test-table-reload-btn data-search" style="margin-bottom: 10px;">
+                        搜索ID：
+                        <div class="layui-inline">
+                            <input class="layui-input item-input" name="id" id="id" autocomplete="off">
+                        </div>
+                        会员等级名称：
+                        <div class="layui-inline">
+                            <input class="layui-input item-input" name="id" id="level_name" autocomplete="off">
+                        </div>
+
+                        <button class="layui-btn" id="search" data-type="reload">搜索</button>
+                    </div>
+                    <table class="layui-hide" id="level-data" lay-filter="level-data"></table>
+
+
+                    <script type="text/html" id="test-table-switchTpl">
+                        <!-- 这里的 checked 的状态只是演示 -->
+                        <input type="checkbox" name="状态" lay-skin="switch" lay-text="是|否"
+                               lay-filter="test-table-status"
+                               value="{{ d.status }}" data-json="{{ encodeURIComponent(JSON.stringify(d)) }}" {{
+                               d.status==
+                               1 ? 'checked' : '' }}>
+                    </script>
+
+                    <script type="text/html" id="test-table-operate-barDemo">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="attr">属性</a>
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    </script>
+
+                    <div class="layui-card level-input" hidden>
+                        <div class="layui-card-body">
+                            <from class="layui-form" lay-filter="component-form-element">
+                                <input type="hidden" value="" name="level_id" data-name="id"
+                                       class="layui-input level_id">
+                                <div class="layui-row layui-col-space10 layui-form-item">
+                                    <div class="layui-col-lg12">
+                                        <label class="layui-form-label">等级名称：</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" value="" name="level_name" lay-verify="required"
+                                                   placeholder="" autocomplete="off" data-name="level_name"
+                                                   class="layui-input item-input">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-row layui-col-space10 layui-form-item">
+                                    <div class="layui-col-lg12">
+                                        <label class="layui-form-label">等级下线：</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" value="" name="bom_point" lay-verify="required"
+                                                   placeholder="" autocomplete="off" data-name="bom_point"
+                                                   class="layui-input item-input">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-row layui-col-space10 layui-form-item">
+                                    <div class="layui-col-lg12">
+                                        <label class="layui-form-label">等级上线：</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" value="" name="top_point" lay-verify="required"
+                                                   placeholder="" autocomplete="off" data-name="top_point"
+                                                   class="layui-input item-input">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-row layui-col-space10 layui-form-item">
+                                    <div class="layui-col-lg12">
+                                        <label class="layui-form-label">折扣率：</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" value="" name="rate" lay-verify="required"
+                                                   placeholder="" autocomplete="off" data-name="rate"
+                                                   class="layui-input item-input">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <div class="layui-input-block">
+                                        <button class="layui-btn data-send" lay-submit="">立即提交</button>
+                                    </div>
+                                </div>
+                            </from>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="__PLUGINS__/jquery.min.js"></script>
+<script src="__PLUGINS__/layuiadmin/layui/layui.js"></script>
+
+
+<script>
+
+  layui.config({
+    base: '/public/plugins/layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'table', 'form', 'upload', 'layer'], function () {
+    var table = layui.table
+      , form = layui.form
+      , upload = layui.upload
+      , admin = layui.admin;
+
+
+    function Level() {
+      var self = this;
+      self.param = {}
+      self.data = {}
+
+      layer.ready(function () {
+        self.getList();
+      });
+
+      //监听表格复选框选择
+      table.on('checkbox(type-data)', function (obj) {
+        console.log(obj)
+      });
+
+      //弹出新增 修改框中checkbox的状态
+      form.on('switch(type-status)', function (data) {
+        $('.item-checkbox').val(data.elem.checked);
+      });
+
+      //监听状态操作
+      form.on('switch(test-table-status)', function (obj) {
+
+        var json = JSON.parse(decodeURIComponent($(this).data('json')));
+        layer.tips(this.value + ' ' + this.name + '：' + obj.elem.checked, obj.othis);
+        json = table.clearCacheKey(json);
+        if (obj.elem.checked) {
+          var state = 1
+        } else {
+          var state = 0
+        }
+        var index = layer.load(2);
+        $.ajax({
+          url: 'setState',
+          data: {
+            id: json.id,
+            state: state,
+          },
+          type: 'post',
+          dataLevel: 'json',
+          success: function (msg) {
+            if (msg.code > 0) {
+              layer.msg(msg.msg, {icon: 5});
+              if (obj.value == 1) {
+                obj.othis.parent().find('.layui-unselect').addClass('layui-form-onswitch')
+                obj.othis.parent().find('.layui-unselect em').html('关')
+              } else {
+                obj.othis.parent().find('.layui-unselect').removeClass('layui-form-onswitch')
+                obj.othis.parent().find('.layui-unselect em').html('开')
+              }
+            }
+            layer.close(index)
+          }
+        });
+      });
+
+      //监听工具条
+      table.on('tool(level-data)', function (obj) {
+        var data = obj.data;
+
+        if (obj.event === 'attr') {
+          layer.open({
+            type: 1,
+            maxmin: true, //开启最大化最小化按钮
+            title: '(' + data.type_name + ')会员等级属性',
+            area: '50%',
+            offset: '100px',
+            closeBtn: 1,
+            shadeClose: true,
+            content: $(".attr-box"),
+          });
+        } else if (obj.event === 'del') {
+          layer.confirm('真的删除行么', function (index) {
+            obj.del();
+            $delArr = [];
+            $delArr.push(obj['data']['id']);
+            $.ajax({
+              url: 'delLevel',
+              data: {
+                id: JSON.stringify($delArr),
+              },
+              type: 'post',
+              dataLevel: 'json',
+              success: function (msg) {
+                if (msg.code > 0) {
+                  layer.msg(msg.msg, {icon: 5});
+
+                } else {
+                  layer.msg(msg.msg, {icon: 1});
+                }
+              }
+            });
+            layer.close(index);
+          });
+        } else if (obj.event === 'edit') {
+          $('.level-input .item-input').each(function () {
+            var dataName = $(this).attr('data-name');
+            $("input[data-name=" + dataName + "]").val(data[dataName]);
+          })
+
+          $('.level-input .item-textarea').each(function () {
+            var dataName = $(this).attr('data-name');
+            $("textarea[data-name=" + dataName + "]").val(data[dataName]);
+          })
+
+          $('.level-input #type_img').prop('src', data['type_img']);
+
+          $('.level-input .type_id').val(data['id']);
+          if (data['status'] == 1) {
+            $('.level-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
+            $('.level-input .item-checkbox').parent().find('.layui-unselect em').html('是');
+          } else {
+            $('.level-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
+            $('.level-input .item-checkbox').parent().find('.layui-unselect em').html('否');
+          }
+
+
+          // $('.data-search .item-input').each(function () {
+          //   var dataName = $(this).attr('id');
+          //   var val = $.trim($(this).val());
+          //   self.param[dataName] = val
+          //   if (self.param[dataName] == '') {
+          //     delete self.param[dataName];
+          //   }
+          // })
+          layer.open({
+            type: 1,
+            title: '会员等级修改',
+            area: ['30%'],
+            closeBtn: 0,
+            shadeClose: true,
+            skin: 'yourClass',
+            content: $(".level-input"),
+          });
+        }
+      });
+
+      var $ = layui.$, active = {
+        reload: function () {
+          $('.data-search .item-input').each(function () {
+            var dataName = $(this).attr('id');
+            var val = $.trim($(this).val());
+            self.param[dataName] = val
+            if (self.param[dataName] == '') {
+              delete self.param[dataName];
+            }
+          })
+          //执行重载
+          table.reload('level-data', {
+            page: {
+              curr: 1 //重新从第 1 页开始
+            }
+            , where: {
+              param: JSON.stringify(self.param)
+            }
+          });
+        }
+        , delLevel: function () { //获取选中数据
+          layer.confirm('真的删除全部吗?', function (index) {
+            var checkStatus = table.checkStatus('type-data')
+              , data = checkStatus.data;
+            var $id = [];
+            $.each(data, function (i, el) {
+              $id.push(el.id);
+            })
+            if ($id) {
+              $.ajax({
+                url: 'delLevel',
+                data: {
+                  id: JSON.stringify($id),
+                },
+                type: 'post',
+                dataLevel: 'json',
+                success: function (msg) {
+                  if (msg.code > 0) {
+                    layer.msg(msg.msg, {icon: 5});
+                  } else {
+                    layer.msg(msg.msg, {icon: 1});
+                    self.getList();
+                  }
+                  layer.close(index)
+                }
+              });
+            }
+          })
+        }
+        , setSort: function () { //获取选中数据
+          var allLevelData = table.cache['type-data']
+          var $id = {};
+
+          $.each(allLevelData, function (i, el) {
+            $id[el.id] = el.sort;
+          })
+
+          if ($id) {
+            $.ajax({
+              url: 'setSort',
+              data: {
+                sort: JSON.stringify($id),
+              },
+              type: 'post',
+              dataLevel: 'json',
+              success: function (msg) {
+                if (msg.code > 0) {
+                  layer.msg(msg.msg, {icon: 5});
+                } else {
+                  layer.msg(msg.msg, {icon: 1});
+                  self.getList();
+                }
+                layer.close(index)
+              }
+            });
+          }
+        }
+        , addLevel: function () {
+          $('.type-input .item-input').each(function () {
+            var dataName = $(this).attr('data-name');
+            $("input[data-name=" + dataName + "]").val('');
+          })
+
+          $('.type-input .item-textarea').each(function () {
+            var dataName = $(this).attr('data-name');
+            $("textarea[data-name=" + dataName + "]").val('');
+          })
+
+          $('.type-input #type_img').prop('src', '/public/static/common/img/default.png');
+
+          $('.type-input .type_id').val('');
+          layer.open({
+            type: 1,
+            title: '会员等级新增',
+            area: ['30%'],
+            closeBtn: 0,
+            shadeClose: true,
+            skin: 'yourClass',
+            content: $(".level-input"),
+          });
+        }
+        , getCheckLength: function () { //获取选中数目
+          var checkStatus = table.checkStatus('type-data')
+            , data = checkStatus.data;
+          layer.msg('选中了：' + data.length + ' 个');
+        }
+        , isAll: function () { //验证是否全选
+          var checkStatus = table.checkStatus('type-data');
+          layer.msg(checkStatus.isAll ? '全选' : '未全选')
+        }
+      };
+
+      $('.test-table-operate-btn .layui-btn').on('click', function () {
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+      });
+
+      //提交数据
+      $('.data-send').click(function () {
+        var flag = false;
+
+        $('.type-input .item-input').each(function () {
+          var dataName = $(this).attr('data-name');
+          self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
+          if (dataName == 'type_name' && self['data'][dataName] == '') {
+            $("input[data-name=" + dataName + "]").addClass('layui-form-danger');
+            flag = true;
+          }
+        })
+
+        $('.type-input .item-checkbox').each(function () {
+          var dataName = $(this).attr('data-name');
+          self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
+          console.log(self['data'][dataName]);
+          if (self['data'][dataName] == "true") {
+            self['data'][dataName] = 1;
+          } else {
+            self['data'][dataName] = 0;
+          }
+        })
+
+
+        $('.type-input .item-textarea').each(function () {
+          var dataName = $(this).attr('data-name');
+          self['data'][dataName] = $("textarea[data-name=" + dataName + "]").val();
+        })
+
+        self['data']['type_img'] = $('.type-input #type_img').attr('src');
+
+        var $type_id = $('.type_id').val();
+
+        if ($type_id) {
+          var $url = 'editLevel';
+        } else {
+          var $url = 'addLevel';
+        }
+
+        if (flag) {
+          return;
+        }
+
+        $.ajax({
+          url: $url,
+          data: {
+            data: JSON.stringify(self.data),
+            id: $type_id,
+          },
+          type: 'post',
+          dataLevel: 'json',
+          success: function (msg) {
+            if (msg.code > 0) {
+              layer.msg(msg.msg, {icon: 2});
+            } else {
+              layer.msg(msg.msg, {icon: 1});
+              self.getList();
+            }
+          }
+        });
+      })
+
+      //搜索
+      $('.test-table-reload-btn .layui-btn').on('click', function () {
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+      });
+
+      //普通图片上传
+      var uploadInst = upload.render({
+        elem: '#test-upload-normal'
+        , url: 'upload'
+        , field: 'image'
+        , before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+          layer.load('loading'); //上传loading
+        }
+        , done: function (res) {
+          //如果上传失败
+          layer.closeAll('loading'); //关闭loading
+          if (res.code > 0) {
+            return layer.msg('上传失败');
+          }
+          $('#type_img').attr('src', res.file.saveFiles); //图片链接（base64）
+          //上传成功
+        }
+
+        , error: function () {
+          //演示失败状态，并实现重传
+          var demoText = $('#test-upload-demoText');
+          demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+          demoText.find('.demo-reload').on('click', function () {
+            uploadInst.upload();
+          });
+        }
+      });
+    }
+
+    Level.prototype = {
+      constructor: Level,
+      getList: function () {
+        table.render({
+          elem: '#level-data'
+          , method: 'post'
+          , url: 'getData'
+          , cols: [[
+            {type: 'checkbox', fixed: 'left'}
+            , {field: 'id', width: 90, title: 'ID', sort: true, fixed: 'left'}
+            , {field: 'level_name', width: 450, title: '会员等级名称'}
+            , {field: 'bom_point', width: 200, title: '等级下线'}
+            , {field: 'top_point', width: 200, title: '等级上线'}
+            , {field: 'rate', width: 200, title: '折扣率'}
+            , {width: 450, align: 'center', toolbar: '#test-table-operate-barDemo'}
+          ]]
+          , page: true
+        })
+      },
+
+    }
+
+
+    var levelObj = new Level();
+  });
+</script>
+</body>
+
