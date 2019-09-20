@@ -2,15 +2,16 @@
 
 namespace app\common\model;
 /**
- * 商品类型模型
+ * 等级模型
  */
 class MemberLevel extends BaseModel
 {
     /**
-     * 根据主键查询类型数据
+     * 根据主键查询等级数据
      * @param $memberLevelID
+     * @param bool $lock
      * @param string $field
-     * @return MemberLevel
+     * @return array
      */
     public function getMemberLevelByKV($memberLevelID, $lock = false, $field = 'id,level_name') {
         $where['id'] = ['in', $memberLevelID];
@@ -21,7 +22,7 @@ class MemberLevel extends BaseModel
     }
 
     /**
-     * 查询类型数据的数量
+     * 查询等级数据的数量
      * @param array $param
      * @return int|string
      */
@@ -31,7 +32,7 @@ class MemberLevel extends BaseModel
     }
 
     /**
-     * 获取类型数据
+     * 获取等级数据
      * @param array $param
      * @param string $field
      * @return false|\PDOStatement|string|\think\Collection
@@ -53,8 +54,12 @@ class MemberLevel extends BaseModel
             $where['id'] = ['in', $param['id']];
         }
 
+        if (!empty($param['not_id'])) {
+            $where['id'] = ['in', $param['id']];
+        }
+
         if (!empty($param['level_name'])) {
-            $where['level_name'] = ['LIKE', "%" . $param['level_name'] . "%"];
+            $where['level_name'] = $param['level_name'];
         }
 
         return $where;
