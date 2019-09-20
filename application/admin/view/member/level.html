@@ -65,7 +65,6 @@
                     </script>
 
                     <script type="text/html" id="test-table-operate-barDemo">
-                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="attr">属性</a>
                         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
                         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
                     </script>
@@ -156,7 +155,7 @@
       });
 
       //监听表格复选框选择
-      table.on('checkbox(type-data)', function (obj) {
+      table.on('checkbox(level-data)', function (obj) {
         console.log(obj)
       });
 
@@ -204,19 +203,7 @@
       //监听工具条
       table.on('tool(level-data)', function (obj) {
         var data = obj.data;
-
-        if (obj.event === 'attr') {
-          layer.open({
-            type: 1,
-            maxmin: true, //开启最大化最小化按钮
-            title: '(' + data.type_name + ')会员等级属性',
-            area: '50%',
-            offset: '100px',
-            closeBtn: 1,
-            shadeClose: true,
-            content: $(".attr-box"),
-          });
-        } else if (obj.event === 'del') {
+        if (obj.event === 'del') {
           layer.confirm('真的删除行么', function (index) {
             obj.del();
             $delArr = [];
@@ -252,7 +239,7 @@
 
           $('.level-input #type_img').prop('src', data['type_img']);
 
-          $('.level-input .type_id').val(data['id']);
+          $('.level-input .level_id').val(data['id']);
           if (data['status'] == 1) {
             $('.level-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
             $('.level-input .item-checkbox').parent().find('.layui-unselect em').html('是');
@@ -304,7 +291,7 @@
         }
         , delLevel: function () { //获取选中数据
           layer.confirm('真的删除全部吗?', function (index) {
-            var checkStatus = table.checkStatus('type-data')
+            var checkStatus = table.checkStatus('level-data')
               , data = checkStatus.data;
             var $id = [];
             $.each(data, function (i, el) {
@@ -332,7 +319,7 @@
           })
         }
         , setSort: function () { //获取选中数据
-          var allLevelData = table.cache['type-data']
+          var allLevelData = table.cache['level-data']
           var $id = {};
 
           $.each(allLevelData, function (i, el) {
@@ -360,19 +347,12 @@
           }
         }
         , addLevel: function () {
-          $('.type-input .item-input').each(function () {
+          $('.level-input .item-input').each(function () {
             var dataName = $(this).attr('data-name');
             $("input[data-name=" + dataName + "]").val('');
           })
 
-          $('.type-input .item-textarea').each(function () {
-            var dataName = $(this).attr('data-name');
-            $("textarea[data-name=" + dataName + "]").val('');
-          })
-
-          $('.type-input #type_img').prop('src', '/public/static/common/img/default.png');
-
-          $('.type-input .type_id').val('');
+          $('.level-input .level_id').val('');
           layer.open({
             type: 1,
             title: '会员等级新增',
@@ -403,7 +383,7 @@
       $('.data-send').click(function () {
         var flag = false;
 
-        $('.type-input .item-input').each(function () {
+        $('.level-input .item-input').each(function () {
           var dataName = $(this).attr('data-name');
           self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
           if (dataName == 'type_name' && self['data'][dataName] == '') {
@@ -412,28 +392,9 @@
           }
         })
 
-        $('.type-input .item-checkbox').each(function () {
-          var dataName = $(this).attr('data-name');
-          self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
-          console.log(self['data'][dataName]);
-          if (self['data'][dataName] == "true") {
-            self['data'][dataName] = 1;
-          } else {
-            self['data'][dataName] = 0;
-          }
-        })
+        var $level_id = $('.level_id').val();
 
-
-        $('.type-input .item-textarea').each(function () {
-          var dataName = $(this).attr('data-name');
-          self['data'][dataName] = $("textarea[data-name=" + dataName + "]").val();
-        })
-
-        self['data']['type_img'] = $('.type-input #type_img').attr('src');
-
-        var $type_id = $('.type_id').val();
-
-        if ($type_id) {
+        if ($level_id) {
           var $url = 'editLevel';
         } else {
           var $url = 'addLevel';
@@ -447,7 +408,7 @@
           url: $url,
           data: {
             data: JSON.stringify(self.data),
-            id: $type_id,
+            id: $level_id,
           },
           type: 'post',
           dataLevel: 'json',

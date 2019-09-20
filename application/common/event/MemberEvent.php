@@ -3,7 +3,6 @@
 
 namespace app\common\event;
 
-use app\common\model\Level;
 use think\Db;
 use app\common\model\MemberLevel;
 
@@ -39,7 +38,7 @@ class MemberEvent extends BaseEvent
      * @param $levelID
      * @return array
      */
-    public function editLevel($data,$levelID){
+    public function editLevel($levelID,$data){
         $levelRes = array();
         $flag = $this->checkLevelID($levelID, $levelRes, true);
         if ($flag['code'] > 0) {
@@ -78,7 +77,7 @@ class MemberEvent extends BaseEvent
      * @param $levelID
      * @return array
      */
-    public function delMember($levelID) {
+    public function delLevel($levelID) {
         $levelRes = array();
         $flag = $this->checkLevelID($levelID, $levelRes, true);
 
@@ -110,8 +109,7 @@ class MemberEvent extends BaseEvent
         if (empty($levelID)) {
             return array_err(1951298, '属性标识不能为空');
         }
-        $levelRes = $mMemberLevel->getMemberByKV($levelID, $lock,'id,member_name,member_values,member_type,type_id');
-
+        $levelRes = $mMemberLevel->getLevelByKV($levelID, $lock,'id,level_name,bom_point,top_point,rate');
         if (count($levelID) != count($levelRes)) {
             return array_err(1951297, '存在非法数据');
         }
@@ -147,7 +145,7 @@ class MemberEvent extends BaseEvent
         }
 
         $param['level_name'] = $data['level_name'];
-        $levelRes = $mMemberLevel->getMemberByParam($param);
+        $levelRes = $mMemberLevel->getLevelByParam($param);
 
         if($levelRes){
             return array_err(19914, '该等级已存在相同的名称,请更换');

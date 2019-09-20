@@ -13,7 +13,7 @@ use app\common\util\FilesUtil;
 
 class Member extends Base
 {
-    /**
+    /**addlevel
      * 会员等级列表页面
      * @return mixed
      */
@@ -40,11 +40,11 @@ class Member extends Base
         //条数的限制
         //dealPage();
         $data = array_err(0, 'success');
-        $count = $mMemberLevel->getMemberLevelByParamCnt($param);
+        $count = $mMemberLevel->getLevelByParamCnt($param);
         $data['count'] = $count;
         $MemberLevelRes = array();
         if ($count) {
-            $MemberLevelRes = $mMemberLevel->getMemberLevelByParam($param);
+            $MemberLevelRes = $mMemberLevel->getLevelByParam($param);
         }
 
         $data['data'] = $MemberLevelRes;
@@ -55,14 +55,14 @@ class Member extends Base
      * 修改会员等级数据
      * @return array
      */
-    public function editMember() {
+    public function editlevel() {
         $this->_inputAjax();
         $data = json_decode_html(input('data'));
-        $MemberID = input('id/d');
+        $levelID = input('id/d');
         Db::startTrans();
         $mMember = new MemberEvent();
 
-        $flag = $mMember->editMember($MemberID, $data);
+        $flag = $mMember->editlevel($levelID, $data);
         if ($flag['code'] > 0) {
             Db::rollback();
         } else {
@@ -71,13 +71,13 @@ class Member extends Base
         return $flag;
     }
 
-    public function addMember() {
+    public function addLevel() {
         $this->_inputAjax();
         $data = json_decode_html(input('data'));
 
         $mMember = new MemberEvent();
 
-        $flag = $mMember->addMember($data);
+        $flag = $mMember->addLevel($data);
 
         return $flag;
     }
@@ -86,13 +86,13 @@ class Member extends Base
      * 删除会员等级
      * @return array
      */
-    public function delMember() {
+    public function delLevel() {
         $this->_inputAjax();
         $MemberID = json_decode_html(input('id'));
         Db::startTrans();
         $mMember = new MemberEvent();
 
-        $flag = $mMember->delMember($MemberID);
+        $flag = $mMember->delLevel($MemberID);
         if ($flag['code'] > 0) {
             Db::rollback();
         } else {

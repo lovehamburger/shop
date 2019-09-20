@@ -8,13 +8,13 @@ class MemberLevel extends BaseModel
 {
     /**
      * 根据主键查询等级数据
-     * @param $memberLevelID
+     * @param $levelID
      * @param bool $lock
      * @param string $field
      * @return array
      */
-    public function getMemberLevelByKV($memberLevelID, $lock = false, $field = 'id,level_name') {
-        $where['id'] = ['in', $memberLevelID];
+    public function getLevelByKV($levelID, $lock = false, $field = 'id,level_name') {
+        $where['id'] = ['in', $levelID];
         if ($lock) {
             return $this->where($where)->master()->lock($lock)->column($field);
         }
@@ -26,7 +26,7 @@ class MemberLevel extends BaseModel
      * @param array $param
      * @return int|string
      */
-    public function getMemberLevelByParamCnt($param = array()) {
+    public function getLevelByParamCnt($param = array()) {
         $where = $this->_makeParam($param);
         return $this->where($where)->count();
     }
@@ -40,7 +40,7 @@ class MemberLevel extends BaseModel
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getMemberLevelByParam($param = array(), $field = 'id,level_name,bom_point,top_point,rate') {
+    public function getLevelByParam($param = array(), $field = 'id,level_name,bom_point,top_point,rate') {
         $where = $this->_makeParam($param);
         return $this->where($where)->field($field)
                                 ->limit(($param['curr_page'] - 1) * $param['page_count'], $param['page_count'])
