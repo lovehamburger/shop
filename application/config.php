@@ -247,6 +247,12 @@ return [
             'ext' =>'png,jpg,jpeg',
             'thumb' =>true,
         ],
+        'goods' => [
+            'size' =>'1242880',
+            'save_dir' =>'goods',
+            'ext' =>'png,jpg,jpeg',
+            'thumb' =>true,
+        ],
         'link' => [
             'size' =>'1242880',
             'save_dir' =>'links',

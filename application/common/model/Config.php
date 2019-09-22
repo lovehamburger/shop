@@ -7,21 +7,20 @@ namespace app\common\model;
 class Config extends BaseModel
 {
 
-    public function getConfTypeNameAttr($value)
-    {
-        $conftype = [1=>'网店配置',2=>'商品配置'];
+    public function getConfTypeNameAttr($value) {
+        $conftype = [1 => '网店配置', 2 => '商品配置'];
         return $conftype[$value];
     }
 
 
     /**
      * 根据主键查询配置数据
-     * @param $brandID
+     * @param $configID
      * @param string $field
      * @return Config
      */
-    public function getConfigByKV($brandID, $lock = false, $field = 'id,ename,cname,form_type,conf_type,values,value,sort,status') {
-        $where['id'] = ['in', $brandID];
+    public function getConfigByKV($configID, $lock = false, $field = 'id,ename,cname,form_type,conf_type,values,value,sort,status') {
+        $where['id'] = ['in', $configID];
         if ($lock) {
             return $this->where($where)->master()->lock($lock)->column($field);
         }
@@ -38,6 +37,11 @@ class Config extends BaseModel
         return $this->where($where)->count();
     }
 
+    public function getConfigByEn($eName, $field = 'id,values,value') {
+        $where['ename'] = ['in', $eName];
+        return $this->where($where)->field($field)->order('sort')->select();
+    }
+
     /**
      * 获取配置数据
      * @param array $param
@@ -50,9 +54,9 @@ class Config extends BaseModel
     public function getConfigByParam($param = array(), $field = 'id,ename,cname,form_type,conf_type,values,value,sort,status') {
         $where = $this->_makeParam($param);
         return $this->where($where)->field($field)
-                                ->limit(($param['curr_page'] - 1) * $param['page_count'], $param['page_count'])
-                                ->order('sort,id desc')
-                                ->select();
+            ->limit(($param['curr_page'] - 1) * $param['page_count'], $param['page_count'])
+            ->order('sort,id desc')
+            ->select();
     }
 
 
@@ -67,11 +71,11 @@ class Config extends BaseModel
         }
 
         if (!empty($param['ename'])) {
-            $where['ename'] = ['=',$param['ename']];
+            $where['ename'] = ['=', $param['ename']];
         }
 
         if (!empty($param['conf_type'])) {
-            $where['conf_type'] = ['=',$param['conf_type']];
+            $where['conf_type'] = ['=', $param['conf_type']];
         }
 
         return $where;

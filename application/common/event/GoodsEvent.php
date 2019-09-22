@@ -3,6 +3,7 @@
 
 namespace app\common\event;
 
+use app\common\model\Brand;
 use think\Db;
 use app\common\model\Goods;
 
@@ -137,12 +138,12 @@ class GoodsEvent extends BaseEvent
     }
 
     /**
-     * 添加品牌数据
+     * 添加商品数据
      * @param $data
      * @return array
      */
-    public function addGoods($data) {
-        $flag = $this->checkGoodsData($data);
+    public function addGoods($goodsBase,$goodsPrice,$goodsAttr) {
+        $flag = $this->checkGoodsData($goodsBase,$goodsPrice,$goodsAttr);
 
         if ($flag['code'] > 0) {
             return $flag;
@@ -200,36 +201,118 @@ class GoodsEvent extends BaseEvent
         return array_err(0,'success');
     }
 
-    public function checkGoodsData(&$data, $brandID = '') {
-
-        if (empty($data['brand_name'])) {
-            return array_err(1952199, '品牌名称不能为空');
+    /**
+     * 检查商品数据
+     * @param $goodsBase [] 商品基础数据
+     * @param $goodsPrice 商品价格数据
+     * @param $goodsAttr 商品属性数据
+     * @return array
+     */
+    public function checkGoodsData(&$goodsBase,$goodsPrice,$goodsAttr) {
+        if(empty($goodsBase['goods_name'])){
+            return array_err(92299, '商品名称不能为空');
         }
 
-        if ($data['brand_state'] != 0 && $data['brand_name'] != 1) {
-            return array_err(1952198, '品牌状态错误');
+        if(empty($goodsBase['markte_price'])){
+            return array_err(92299, '市场价格为必填');
         }
 
-        if (!count_words($data['brand_description'], 200, 'lt') && !empty($data['brand_description'])) {
-            return array_err(1952197, '描述文字不能大于200');
+        if(empty($goodsBase['shop_price'])){
+            return array_err(92299, '零售价格为必填');
         }
 
-        if (!empty($data['brand_url'])) {
-            $data['brand_url'] = right_url($data['brand_url']);
+        if(isset($goodsBase['category_id'])){
+            $mGoods = new Goods();
+            if(!empty($goodsBase['category_id'])){
+                $cateRes = $mGoods->getGoodsCateByKV($goodsBase['category_id'],false,'id,show_cate');
+                if(empty($cateRes)){
+                    return array_err(197318, '请设置正确的所属分类');
+                }
+                if($cateRes[$goodsBase['category_id']] == 0){
+                    return array_err(197317, '所属分类为关闭状态,请先开启');
+                }
+            }else{
+                return array_err(197318, '所属分类不能为空');
+            }
         }
 
-        $param['brand_name'] = $data['brand_name'];
-
-        if ($brandID) {
-            $param['id'] = array('neq', $brandID);
+        if(isset($goodsBase['brand_id'])){
+            $mBrand = new Brand();
+            if(!empty($goodsBase['brand_id'])){
+                $cateRes = $mBrand->getBreadByKV($goodsBase['brand_id'],false,'id,status');
+                if(empty($cateRes)){
+                    return array_err(197318, '请设置正确的品牌');
+                }
+                if($cateRes[$goodsBase['brand_id']] == 0){
+                    return array_err(197317, '所属品牌为关闭状态,请先开启');
+                }
+            }
         }
 
-        $brandRes = Db::name('brand')->where($param)->find();
-
-        if ($brandRes) {
-            return array_err(1952196, '品牌名称已经被使用,请更换');
+        if(isset($goodsBase['goods_weight']) && !is_numeric($goodsBase['goods_weight'])){
+            return array_err(197317, '商品重量必须是数字');
         }
 
+        if(!is_numeric($goodsBase['markte_price']) || !is_numeric($goodsBase['shop_price'])){
+            return array_err(197317, '价格必须是数字');
+        }
+
+        if($goodsBase['on_sale'] != 1 || $goodsBase['on_sale'] != 0){
+            return array_err(197317, '是否上下架标识错误');
+        }
+
+        if(!empty($goodsPrice)){
+            $checkGoodsPrice = $this->_checkGoodsPrice($goodsPrice);
+            if($checkGoodsPrice['err_code'] > 0){
+                return $checkGoodsPrice;
+            }
+        }
+
+        if(!empty($goodsAttr)){
+            $checkGoodsAttr = $this->_checkGoodsAttr($goodsAttr);
+            if($checkGoodsAttr['err_code'] > 0){
+                return $checkGoodsAttr;
+            }
+        }
+
+        return array_err(0, 'success');
+    }
+
+    /**
+     * @param $goodsPrice
+     * @return array
+     */
+    protected function _checkGoodsPrice($goodsPrice){
+        $eMemberEvent =  new MemberEvent();
+        $checkLevelFlag = $eMemberEvent->checkLevelID(array_keys($goodsPrice),$levelRes);
+        if($checkLevelFlag['err_code'] > 0){
+            return $checkLevelFlag;
+        }
+
+        foreach ($goodsPrice as $k=>$v){
+            if(!is_numeric($v)){
+                return array_err(9777, '等级价格必须为数字');
+            }
+        }
+
+        return array_err(0, 'success');
+    }
+
+
+    protected function _checkGoodsAttr($goodsAttr){
+        $mTypeEvent = new TypeEvent();
+        $typeRes = [];
+        $checkTypeFlag = $mTypeEvent->checkTypeID($goodsAttr['type_id'],$typeRes);
+        if($checkTypeFlag['err_code'] > 0){
+            return $checkTypeFlag;
+        }
+
+        $arrAttrID = array_column($goodsAttr,'attr_id');
+        $attrRes = [];
+        $checkAttrFlag = $mTypeEvent->checkAttrID($arrAttrID,$attrRes);
+        if($checkAttrFlag['err_code'] > 0){
+            return $checkAttrFlag;
+        }
         return array_err(0, 'success');
     }
 

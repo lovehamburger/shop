@@ -102,12 +102,22 @@ class Goods extends Base
 
     public function addGoods() {
         $this->_inputAjax();
-        $data = json_decode_html(input('data'));
-
+        $goodsBase = json_decode_html(input('goods_base'));
+        $goodsPrice = json_decode_html(input('goods_price'));
+        $goodsAttr = json_decode_html(input('goods_attr'));
+        echo'<pre>';
+            print_r($goodsAttr);
+        echo'</pre>';
+        die();
+        Db::startTrans();
         $mGoods = new GoodsEvent();
 
-        $flag = $mGoods->addGoods($data);
-
+        $flag = $mGoods->addGoods($goodsBase,$goodsPrice,$goodsAttr);
+        if ($flag['code'] > 0) {
+            Db::rollback();
+        } else {
+            Db::commit();
+        }
         return $flag;
     }
 
@@ -137,10 +147,10 @@ class Goods extends Base
     public function upload() {
         $this->_inputAjax();
         $files = new FilesUtil();
-        $files->size = config('uploads.goods_brand')['size'];
-        $files->saveDir = config('uploads.goods_brand')['save_dir'];
-        $files->ext = config('uploads.goods_brand')['ext'];
-        $files->thumb = config('uploads.goods_brand')['thumb'];
+        $files->size = config('uploads.goods')['size'];
+        $files->saveDir = config('uploads.goods')['save_dir'];
+        $files->ext = config('uploads.goods')['ext'];
+        $files->thumb = config('uploads.goods')['thumb'];
         return $flag = $files->uploads('image');
     }
 

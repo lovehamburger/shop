@@ -209,9 +209,6 @@ class ConfigEvent extends BaseEvent
         if(in_array($data['form_type'] ,array('select','checkbox','radio'))){
             $data['values'] = trim(str_replace('，',',',$data['values']),',');
             $data['value'] = trim(str_replace('，',',',$data['value']),',');
-        }else{
-            $data['values'] = '';
-            $data['value'] = '';
         }
 
         if(empty($data['ename'])){
