@@ -245,7 +245,7 @@ return [
             'size' =>'1242880',
             'save_dir' =>'brands',
             'ext' =>'png,jpg,jpeg',
-            'thumb' =>true,
+            'thumb' =>false,
         ],
         'goods' => [
             'size' =>'1242880',
@@ -257,13 +257,13 @@ return [
             'size' =>'1242880',
             'save_dir' =>'links',
             'ext' =>'png,jpg,jpeg',
-            'thumb' =>true,
+            'thumb' =>false,
         ],
         'logo' => [
             'size' =>'1242880',
             'save_dir' =>'logo',
             'ext' =>'png,jpg,jpeg',
-            'thumb' =>true,
+            'thumb' =>false,
         ],
     ]
 ];

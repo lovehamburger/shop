@@ -105,10 +105,6 @@ class Goods extends Base
         $goodsBase = json_decode_html(input('goods_base'));
         $goodsPrice = json_decode_html(input('goods_price'));
         $goodsAttr = json_decode_html(input('goods_attr'));
-        echo'<pre>';
-            print_r($goodsAttr);
-        echo'</pre>';
-        die();
         Db::startTrans();
         $mGoods = new GoodsEvent();
 

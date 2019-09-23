@@ -164,8 +164,8 @@
                                                     <button type="button" class="layui-btn" id="test-upload-normal">上传图片
                                                     </button>
                                                     <div class="layui-upload-list">
-                                                        <img class="layui-upload-img"
-                                                             src="/public/static/common/img/default.png"
+                                                        <img class="layui-upload-img" alt=""
+
                                                              id="master_img">
                                                         <p id="test-upload-demoText"></p>
                                                     </div>
@@ -261,6 +261,7 @@
             self.goods_price = {}
             self.goods_base = {}
             self.goods_attr = {}
+            self.goods_photo = {}
             layer.ready(function () {
               self.getCateGory();
               self.getBrand();
@@ -289,6 +290,15 @@
                   goods_price: JSON.stringify(self.goods_price),
                   goods_base: JSON.stringify(self.goods_base),
                   goods_attr: JSON.stringify(self.goods_attr),
+                  goods_photo: JSON.stringify(self.goods_photo),
+                },
+                success: function (msg) {
+                  if (msg.code > 0) {
+                    layer.msg(msg.msg, {icon: 5});
+                  } else {
+
+                  }
+                  layer.close(index)
                 }
               })
             })
@@ -346,7 +356,7 @@
                 if (res.code > 0) {
                   return layer.msg('上传失败');
                 }
-                $('#master_img').attr('src', res.file.saveFiles); //图片链接（base64）
+                $('#master_img').attr('src', res.file.saveFiles).attr('alt',res.file.saveFiles); //图片链接（base64）
                 //上传成功
               }
 
@@ -522,17 +532,11 @@
                 if (dataName == 'goods_weight' && self['goods_base'][dataName] != '') {
                   self['goods_base']['weight_unit'] = $('.weight_unit').val();
                 }
-                if (self['goods_base'][dataName] == '') {
-                  delete self['goods_base'][dataName];
-                }
               })
 
               $('.goods_base .item-select').each(function () {
                 var dataName = $(this).attr('data-name');
                 self['goods_base'][dataName] = $("select[data-name=" + dataName + "]").val();
-                if (self['goods_base'][dataName] == '') {
-                  delete self['goods_base'][dataName];
-                }
               })
 
               $('.goods_base .item-checkbox').each(function () {
@@ -546,7 +550,7 @@
                 }
               })
 
-              self['goods_base']['og_thumb'] = $('#master_img').attr('src');
+              self['goods_base']['og_thumb'] = $('#master_img').prop('alt') ;
 
               self['goods_base']['goods_des'] = ue.getContent();
 
@@ -569,7 +573,7 @@
               $('#goods-upload-more-list .more_img_box').each(function () {
                 goods_pics_arrs.push($(this).find('img').prop('alt'))
               })
-              self['goods_base']['more_pics'] = goods_pics_arrs;
+              self['goods_photo'] = goods_pics_arrs;
 
 
               $('.goods_price .item-input').each(function () {

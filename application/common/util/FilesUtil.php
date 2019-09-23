@@ -79,13 +79,12 @@ class FilesUtil extends BaseUtil
                     $mConfig = new Config();
                     $thumbConfig = [goods_thumb_big, goods_thumb_mid, goods_thumb_sm];
                     $thumbConfigArr = $mConfig->getConfigByEn($thumbConfig);
-                     echo'<pre>';
-                         print_r(explode('\r',$info->getSaveName()));
-                     echo'</pre>';
+
+                    $md5File = substr($file->md5(), 0, 2);
                     // 按照原图的比例生成一个最大为150*150的缩略图并保存为thumb.png
                     foreach ($thumbConfigArr as $k => $v) {
                         $thumbValues = explode(',', $v['value']);
-                        $thumbFiles = './' . $saveDir . '/' . $v['values'];
+                        $thumbFiles = './' . $saveDir . '/' .$md5File.'/'. $v['values'].'_'.$info->getFilename();
 
                         $image->thumb($thumbValues[0], $thumbValues[1], \think\Image::THUMB_CENTER)->save($thumbFiles);
                     }
