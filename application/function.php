@@ -53,3 +53,76 @@ function count_words($str, $max = 10, $type = 'lt', $min = 1) {
             return ($len > $min && $len < $max) ? 1 : 0;
     }
 }
+
+
+/**
+ * 更新比对
+ * @param array $dbArray 数据表数组
+ * @param array $updatetArray 待更新数组
+ * @param string $key 主键
+ * @param array $compareCols 需比对的字段
+ * @return mixed 比对数组
+ */
+function updateCompare($dbArray, $updatetArray, $key, $compareCols){
+    //返回定义
+    $updateArr = array();
+    $insertArr = array();
+    $deleteArr = array();
+
+    //正向遍历
+    foreach ($dbArray as $dbrow){
+        //获取数组
+        $tempArr = getKey($updatetArray, $key, $dbrow[$key]);
+
+        //删除操作
+        if(empty($tempArr)){
+            $deleteArr['key'] = $key;
+            $deleteArr[] = $dbrow[$key];
+        }else{
+            //比较键值
+            foreach ($compareCols as $colName){
+                //空值不比较
+                if(empty($dbrow[$colName]) && empty($tempArr[$colName])){
+                    continue;
+                }
+                if($dbrow[$colName] != $tempArr[$colName]){
+                    $updateArr['key'] = $key;
+                    $updateArr[$dbrow[$key]][$colName] = $tempArr[$colName];
+
+                }
+            }
+        }
+    }
+
+    //反向遍历
+    foreach ($updatetArray as $uprow){
+        //获取数组
+        $tempArr = getKey($dbArray, $key, $uprow[$key]);
+        //新增操作
+        if(empty($tempArr)){
+            $insertArr[] = $uprow;
+        }
+    }
+
+    $resArray = array();
+    if(!empty($insertArr)){
+        $resArray['A'] = $insertArr;
+    }
+
+    if(!empty($updateArr)){
+        $resArray['M'] = $updateArr;
+    }
+
+    if(!empty($deleteArr)){
+        $resArray['D'] = $deleteArr;
+    }
+
+    return $resArray;
+}
+
+/**
+ * @return false|string
+ */
+function _NOW_TIME(){
+    return date("Y-m-d H:i:s", time());
+}

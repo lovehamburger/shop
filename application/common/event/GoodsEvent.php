@@ -4,6 +4,7 @@
 namespace app\common\event;
 
 use app\common\model\Brand;
+use app\common\util\apiUtil;
 use think\Db;
 use app\common\model\Goods;
 
@@ -137,9 +138,9 @@ class GoodsEvent extends BaseEvent
         return array_err(0, '修改排序数据成功');
     }
 
-    public function addGoods($goodsBase, $goodsPrice, $goodsAttr){
+    public function addGoods($goodsBase, $goodsPrice, $goodsAttr) {
         $dataRes = $this->_addGoods($goodsBase, $goodsPrice, $goodsAttr);
-        if($dataRes['code']  > 0){
+        if ($dataRes['code'] > 0) {
             return $dataRes;
         }
 
@@ -150,17 +151,40 @@ class GoodsEvent extends BaseEvent
         $data['shop_price'] = $dataRes['goods_base']['shop_price'];
         $data['goods_weight'] = $dataRes['goods_base']['goods_weight'];
         $data['category_id'] = $dataRes['goods_base']['category_id'];
-        $data['brand_id'] = $dataRes['goods_base']['brand_id'];
+        $data['brand_id'] = $dataRes['goods_base']['brand_id'] ?? 0;
         $data['on_sale'] = $dataRes['goods_base']['on_sale'];
         $data['og_thumb'] = $dataRes['goods_base']['og_thumb'];
-        $data['goods_name'] = $dataRes['goods_base']['goods_name'];
-        $data['goods_name'] = $dataRes['goods_base']['goods_name'];
-        $data['goods_name'] = $dataRes['goods_base']['goods_name'];
+        $data['sm_thumb'] = $dataRes['goods_base']['sm_thumb'];
+        $data['mid_thumb'] = $dataRes['goods_base']['mid_thumb'];
+        $data['big_thumb'] = $dataRes['goods_base']['big_thumb'];
+        $data['goods_code'] = $dataRes['goods_base']['goods_code'];
+        $data['type_id'] = $dataRes['goods_attr']['type_id'] ?? 0;
         $data['goods_des'] = $dataRes['goods_base']['goods_des'];
+        $data['time'] = time();
+
         $editFlag = $mGoods->save($data);
 
+        if ($editFlag === false) {
+            return array_err(92499, '增加商品基础数据失败');
+        }
 
-        $data['goods_name'] = $dataRes['goods_price']['goods_name'];
+
+        if(!empty($dataRes['goods_price'])){
+            $allPrice = [];
+            foreach ($dataRes['goods_price'] as $k=>$v){
+                $allPrice['mprice'] = $v;
+                $allPrice['mlevel_id'] = $k;
+                $allPrice['goods_id'] = $mGoods->id;
+            }
+        }
+
+        echo'<pre>';
+        print_r($mGoods->id);
+        echo'</pre>';
+        echo'<pre>';
+        print_r($dataRes['goods_price']);
+        echo'</pre>';
+        die();
 
         $data['goods_name'] = $dataRes['goods_attr']['goods_name'];
 
@@ -180,26 +204,30 @@ class GoodsEvent extends BaseEvent
      */
     protected function _addGoods($goodsBase, $goodsPrice, $goodsAttr) {
         $checkGoodsFlag = $this->checkGoodsData($goodsBase);
-        if($checkGoodsFlag['code'] > 0 ){
+        if ($checkGoodsFlag['code'] > 0) {
             return $checkGoodsFlag;
         }
         if ($goodsBase['og_thumb']) {
             $pathInfo = pathinfo($goodsBase['og_thumb']);
-            $goodsBase['sm_thumb'] = $pathInfo['dirname'].'/sm_'.$pathInfo['basename'];
-            $goodsBase['mid_thumb'] = $pathInfo['dirname'].'/mid_'.$pathInfo['basename'];
-            $goodsBase['big_thumb'] = $pathInfo['dirname'].'/big_'.$pathInfo['basename'];
+            $goodsBase['sm_thumb'] = $pathInfo['dirname'] . '/sm_' . $pathInfo['basename'];
+            $goodsBase['mid_thumb'] = $pathInfo['dirname'] . '/mid_' . $pathInfo['basename'];
+            $goodsBase['big_thumb'] = $pathInfo['dirname'] . '/big_' . $pathInfo['basename'];
         }
 
+        //设置商品编码
+        $seq = new apiUtil('GOODS_CODE', false);
+        $goodsBase['goods_code'] = $seq->next_val();
+
         $checkGoodsPriceFlag = $this->checkGoodsPrice($goodsPrice);
-        if($checkGoodsPriceFlag['code'] > 0 ){
+        if ($checkGoodsPriceFlag['code'] > 0) {
             return $checkGoodsPriceFlag;
         }
         $checkGoodsAttrFlag = $this->checkGoodsAttr($goodsAttr);
 
-        if($checkGoodsAttrFlag['code'] > 0 ){
+        if ($checkGoodsAttrFlag['code'] > 0) {
             return $checkGoodsAttrFlag;
         }
-        $data = array_err(0,'success');
+        $data = array_err(0, 'success');
 
         $data['goods_base'] = $goodsBase;
         $data['goods_price'] = $goodsPrice;
@@ -329,8 +357,8 @@ class GoodsEvent extends BaseEvent
                 }
             }
 
-            return array_err(0, 'success');
         }
+        return array_err(0, 'success');
     }
 
     /**
@@ -352,8 +380,8 @@ class GoodsEvent extends BaseEvent
             if ($checkAttrFlag['err_code'] > 0) {
                 return $checkAttrFlag;
             }
-            return array_err(0, 'success');
         }
+        return array_err(0, 'success');
     }
 
     /**
