@@ -162,9 +162,9 @@ class GoodsEvent extends BaseEvent
         $data['goods_des'] = $dataRes['goods_base']['goods_des'];
         $data['time'] = time();
 
-        $editFlag = $mGoods->save($data);
+        $addGoodsFlag = $mGoods->save($data);
 
-        if ($editFlag === false) {
+        if ($addGoodsFlag === false) {
             return array_err(92499, '增加商品基础数据失败');
         }
 
@@ -172,27 +172,32 @@ class GoodsEvent extends BaseEvent
         if(!empty($dataRes['goods_price'])){
             $allPrice = [];
             foreach ($dataRes['goods_price'] as $k=>$v){
-                $allPrice['mprice'] = $v;
-                $allPrice['mlevel_id'] = $k;
-                $allPrice['goods_id'] = $mGoods->id;
+                $dataPrice['mprice'] = $v;
+                $dataPrice['mlevel_id'] = $k;
+                $dataPrice['goods_id'] = $mGoods->id;
+                $allPrice[] = $dataPrice;
+            }
+
+            $addGoodsPriceFlag = Db::name('member_price')->insertAll($allPrice);
+
+            if ($addGoodsPriceFlag === false) {
+                return array_err(92499, '增加商品基础数据失败');
             }
         }
 
-        echo'<pre>';
-        print_r($mGoods->id);
-        echo'</pre>';
-        echo'<pre>';
-        print_r($dataRes['goods_price']);
-        echo'</pre>';
-        die();
+        if(!empty($dataRes['goods_attr'])){
+            foreach ($dataRes['goods_attr']['attr_lists'] as $k=>$v){
+                $dataRes['goods_attr']['attr_lists'][$k]['goods_id'] = $mGoods->id;
+            }
 
-        $data['goods_name'] = $dataRes['goods_attr']['goods_name'];
+            $addGoodsAttrFlag = Db::name('goods_attr')->insertAll($dataRes['goods_attr']['attr_lists']);
 
-        if ($editFlag === false) {
-            return array_err(1951296, '添加品牌数据失败');
+            if ($addGoodsAttrFlag === false) {
+                return array_err(92499, '增加商品基础数据失败');
+            }
         }
 
-        return array_err(0, '添加品牌数据成功');
+        return array_err(0, '添加商品数据成功');
     }
 
     /**
