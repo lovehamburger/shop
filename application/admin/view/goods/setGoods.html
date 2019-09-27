@@ -398,6 +398,7 @@
               $.ajax({
                 url: '/admin.php/Brand/getData',
                 type: 'post',
+                data:{param:JSON.stringify({"status":1})},
                 dataType: 'json',
                 success: function (msg) {
                   if (msg.code > 0) {

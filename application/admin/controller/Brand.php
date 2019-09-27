@@ -36,6 +36,10 @@ class Brand extends Base
         $param = json_decode_html(input('param'));
         $param['curr_page'] = input('page/d');
         $param['page_count'] = input('limit/d');
+
+        if(isset($param['state'])){
+            $param['status'] = $param['state'];
+        }
         //条数的限制
         //dealPage();
         $data = array_err(0, 'success');

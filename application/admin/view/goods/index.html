@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>商品品牌</title>
+    <title>商品商品</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport"
@@ -34,9 +34,9 @@
                 <div class="layui-card-header">数据操作</div>
                 <div class="layui-card-body">
                     <div class="layui-btn-group test-table-operate-btn" style="margin-bottom: 10px;">
-                        <button class="layui-btn" data-type="delBrand">删除品牌</button>
+                        <button class="layui-btn" data-type="delGoods">删除商品</button>
 
-                        <button class="layui-btn layui-btn-normal" data-type="addBrand">新增品牌</button>
+                        <button class="layui-btn layui-btn-normal" data-type="addGoods">新增商品</button>
                         <button class="layui-btn layui-btn-danger" data-type="setSort">保存排序</button>
                         <!--                        <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>-->
                         <!--                        <button class="layui-btn" data-type="isAll">验证是否全选</button>-->
@@ -46,14 +46,14 @@
                         <div class="layui-inline">
                             <input class="layui-input item-input" name="id" id="id" autocomplete="off">
                         </div>
-                        品牌名称：
+                        商品名称：
                         <div class="layui-inline">
-                            <input class="layui-input item-input" name="id" id="brand_name" autocomplete="off">
+                            <input class="layui-input item-input" name="id" id="goods_name" autocomplete="off">
                         </div>
 
                         <button class="layui-btn" id="search" data-type="reload">搜索</button>
                     </div>
-                    <table class="layui-hide" id="brand-data" lay-filter="brand-data"></table>
+                    <table class="layui-hide" id="goods-data" lay-filter="goods-data"></table>
 
 
                     <script type="text/html" id="test-table-switchTpl">
@@ -71,26 +71,26 @@
                         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
                     </script>
 
-                    <div class="layui-card brand-input" hidden>
+                    <div class="layui-card goods-input" hidden>
                         <div class="layui-card-body">
                             <from class="layui-form" lay-filter="component-form-element">
-                                <input type="hidden" value="" name="brand_id" data-name="id"
-                                       class="layui-input brand_id">
+                                <input type="hidden" value="" name="goods_id" data-name="id"
+                                       class="layui-input goods_id">
                                 <div class="layui-row layui-col-space10 layui-form-item">
                                     <div class="layui-col-lg6">
-                                        <label class="layui-form-label">品牌名称：</label>
+                                        <label class="layui-form-label">商品名称：</label>
                                         <div class="layui-input-block">
-                                            <input type="text" value="" name="brand_name" lay-verify="required"
-                                                   placeholder="" autocomplete="off" data-name="brand_name"
+                                            <input type="text" value="" name="goods_name" lay-verify="required"
+                                                   placeholder="" autocomplete="off" data-name="goods_name"
                                                    class="layui-input item-input">
                                         </div>
                                     </div>
                                     <div class="layui-col-lg6">
-                                        <label class="layui-form-label">品牌链接：</label>
+                                        <label class="layui-form-label">商品链接：</label>
                                         <div class="layui-input-block">
-                                            <input type="text" name="brand_url" data-name="brand_url"
+                                            <input type="text" name="goods_url" data-name="goods_url"
                                                    placeholder="" autocomplete="off"
-                                                   class="layui-input item-input brand_url">
+                                                   class="layui-input item-input goods_url">
                                         </div>
                                     </div>
                                 </div>
@@ -99,7 +99,7 @@
                                     <label class="layui-form-label">是否开启：</label>
                                     <div class="layui-input-block">
                                         <input type="checkbox" class="item-checkbox" name="status" data-name="status"
-                                               lay-skin="switch" lay-filter="brand-status" lay-text="是|否">
+                                               lay-skin="switch" lay-filter="goods-status" lay-text="是|否">
                                         <div class="layui-unselect layui-form-switch layui-form-onswitch"
                                              lay-skin="_switch"><em>是</em><i></i></div>
                                     </div>
@@ -109,14 +109,14 @@
 
                                 </div>
                                 <div class="layui-col-lg6">
-                                    <label class="layui-form-label">品牌排序：</label>
+                                    <label class="layui-form-label">商品排序：</label>
                                     <div class="layui-input-block" style="width: 20%">
                                         <input type="text" name="sort" data-name="sort"
                                                placeholder="" autocomplete="off" class="layui-input item-input">
                                     </div>
                                 </div>
                                 <div class="layui-form-item layui-col-lg12">
-                                    <label class="layui-form-label">品牌图片：</label>
+                                    <label class="layui-form-label">商品图片：</label>
                                     <div class="layui-col-md12">
                                         <div class="layui-card">
 
@@ -125,7 +125,7 @@
                                                 </button>
                                                 <div class="layui-upload-list">
                                                     <img class="layui-upload-img"
-                                                         src="/public/static/common/img/default.png" id="brand_img">
+                                                         src="/public/static/common/img/default.png" id="goods_img">
                                                     <p id="test-upload-demoText"></p>
                                                 </div>
                                             </div>
@@ -134,9 +134,9 @@
                                     </div>
                                 </div>
                                 <div class="layui-form-item">
-                                    <label class="layui-form-label">品牌描述：</label>
+                                    <label class="layui-form-label">商品描述：</label>
                                     <div class="layui-input-block">
-                                        <textarea name="brand_description" data-name="brand_description" placeholder=""
+                                        <textarea name="goods_description" data-name="goods_description" placeholder=""
                                                   class="layui-textarea item-textarea"></textarea>
                                     </div>
                                 </div>
@@ -170,7 +170,7 @@
       , admin = layui.admin;
 
 
-    function Brand() {
+    function Goods() {
       var self = this;
       self.param = {}
       self.data = {}
@@ -180,12 +180,12 @@
       });
 
       //监听表格复选框选择
-      table.on('checkbox(brand-data)', function (obj) {
+      table.on('checkbox(goods-data)', function (obj) {
         console.log(obj)
       });
 
       //弹出新增 修改框中checkbox的状态
-      form.on('switch(brand-status)', function (data) {
+      form.on('switch(goods-status)', function (data) {
         $('.item-checkbox').val(data.elem.checked);
       });
 
@@ -226,7 +226,7 @@
       });
 
       //监听工具条
-      table.on('tool(brand-data)', function (obj) {
+      table.on('tool(goods-data)', function (obj) {
         var data = obj.data;
         if (obj.event === 'detail') {
           layer.msg('ID：' + data.id + ' 的查看操作');
@@ -236,7 +236,7 @@
             $delArr = [];
             $delArr.push(obj['data']['id']);
             $.ajax({
-              url: 'delBrand',
+              url: 'delGoods',
               data: {
                 id: JSON.stringify($delArr),
               },
@@ -254,25 +254,25 @@
             layer.close(index);
           });
         } else if (obj.event === 'edit') {
-          $('.brand-input .item-input').each(function () {
+          $('.goods-input .item-input').each(function () {
             var dataName = $(this).attr('data-name');
             $("input[data-name=" + dataName + "]").val(data[dataName]);
           })
 
-          $('.brand-input .item-textarea').each(function () {
+          $('.goods-input .item-textarea').each(function () {
             var dataName = $(this).attr('data-name');
             $("textarea[data-name=" + dataName + "]").val(data[dataName]);
           })
 
-          $('.brand-input #brand_img').prop('src', data['brand_img']);
+          $('.goods-input #goods_img').prop('src', data['goods_img']);
 
-          $('.brand-input .brand_id').val(data['id']);
+          $('.goods-input .goods_id').val(data['id']);
           if (data['status'] == 1) {
-            $('.brand-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
-            $('.brand-input .item-checkbox').parent().find('.layui-unselect em').html('是');
+            $('.goods-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
+            $('.goods-input .item-checkbox').parent().find('.layui-unselect em').html('是');
           } else {
-            $('.brand-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
-            $('.brand-input .item-checkbox').parent().find('.layui-unselect em').html('否');
+            $('.goods-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
+            $('.goods-input .item-checkbox').parent().find('.layui-unselect em').html('否');
           }
 
 
@@ -286,12 +286,12 @@
           // })
           layer.open({
             type: 1,
-            title: '品牌修改',
+            title: '商品修改',
             area: ['50%'],
             closeBtn: 0,
             shadeClose: true,
             skin: 'yourClass',
-            content: $(".brand-input"),
+            content: $(".goods-input"),
           });
         }
       });
@@ -307,7 +307,7 @@
             }
           })
           //执行重载
-          table.reload('brand-data', {
+          table.reload('goods-data', {
             page: {
               curr: 1 //重新从第 1 页开始
             }
@@ -316,9 +316,9 @@
             }
           });
         }
-        , delBrand: function () { //获取选中数据
+        , delGoods: function () { //获取选中数据
           layer.confirm('真的删除全部吗?', function (index) {
-            var checkStatus = table.checkStatus('brand-data')
+            var checkStatus = table.checkStatus('goods-data')
               , data = checkStatus.data;
             var $id = [];
             $.each(data, function (i, el) {
@@ -326,7 +326,7 @@
             })
             if ($id) {
               $.ajax({
-                url: 'delBrand',
+                url: 'delGoods',
                 data: {
                   id: JSON.stringify($id),
                 },
@@ -346,10 +346,10 @@
           })
         }
         , setSort: function () { //获取选中数据
-          var allBrandData = table.cache['brand-data']
+          var allGoodsData = table.cache['goods-data']
           var $id = {};
 
-          $.each(allBrandData, function (i, el) {
+          $.each(allGoodsData, function (i, el) {
             $id[el.id] = el.sort;
           })
 
@@ -373,37 +373,37 @@
             });
           }
         }
-        , addBrand: function () {
-          $('.brand-input .item-input').each(function () {
+        , addGoods: function () {
+          $('.goods-input .item-input').each(function () {
             var dataName = $(this).attr('data-name');
             $("input[data-name=" + dataName + "]").val('');
           })
 
-          $('.brand-input .item-textarea').each(function () {
+          $('.goods-input .item-textarea').each(function () {
             var dataName = $(this).attr('data-name');
             $("textarea[data-name=" + dataName + "]").val('');
           })
 
-          $('.brand-input #brand_img').prop('src', '/public/static/common/img/default.png');
+          $('.goods-input #goods_img').prop('src', '/public/static/common/img/default.png');
 
-          $('.brand-input .brand_id').val('');
+          $('.goods-input .goods_id').val('');
           layer.open({
             type: 1,
-            title: '品牌新增',
+            title: '商品新增',
             area: ['50%'],
             closeBtn: 0,
             shadeClose: true,
             skin: 'yourClass',
-            content: $(".brand-input"),
+            content: $(".goods-input"),
           });
         }
         , getCheckLength: function () { //获取选中数目
-          var checkStatus = table.checkStatus('brand-data')
+          var checkStatus = table.checkStatus('goods-data')
             , data = checkStatus.data;
           layer.msg('选中了：' + data.length + ' 个');
         }
         , isAll: function () { //验证是否全选
-          var checkStatus = table.checkStatus('brand-data');
+          var checkStatus = table.checkStatus('goods-data');
           layer.msg(checkStatus.isAll ? '全选' : '未全选')
         }
       };
@@ -417,16 +417,16 @@
       $('.data-send').click(function () {
         var flag = false;
 
-        $('.brand-input .item-input').each(function () {
+        $('.goods-input .item-input').each(function () {
           var dataName = $(this).attr('data-name');
           self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
-          if (dataName == 'brand_name' && self['data'][dataName] == '') {
+          if (dataName == 'goods_name' && self['data'][dataName] == '') {
             $("input[data-name=" + dataName + "]").addClass('layui-form-danger');
             flag = true;
           }
         })
 
-        $('.brand-input .item-checkbox').each(function () {
+        $('.goods-input .item-checkbox').each(function () {
           var dataName = $(this).attr('data-name');
           self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
           console.log(self['data'][dataName]);
@@ -438,19 +438,19 @@
         })
 
 
-        $('.brand-input .item-textarea').each(function () {
+        $('.goods-input .item-textarea').each(function () {
           var dataName = $(this).attr('data-name');
           self['data'][dataName] = $("textarea[data-name=" + dataName + "]").val();
         })
 
-        self['data']['brand_img'] = $('.brand-input #brand_img').attr('src');
+        self['data']['goods_img'] = $('.goods-input #goods_img').attr('src');
 
-        var $brand_id = $('.brand_id').val();
+        var $goods_id = $('.goods_id').val();
 
-        if ($brand_id) {
-          var $url = 'editBrand';
+        if ($goods_id) {
+          var $url = 'editGoods';
         } else {
-          var $url = 'addBrand';
+          var $url = 'addGoods';
         }
 
         if (flag) {
@@ -461,7 +461,7 @@
           url: $url,
           data: {
             data: JSON.stringify(self.data),
-            id: $brand_id,
+            id: $goods_id,
           },
           type: 'post',
           dataType: 'json',
@@ -496,7 +496,7 @@
           if (res.code > 0) {
             return layer.msg('上传失败');
           }
-          $('#brand_img').attr('src', res.file.saveFiles); //图片链接（base64）
+          $('#goods_img').attr('src', res.file.saveFiles); //图片链接（base64）
           //上传成功
         }
 
@@ -511,53 +511,34 @@
       });
     }
 
-    Brand.prototype = {
-      constructor: Brand,
+    Goods.prototype = {
+      constructor: Goods,
       getList: function () {
         table.render({
-          elem: '#brand-data'
+          elem: '#goods-data'
           , method: 'post'
           , url: 'getData'
           , cols: [[
             {type: 'checkbox', fixed: 'left'}
             , {field: 'id', width: 92, title: 'ID', sort: true, fixed: 'left'}
-            , {field: 'brand_name', width: 300, title: '品牌名称'}
-            , {field: 'brand_url', width: 350, title: '品牌地址'}
-            , {field: 'brand_description', width: 450, title: '品牌描述'}
-            , {field: 'sort', width: 80, title: '排序', sort: true, edit: 'text'}
-            , {field: 'status', title: '状态', width: 100, templet: '#test-table-switchTpl', unresize: true}
+            , {field: 'goods_code', width: 200, title: '商品编号'}
+            , {field: 'goods_name', width: 200, title: '商品名称'}
+            , {field: 'markte_price', width: 100, title: '市场价'}
+            , {field: 'shop_price', width: 100, title: '零售价'}
+            , {field: 'category_id', width: 100, title: '所属栏目'}
+            , {field: 'type_id', width: 100, title: '所属类型'}
+            , {field: 'brand_id', width: 100, title: '商品品牌'}
+            , {field: 'goods_weight', width: 100, title: '商品重量'}
+            , {field: 'weight_unit', width: 100, title: '重量单位'}
+            , {field: 'on_sale', title: '状态', width: 100, templet: '#test-table-switchTpl', unresize: true}
             , {width: 210, align: 'center', toolbar: '#test-table-operate-barDemo'}
           ]]
           , page: true
         })
       },
-      // setBrand: function ($url,$brand_id) {
-      //   var self = this;
-      //   var index = layer.load(2);
-      //   $.ajax({
-      //     url: $url,
-      //     data: {
-      //       data:self.data,
-      //       id:$brand_id,
-      //     },
-      //     type: 'post',
-      //     dataType: 'json',
-      //     success: function (msg) {
-      //       if (msg.code > 0) {
-      //         layer.msg(msg.msg, {icon: 5});
-      //         if (obj.value == 1) {
-      //
-      //         } else {
-      //
-      //         }
-      //       }
-      //       layer.close(index)
-      //     }
-      //   });
-      // }
     }
 
-    new Brand();
+    new Goods();
   });
 </script>
 </body>

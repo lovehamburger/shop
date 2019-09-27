@@ -42,9 +42,9 @@ class Brand extends BaseModel
     public function getBrandByParam($param = array(), $field = 'id,brand_name,brand_url,brand_img,brand_description,sort,status') {
         $where = $this->_makeParam($param);
         return $this->where($where)->field($field)
-                                ->limit(($param['curr_page'] - 1) * $param['page_count'], $param['page_count'])
-                                ->order('sort')
-                                ->select();
+            ->limit(($param['curr_page'] - 1) * $param['page_count'], $param['page_count'])
+            ->order('sort')
+            ->select();
     }
 
 
@@ -56,6 +56,10 @@ class Brand extends BaseModel
 
         if (!empty($param['brand_name'])) {
             $where['brand_name'] = ['LIKE', "%" . $param['brand_name'] . "%"];
+        }
+
+        if (isset($param['status'])) {
+            $where['status'] = $param['status'];
         }
 
         return $where;

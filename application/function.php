@@ -55,6 +55,18 @@ function count_words($str, $max = 10, $type = 'lt', $min = 1) {
 }
 
 
+function getKey($keyArray, $key, $value){
+    $res = array();
+    foreach($keyArray as $row){
+        if($row[$key] == $value){
+            $res = $row;
+            break;
+        }
+    }
+    return $res;
+}
+
+
 /**
  * 更新比对
  * @param array $dbArray 数据表数组

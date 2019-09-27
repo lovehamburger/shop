@@ -47,18 +47,18 @@ class GoodsEvent extends BaseEvent
      * @param bool $lock
      * @return array
      */
-    public function checkGoodsID($brandID, &$brandRes, $lock = false) {
+    public function checkGoodsID($goodsID, &$goodsBaseRes, $lock = false) {
         $mGoods = new Goods();
-        if (empty($brandID)) {
-            return array_err(1951298, '品牌标识不能为空');
+        if (empty($goodsID)) {
+            return array_err(1951298, '商品标识不能为空');
         }
-        $brandRes = $mGoods->getGoodsCateByKV($brandID, $lock);
+        $goodsBaseRes = $mGoods->getGoodsByKV($goodsID, $lock);
 
-        if (count($brandID) != count($brandRes)) {
+        if (count($goodsID) != count($goodsBaseRes)) {
             return array_err(1951297, '存在非法数据');
         }
 
-        if (empty($brandRes)) {
+        if (empty($goodsBaseRes)) {
             return array_err(1951296, '没有查找到您要的标识');
         }
         return array_err(0, 'success');
@@ -66,43 +66,73 @@ class GoodsEvent extends BaseEvent
 
     /**
      * 修改品牌数据
-     * @param $brandID
+     * @param $goodsID
      * @param $data
      * @return array
      */
-    public function editGoods($brandID, $data) {
-        $brandRes = array();
-        $flag = $this->checkGoodsID($brandID, $brandRes, true);
+    public function editGoods($goodsID,$goodsBase, $goodsPrice, $goodsAttr) {
+        $this->_editGoods($goodsID,$goodsBase, $goodsPrice, $goodsAttr);
+    }
+
+
+    /**
+     * 修改品牌数据
+     * @param $goodsID
+     * @param $data
+     * @return array
+     */
+    public function _editGoods($goodsID,$goodsBase, $goodsPrice, $goodsAttr) {
+        $goodsBaseRes = array();
+        $flag = $this->checkGoodsID($goodsID, $goodsBaseRes, true);
         if ($flag['code'] > 0) {
             return $flag;
         }
 
-        $flag = $this->checkGoodsData($data, $brandID);
-
-        if ($flag['code'] > 0) {
-            return $flag;
+        $checkGoodsFlag = $this->checkGoodsData($goodsBase);
+        if ($checkGoodsFlag['code'] > 0) {
+            return $checkGoodsFlag;
         }
 
-        //这边判断数据是否有变化
-        foreach ($data as $k => $v) {
-            if ($v == $brandRes[$brandID][$k]) {
-                unset($data[$k]);
-            }
+        //比对商品数据是否需要修改
+        $compareCols = 'goods_name,og_thumb,markte_price,shop_price,on_sale,category_id,brand_id,type_id,goods_des,goods_weight,weight_unit';//设置需要对比的字段
+        $this->_compareOrdInfo($goodsBaseRes,$goodsBase,$goodsID,$compareCols);
+
+        //设置商品编码
+        $seq = new apiUtil('GOODS_CODE', false);
+        $goodsBase['goods_code'] = $seq->next_val();
+
+        $checkGoodsPriceFlag = $this->checkGoodsPrice($goodsPrice);
+        if ($checkGoodsPriceFlag['code'] > 0) {
+            return $checkGoodsPriceFlag;
         }
+        $checkGoodsAttrFlag = $this->checkGoodsAttr($goodsAttr);
 
-        if (empty($data)) {
-            return array_err(0, '数据没有发生变化无需要修改');
+        if ($checkGoodsAttrFlag['code'] > 0) {
+            return $checkGoodsAttrFlag;
         }
+        $data = array_err(0, 'success');
 
-        $mGoods = new Goods();
+        $data['goods_base'] = $goodsBase;
+        $data['goods_price'] = $goodsPrice;
+        $data['goods_attr'] = $goodsAttr;
 
-        $editFlag = $mGoods->save($data, ['id' => $brandID]);
+        return $data;
+    }
 
-        if ($editFlag === false) {
-            return array_err(1951296, '修改品牌数据失败');
-        }
 
-        return array_err(0, '修改品牌数据成功');
+    protected function _compareOrdInfo($dbArray,$updatetArray,$goodsID,$compareCols){
+        /**
+         *  * 更新比对
+         * @param array $dbArray 数据表数组
+         * @param array $updatetArray 待更新数组
+         * @param string $key 主键
+         * @param array $compareCols 需比对的字段
+         * @return mixed 比对数组
+         */
+        $res = updateCompare($dbArray, $updatetArray, $goodsID, $compareCols);
+        echo'<pre>'; 
+            print_r($res);
+        echo'</pre>';
     }
 
 
@@ -352,7 +382,7 @@ class GoodsEvent extends BaseEvent
         if (!empty($goodsPrice)) {
             $eMemberEvent = new MemberEvent();
             $checkLevelFlag = $eMemberEvent->checkLevelID(array_keys($goodsPrice), $levelRes);
-            if ($checkLevelFlag['err_code'] > 0) {
+            if ($checkLevelFlag['code'] > 0) {
                 return $checkLevelFlag;
             }
 
@@ -375,14 +405,14 @@ class GoodsEvent extends BaseEvent
             $mTypeEvent = new TypeEvent();
             $typeRes = [];
             $checkTypeFlag = $mTypeEvent->checkTypeID($goodsAttr['type_id'], $typeRes);
-            if ($checkTypeFlag['err_code'] > 0) {
+            if ($checkTypeFlag['code'] > 0) {
                 return $checkTypeFlag;
             }
 
             $arrAttrID = array_column($goodsAttr, 'attr_id');
             $attrRes = [];
             $checkAttrFlag = $mTypeEvent->checkAttrID($arrAttrID, $attrRes);
-            if ($checkAttrFlag['err_code'] > 0) {
+            if ($checkAttrFlag['code'] > 0) {
                 return $checkAttrFlag;
             }
         }

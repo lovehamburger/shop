@@ -86,12 +86,14 @@ class Goods extends Base
      */
     public function editGoods() {
         $this->_inputAjax();
-        $data = json_decode_html(input('data'));
-        $brandID = input('id/d');
+        $goodsID = input('goods_id');
+        $goodsBase = json_decode_html(input('goods_base'));
+        $goodsPrice = json_decode_html(input('goods_price'));
+        $goodsAttr = json_decode_html(input('goods_attr'));
         Db::startTrans();
         $mGoods = new GoodsEvent();
 
-        $flag = $mGoods->editGoods($brandID, $data);
+        $flag = $mGoods->editGoods($goodsID,$goodsBase,$goodsPrice,$goodsAttr);
         if ($flag['code'] > 0) {
             Db::rollback();
         } else {
