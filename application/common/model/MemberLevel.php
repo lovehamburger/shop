@@ -1,6 +1,8 @@
 <?php
 
 namespace app\common\model;
+use think\Db;
+
 /**
  * 等级模型
  */
@@ -63,5 +65,16 @@ class MemberLevel extends BaseModel
         }
 
         return $where;
+    }
+
+
+    /**
+     * @param $goodsID
+     * @param string $field
+     * @return array
+     */
+    public function getMemberPriceByGoodsID($goodsID,$field = '*'){
+        $param['goods_id'] = $goodsID;
+        return Db::name('member_price')->where($param)->column($field);
     }
 }

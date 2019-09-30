@@ -66,7 +66,6 @@
                         <a style="padding: 0 5px;" class="layui-btn layui-btn-warm layui-btn-radius goods_add"
                            lay-submit lay-filter="component-form-element">新增
                         </a>
-
                     </div>
                     <div class="layui-card-body">
                         <div class="layui-tab">
@@ -81,10 +80,11 @@
                                 <div class="layui-tab-item layui-show goods_base">
                                     <div class="layui-card-body">
                                         <div class="layui-row layui-col-space10 layui-form-item">
+                                            <input hidden value="{$Request.param.id}" class="goods_id">
                                             <div class="layui-col-lg6">
                                                 <label class="layui-form-label">商品名称：</label>
                                                 <div class="layui-input-block">
-                                                    <input type="text" name="fullname" lay-verify="required"
+                                                    <input type="text" value="{$goodsRes.goods.goods_name}" name="fullname" lay-verify="required"
                                                            placeholder="" autocomplete="off" data-name="goods_name"
                                                            class="layui-input item-input">
                                                 </div>
@@ -95,7 +95,6 @@
                                                     <select name="category_id" data-name="category_id"
                                                             lay-verify="required" class="cateGory item-select"
                                                             lay-search lay-filter="cateGory">
-
                                                     </select>
                                                 </div>
                                             </div>
@@ -267,6 +266,10 @@
               self.getBrand();
               self.getMemberLever();
               self.getType();
+              var goods_id= $('.goods_id').val();
+              if(goods_id){
+                self.getGoodsData(goods_id);
+              }
             })
 
             //弹出新增 修改框中checkbox的状态
@@ -305,7 +308,11 @@
 
 
             form.on('select(type)', function (data) {
-              self.setAttr(data.value);
+                if(data.value){
+                    self.setAttr(data.value);
+                }else{
+                    $('.attr_lists').html("");
+                }
             });
 
             //属性的复制
@@ -376,7 +383,7 @@
             getCateGory: function () {
               var index = layer.load(2);
               $.ajax({
-                url: 'cateGory',
+                url: '/admin.php/Goods/cateGory',
                 type: 'post',
                 dataLevel: 'json',
                 success: function (msg) {
@@ -464,6 +471,24 @@
                 }
               })
             },
+            getGoodsData: function (goods_id) {
+                var self = this;
+              index = layer.load(2)
+              $.ajax({
+                url: '/admin.php/Goods/setGoods',
+                data:{id:goods_id},
+                type: 'post',
+                dataLevel: 'json',
+                success: function (msg) {
+                  if (msg.code > 0) {
+                    layer.msg(msg.msg, {icon: 5});
+                  } else {
+                      self.orgData(msg)
+                  }
+                  layer.close(index);
+                }
+              })
+            },
             setAttr: function (type_id) {
               $.ajax({
                 url: '/admin.php/Type/getAttr',
@@ -524,68 +549,110 @@
                 }
               })
             },
-            orgData: function () {
-              var self = this;
+            orgData: function (msg) {
+                  var self = this;
+                  if (msg) {
+                      $('.goods_base .item-input').each(function () {
+                          var dataName = $(this).attr('data-name');
+                          self['goods_base'][dataName] = $("input[data-name=" + dataName + "]").val(""+ msg['goods'][dataName] +"");
+                          if (dataName == 'goods_weight' && self['goods_base'][dataName] != '') {
+                              self['goods_base']['weight_unit'] = $('.weight_unit').val();
+                          }
+                      })
 
-              $('.goods_base .item-input').each(function () {
-                var dataName = $(this).attr('data-name');
-                self['goods_base'][dataName] = $("input[data-name=" + dataName + "]").val();
-                if (dataName == 'goods_weight' && self['goods_base'][dataName] != '') {
-                  self['goods_base']['weight_unit'] = $('.weight_unit').val();
-                }
-              })
+                      self['goods_base']['goods_des'] = ue.setContent(""+msg['goods']['goods_des']+"");
 
-              $('.goods_base .item-select').each(function () {
-                var dataName = $(this).attr('data-name');
-                self['goods_base'][dataName] = $("select[data-name=" + dataName + "]").val();
-              })
+                    $('.goods_price .item-input').each(function () {
+                      var levelID = $(this).attr('level_id');
+                      self.goods_price[levelID] = $(this).val(msg['member_price'][levelID]);
+                    })
 
-              $('.goods_base .item-checkbox').each(function () {
-                var dataName = $(this).attr('data-name');
-                self['goods_base'][dataName] = $("input[data-name=" + dataName + "]").val();
-                console.log(self['goods_base'][dataName]);
-                if (self['goods_base'][dataName] == "true") {
-                  self['goods_base'][dataName] = 1;
-                } else {
-                  self['goods_base'][dataName] = 0;
-                }
-              })
+                    self['goods_base']['og_thumb'] = $('#master_img').prop('alt',""+msg['goods']['og_thumb']+"").prop('src',""+msg['goods']['og_thumb']+"");
 
-              self['goods_base']['og_thumb'] = $('#master_img').prop('alt') ;
+                  $('.goods_base .item-select').each(function () {
+                      var dataName = $(this).attr('data-name');
+                      var select = 'dd[lay-value=' + msg['goods'][dataName] + ']';
+                      $(this).siblings("div.layui-form-select").find('dl').find(select).click()
+                  })
 
-              self['goods_base']['goods_des'] = ue.getContent();
+                      $('.goods_base .item-checkbox').each(function () {
+                          var dataName = $(this).attr('data-name');
+                          console.log(msg['goods'][dataName]);
+                          if (msg['goods']['on_sale'] == 1) {
+                              $(this).parent().find('.layui-unselect').addClass('layui-form-onswitch');
+                              $(this).parent().find('.layui-unselect em').html('是');
+                          } else {
+                              $(this).parent().find('.layui-unselect').removeClass('layui-form-onswitch');
+                              $(this).parent().find('.layui-unselect em').html('否');
+                          }
+                      })
+
+                      $('#goods-upload-more-list .more_img_box').each(function () {
+
+                      })
+
+                  } else {
+                      $('.goods_base .item-input').each(function () {
+                          var dataName = $(this).attr('data-name');
+                          self['goods_base'][dataName] = $("input[data-name=" + dataName + "]").val();
+                          if (dataName == 'goods_weight' && self['goods_base'][dataName] != '') {
+                              self['goods_base']['weight_unit'] = $('.weight_unit').val();
+                          }
+                      })
+
+                      $('.goods_base .item-select').each(function () {
+                          var dataName = $(this).attr('data-name');
+                          self['goods_base'][dataName] = $("select[data-name=" + dataName + "]").val();
+                      })
+
+                      $('.goods_base .item-checkbox').each(function () {
+                          var dataName = $(this).attr('data-name');
+                          self['goods_base'][dataName] = $("input[data-name=" + dataName + "]").val();
+                          console.log(self['goods_base'][dataName]);
+                          if (self['goods_base'][dataName] == "true") {
+                              self['goods_base'][dataName] = 1;
+                          } else {
+                              self['goods_base'][dataName] = 0;
+                          }
+                      })
+
+                      self['goods_base']['og_thumb'] = $('#master_img').prop('alt');
+
+                      self['goods_base']['goods_des'] = ue.getContent();
 
 
-              var type_id = $('.goods_attr .type').val();
+                      var type_id = $('.goods_attr .type').val();
 
-              if(type_id){
-                self['goods_attr']['type_id'] = type_id
-                self['goods_attr']['attr_lists'] = [];
-                $('.attr_lists .attr_list').each(function () {
-                  self['attr_list'] = {};
-                  self['attr_list']['attr_id'] = $(this).attr('attr_id');
-                  self['attr_list']['attr_value'] = $(this).find('.attr_val').val();
-                  self['attr_list']['attr_price'] = $(this).find('.attr_price').val() ? $(this).find('.attr_price').val() : 0;
-                  self['goods_attr']['attr_lists'].push(self['attr_list'])
-                })
+                      if (type_id) {
+                          self['goods_attr']['type_id'] = type_id
+                          self['goods_attr']['attr_lists'] = [];
+                          $('.attr_lists .attr_list').each(function () {
+                              self['attr_list'] = {};
+                              self['attr_list']['attr_id'] = $(this).attr('attr_id');
+                              self['attr_list']['attr_value'] = $(this).find('.attr_val').val();
+                              self['attr_list']['attr_price'] = $(this).find('.attr_price').val() ? $(this).find('.attr_price').val() : 0;
+                              self['goods_attr']['attr_lists'].push(self['attr_list'])
+                          })
+                      }
+
+                      var goods_pics_arrs = [];
+                      $('#goods-upload-more-list .more_img_box').each(function () {
+                          goods_pics_arrs.push($(this).find('img').prop('alt'))
+                      })
+                      self['goods_photo'] = goods_pics_arrs;
+
+
+                      $('.goods_price .item-input').each(function () {
+                          var levelID = $(this).attr('level_id');
+                          var level_val = $(this).val();
+                          self.goods_price[levelID] = $(this).val();
+                          if (level_val == '') {
+                              delete self.goods_price[levelID];
+                          }
+                      })
+                  }
+
               }
-
-              var goods_pics_arrs = [];
-              $('#goods-upload-more-list .more_img_box').each(function () {
-                goods_pics_arrs.push($(this).find('img').prop('alt'))
-              })
-              self['goods_photo'] = goods_pics_arrs;
-
-
-              $('.goods_price .item-input').each(function () {
-                var levelID = $(this).attr('level_id');
-                var level_val = $(this).val();
-                self.goods_price[levelID] = $(this).val();
-                if (level_val == '') {
-                  delete self.goods_price[levelID];
-                }
-              })
-            }
           }
           new setGoods();
         });

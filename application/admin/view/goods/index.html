@@ -65,7 +65,7 @@
                                1 ? 'checked' : '' }}>
                     </script>
 
-                    <script type="text/html" id="test-table-operate-barDemo">
+                    <script type="text/html" id="goods-table-tools">
                         <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
                         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
                         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
@@ -229,7 +229,13 @@
       table.on('tool(goods-data)', function (obj) {
         var data = obj.data;
         if (obj.event === 'detail') {
-          layer.msg('ID：' + data.id + ' 的查看操作');
+            var othis = $(this)
+                    , href = "admin.php/goods/setGoods/id/"+data.id
+                    , text = data.goods_name+"修改商品"
+                    , router = layui.router();
+            var topLayui = parent === self ? layui : top.layui;
+            topLayui.index.openTabsPage(href, text || othis.text());
+
         } else if (obj.event === 'del') {
           layer.confirm('真的删除行么', function (index) {
             obj.del();
@@ -525,13 +531,13 @@
             , {field: 'goods_name', width: 200, title: '商品名称'}
             , {field: 'markte_price', width: 100, title: '市场价'}
             , {field: 'shop_price', width: 100, title: '零售价'}
-            , {field: 'category_id', width: 100, title: '所属栏目'}
-            , {field: 'type_id', width: 100, title: '所属类型'}
-            , {field: 'brand_id', width: 100, title: '商品品牌'}
+            , {field: 'cate_name', width: 180, title: '所属栏目'}
+            , {field: 'type_name', width: 100, title: '所属类型'}
+            , {field: 'brand_name', width: 100, title: '商品品牌'}
             , {field: 'goods_weight', width: 100, title: '商品重量'}
             , {field: 'weight_unit', width: 100, title: '重量单位'}
             , {field: 'on_sale', title: '状态', width: 100, templet: '#test-table-switchTpl', unresize: true}
-            , {width: 210, align: 'center', toolbar: '#test-table-operate-barDemo'}
+            , {width: 200, align: 'center', toolbar: '#goods-table-tools'}
           ]]
           , page: true
         })

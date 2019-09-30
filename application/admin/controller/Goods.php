@@ -5,6 +5,7 @@
 
 namespace app\admin\controller;
 
+use app\common\model\MemberLevel;
 use app\common\util\cateTreeUtil;
 use think\Db;
 use app\common\model\Goods as GoodsModel;
@@ -40,6 +41,10 @@ class Goods extends Base
         //条数的限制
         //dealPage();
         $data = array_err(0, 'success');
+
+        $param['if_brand'] = true;
+        $param['if_category'] = true;
+        $param['if_type'] = true;
         $count = $mGoods->getGoodsByParamCnt($param);
         $data['count'] = $count;
         $brandRes = array();
@@ -55,6 +60,27 @@ class Goods extends Base
      * 设置商品页面
      */
     public function setGoods(){
+        //todo 权限
+        $goodsID = input('id/d');
+        if($goodsID && $this->_inputAjax()['code'] == 0){
+            $mGoods = new GoodsModel();
+            $goodsRes = array_err(0,'success');
+            $goodsRes['goods'] = $mGoods->getGoodsByKV($goodsID)[$goodsID];
+
+            if(empty($goodsRes)){
+                return array_err('8989','没有您需要修改的商品');
+            }
+            $goodsRes['attr'] = [];
+            if($goodsRes['goods']['type_id']){
+                $goodsRes['attr'] = $mGoods->getGoodsAttrByGoodsID($goodsID);
+            }
+
+            $mMemberLevel = new MemberLevel();
+            $goodsRes['member_price'] = $mMemberLevel->getMemberPriceByGoodsID($goodsID,'mlevel_id,mprice');
+
+            $goodsRes['photo'] = $mGoods->getGoodsPhotoByGoodsID($goodsID);
+            return $goodsRes;
+        }
         return $this->fetch();
     }
 
@@ -160,9 +186,9 @@ class Goods extends Base
     public function getCateGory() {
         //权限
         //获取所有的商品分类列表
-        $categorydata = Db::name('category')->select();
+        $categoryData = Db::name('category')->select();
         $mCateTree = new cateTreeUtil();
-        $categoryRes = $mCateTree->setSort($categorydata);
+        $categoryRes = $mCateTree->setSort($categoryData);
         $this->assign('categoryRes', $categoryRes);
         return $this->fetch('goods/category');
     }
