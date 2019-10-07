@@ -72,7 +72,9 @@ class Goods extends Base
             }
             $goodsRes['attr'] = [];
             if($goodsRes['goods']['type_id']){
-                $goodsRes['attr'] = $mGoods->getGoodsAttrByGoodsID($goodsID);
+                foreach ($mGoods->getGoodsAttrByGoodsID($goodsID) as $k=>$v){
+                    $goodsRes['attr'][$v['attr_id']][] = $v;
+                }
             }
 
             $mMemberLevel = new MemberLevel();
@@ -133,10 +135,11 @@ class Goods extends Base
         $goodsBase = json_decode_html(input('goods_base'));
         $goodsPrice = json_decode_html(input('goods_price'));
         $goodsAttr = json_decode_html(input('goods_attr'));
+        $goodsPhoto = json_decode_html(input('goods_photo'));
         Db::startTrans();
         $mGoods = new GoodsEvent();
 
-        $flag = $mGoods->addGoods($goodsBase,$goodsPrice,$goodsAttr);
+        $flag = $mGoods->addGoods($goodsBase,$goodsPrice,$goodsAttr,$goodsPhoto);
         if ($flag['code'] > 0) {
             Db::rollback();
         } else {

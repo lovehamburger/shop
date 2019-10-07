@@ -168,7 +168,7 @@ class GoodsEvent extends BaseEvent
         return array_err(0, '修改排序数据成功');
     }
 
-    public function addGoods($goodsBase, $goodsPrice, $goodsAttr) {
+    public function addGoods($goodsBase, $goodsPrice, $goodsAttr,$goodsPhoto) {
         $dataRes = $this->_addGoods($goodsBase, $goodsPrice, $goodsAttr);
         if ($dataRes['code'] > 0) {
             return $dataRes;
@@ -223,6 +223,25 @@ class GoodsEvent extends BaseEvent
             $addGoodsAttrFlag = Db::name('goods_attr')->insertAll($dataRes['goods_attr']['attr_lists']);
 
             if ($addGoodsAttrFlag === false) {
+                return array_err(92499, '增加商品基础数据失败');
+            }
+        }
+
+
+        if(!empty($goodsPhoto)){
+            $goodsPhotoArr = [];
+            foreach ($goodsPhoto as $k=>$v){
+                $pathInfo = pathinfo($v);
+                $goodsPhotoArr[$k]['goods_id'] = $mGoods->id;
+                $goodsPhotoArr[$k]['og_photo'] = $v;
+                $goodsPhotoArr[$k]['sm_photo'] = $pathInfo['dirname'] . '/sm_' . $pathInfo['basename'];
+                $goodsPhotoArr[$k]['mid_photo'] = $pathInfo['dirname'] . '/mid_' . $pathInfo['basename'];
+                $goodsPhotoArr[$k]['big_photo'] = $pathInfo['dirname'] . '/big_' . $pathInfo['basename'];
+            }
+
+            $addGoodsPhotoFlag = Db::name('goods_photo')->insertAll($goodsPhotoArr);
+
+            if ($addGoodsPhotoFlag === false) {
                 return array_err(92499, '增加商品基础数据失败');
             }
         }
@@ -409,7 +428,8 @@ class GoodsEvent extends BaseEvent
                 return $checkTypeFlag;
             }
 
-            $arrAttrID = array_column($goodsAttr, 'attr_id');
+
+            $arrAttrID = array_unique(array_column($goodsAttr['attr_lists'], 'attr_id'));
             $attrRes = [];
             $checkAttrFlag = $mTypeEvent->checkAttrID($arrAttrID, $attrRes);
             if ($checkAttrFlag['code'] > 0) {

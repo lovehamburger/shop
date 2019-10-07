@@ -36,8 +36,7 @@
                     <div class="layui-btn-group test-table-operate-btn" style="margin-bottom: 10px;">
                         <button class="layui-btn" data-type="delGoods">删除商品</button>
 
-                        <button class="layui-btn layui-btn-normal" data-type="addGoods">新增商品</button>
-                        <button class="layui-btn layui-btn-danger" data-type="setSort">保存排序</button>
+                        <button lay-href="admin.php/goods/setGoods" class="layui-btn layui-btn-normal">新增商品</button>
                         <!--                        <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>-->
                         <!--                        <button class="layui-btn" data-type="isAll">验证是否全选</button>-->
                     </div>
@@ -66,86 +65,14 @@
                     </script>
 
                     <script type="text/html" id="goods-table-tools">
-                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
-                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="product">库存</a>
+                        <a class="layui-btn layui-btn-xs" lay-event="detail">编辑</a>
                         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
                     </script>
 
-                    <div class="layui-card goods-input" hidden>
+                    <div class="layui-card goods-product" hidden>
                         <div class="layui-card-body">
-                            <from class="layui-form" lay-filter="component-form-element">
-                                <input type="hidden" value="" name="goods_id" data-name="id"
-                                       class="layui-input goods_id">
-                                <div class="layui-row layui-col-space10 layui-form-item">
-                                    <div class="layui-col-lg6">
-                                        <label class="layui-form-label">商品名称：</label>
-                                        <div class="layui-input-block">
-                                            <input type="text" value="" name="goods_name" lay-verify="required"
-                                                   placeholder="" autocomplete="off" data-name="goods_name"
-                                                   class="layui-input item-input">
-                                        </div>
-                                    </div>
-                                    <div class="layui-col-lg6">
-                                        <label class="layui-form-label">商品链接：</label>
-                                        <div class="layui-input-block">
-                                            <input type="text" name="goods_url" data-name="goods_url"
-                                                   placeholder="" autocomplete="off"
-                                                   class="layui-input item-input goods_url">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="layui-form-item layui-col-lg6">
-                                    <label class="layui-form-label">是否开启：</label>
-                                    <div class="layui-input-block">
-                                        <input type="checkbox" class="item-checkbox" name="status" data-name="status"
-                                               lay-skin="switch" lay-filter="goods-status" lay-text="是|否">
-                                        <div class="layui-unselect layui-form-switch layui-form-onswitch"
-                                             lay-skin="_switch"><em>是</em><i></i></div>
-                                    </div>
-
-
-                                    <!-- 这里的 checked 的状态只是演示 -->
-
-                                </div>
-                                <div class="layui-col-lg6">
-                                    <label class="layui-form-label">商品排序：</label>
-                                    <div class="layui-input-block" style="width: 20%">
-                                        <input type="text" name="sort" data-name="sort"
-                                               placeholder="" autocomplete="off" class="layui-input item-input">
-                                    </div>
-                                </div>
-                                <div class="layui-form-item layui-col-lg12">
-                                    <label class="layui-form-label">商品图片：</label>
-                                    <div class="layui-col-md12">
-                                        <div class="layui-card">
-
-                                            <div class="layui-upload layui-input-block">
-                                                <button type="button" class="layui-btn" id="test-upload-normal">上传图片
-                                                </button>
-                                                <div class="layui-upload-list">
-                                                    <img class="layui-upload-img"
-                                                         src="/public/static/common/img/default.png" id="goods_img">
-                                                    <p id="test-upload-demoText"></p>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">商品描述：</label>
-                                    <div class="layui-input-block">
-                                        <textarea name="goods_description" data-name="goods_description" placeholder=""
-                                                  class="layui-textarea item-textarea"></textarea>
-                                    </div>
-                                </div>
-                                <div class="layui-form-item">
-                                    <div class="layui-input-block">
-                                        <button class="layui-btn data-send" lay-submit="">立即提交</button>
-                                    </div>
-                                </div>
-                            </from>
+                            <table class="layui-hide" id="goods-product" lay-filter="goods-product"></table>
                         </div>
                     </div>
                 </div>
@@ -229,12 +156,12 @@
       table.on('tool(goods-data)', function (obj) {
         var data = obj.data;
         if (obj.event === 'detail') {
-            var othis = $(this)
-                    , href = "admin.php/goods/setGoods/id/"+data.id
-                    , text = data.goods_name+"修改商品"
-                    , router = layui.router();
-            var topLayui = parent === self ? layui : top.layui;
-            topLayui.index.openTabsPage(href, text || othis.text());
+          var othis = $(this)
+            , href = "admin.php/goods/setGoods/id/" + data.id
+            , text = data.goods_name + "修改商品"
+            , router = layui.router();
+          var topLayui = parent === self ? layui : top.layui;
+          topLayui.index.openTabsPage(href, text || othis.text());
 
         } else if (obj.event === 'del') {
           layer.confirm('真的删除行么', function (index) {
@@ -259,45 +186,17 @@
             });
             layer.close(index);
           });
-        } else if (obj.event === 'edit') {
-          $('.goods-input .item-input').each(function () {
-            var dataName = $(this).attr('data-name');
-            $("input[data-name=" + dataName + "]").val(data[dataName]);
-          })
-
-          $('.goods-input .item-textarea').each(function () {
-            var dataName = $(this).attr('data-name');
-            $("textarea[data-name=" + dataName + "]").val(data[dataName]);
-          })
-
-          $('.goods-input #goods_img').prop('src', data['goods_img']);
-
-          $('.goods-input .goods_id').val(data['id']);
-          if (data['status'] == 1) {
-            $('.goods-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
-            $('.goods-input .item-checkbox').parent().find('.layui-unselect em').html('是');
-          } else {
-            $('.goods-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
-            $('.goods-input .item-checkbox').parent().find('.layui-unselect em').html('否');
-          }
-
-
-          // $('.data-search .item-input').each(function () {
-          //   var dataName = $(this).attr('id');
-          //   var val = $.trim($(this).val());
-          //   self.param[dataName] = val
-          //   if (self.param[dataName] == '') {
-          //     delete self.param[dataName];
-          //   }
-          // })
+        } else if (obj.event === 'product') {
+          self.getProduct(data.id);
           layer.open({
             type: 1,
-            title: '商品修改',
-            area: ['50%'],
-            closeBtn: 0,
+            maxmin: true, //开启最大化最小化按钮
+            title: '(' + data.goods_name + ')商品库存',
+            area: '50%',
+            offset: '100px',
+            closeBtn: 1,
             shadeClose: true,
-            skin: 'yourClass',
-            content: $(".goods-input"),
+            content: $(".goods-product"),
           });
         }
       });
@@ -540,6 +439,31 @@
             , {width: 200, align: 'center', toolbar: '#goods-table-tools'}
           ]]
           , page: true
+        })
+      },
+      getProduct: function (goods_id) {
+        table.render({
+          elem: '#goods-product'
+          , method: 'post'
+          , url: 'getData'
+          , where: {
+            goods_id: goods_id
+          }
+          , cols: [[
+            {type: 'checkbox', fixed: 'left'}
+            , {field: 'id', width: 92, title: 'ID', sort: true, fixed: 'left'}
+            , {field: 'goods_code', width: 200, title: '商品编号'}
+            , {field: 'goods_name', width: 200, title: '商品名称'}
+            , {field: 'markte_price', width: 100, title: '市场价'}
+            , {field: 'shop_price', width: 100, title: '零售价'}
+            , {field: 'cate_name', width: 180, title: '所属栏目'}
+            , {field: 'type_name', width: 100, title: '所属类型'}
+            , {field: 'brand_name', width: 100, title: '商品品牌'}
+            , {field: 'goods_weight', width: 100, title: '商品重量'}
+            , {field: 'weight_unit', width: 100, title: '重量单位'}
+            , {field: 'on_sale', title: '状态', width: 100, templet: '#test-table-switchTpl', unresize: true}
+            , {width: 200, align: 'center', toolbar: '#goods-table-tools'}
+          ]]
         })
       },
     }

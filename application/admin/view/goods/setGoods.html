@@ -62,10 +62,16 @@
         <form class="layui-form goods-box" action="" lay-filter="component-form-element">
             <div class="layui-col-md12">
                 <div class="layui-card">
-                    <div class="layui-card-header">商品添加
-                        <a style="padding: 0 5px;" class="layui-btn layui-btn-warm layui-btn-radius goods_add"
-                           lay-submit lay-filter="component-form-element">新增
+                    <div class="layui-card-header">
+                        {empty name="$Request.param.id"}
+                        <a style="padding: 0 5px;" class="layui-btn layui-btn-warm goods_add"
+                           lay-submit lay-filter="component-form-element">商品新增
                         </a>
+                        {else/}
+                        <a style="padding: 0 5px;" class="layui-btn layui-btn goods_add"
+                           lay-submit lay-filter="component-form-element">商品修改
+                        </a>
+                        {/empty}
                     </div>
                     <div class="layui-card-body">
                         <div class="layui-tab">
@@ -84,7 +90,8 @@
                                             <div class="layui-col-lg6">
                                                 <label class="layui-form-label">商品名称：</label>
                                                 <div class="layui-input-block">
-                                                    <input type="text" value="{$goodsRes.goods.goods_name}" name="fullname" lay-verify="required"
+                                                    <input type="text" value="{$goodsRes.goods.goods_name}"
+                                                           name="fullname" lay-verify="required"
                                                            placeholder="" autocomplete="off" data-name="goods_name"
                                                            class="layui-input item-input">
                                                 </div>
@@ -266,8 +273,8 @@
               self.getBrand();
               self.getMemberLever();
               self.getType();
-              var goods_id= $('.goods_id').val();
-              if(goods_id){
+              var goods_id = $('.goods_id').val();
+              if (goods_id) {
                 self.getGoodsData(goods_id);
               }
             })
@@ -308,11 +315,12 @@
 
 
             form.on('select(type)', function (data) {
-                if(data.value){
-                    self.setAttr(data.value);
-                }else{
-                    $('.attr_lists').html("");
-                }
+              if (data.value) {
+                var goods_id = $('.goods_id').val();
+                self.setAttr(data.value,goods_id,self.goods_attr);
+              } else {
+                $('.attr_lists').html("");
+              }
             });
 
             //属性的复制
@@ -336,7 +344,7 @@
             //多图片上传
             upload.render({
               elem: '#test-upload-more'
-              , url: 'upload'
+              , url: '/admin.php/Goods/upload'
               , field: 'image'
               , multiple: true
               , before: function (obj) {
@@ -352,7 +360,7 @@
             //普通图片上传
             var uploadInst = upload.render({
               elem: '#test-upload-normal'
-              , url: 'upload'
+              , url: '/admin.php/Goods/upload'
               , field: 'image'
               , before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
                 layer.load('loading'); //上传loading
@@ -363,7 +371,7 @@
                 if (res.code > 0) {
                   return layer.msg('上传失败');
                 }
-                $('#master_img').attr('src', res.file.saveFiles).attr('alt',res.file.saveFiles); //图片链接（base64）
+                $('#master_img').attr('src', res.file.saveFiles).attr('alt', res.file.saveFiles); //图片链接（base64）
                 //上传成功
               }
 
@@ -405,7 +413,7 @@
               $.ajax({
                 url: '/admin.php/Brand/getData',
                 type: 'post',
-                data:{param:JSON.stringify({"status":1})},
+                data: {param: JSON.stringify({"status": 1})},
                 dataType: 'json',
                 success: function (msg) {
                   if (msg.code > 0) {
@@ -472,24 +480,24 @@
               })
             },
             getGoodsData: function (goods_id) {
-                var self = this;
-              index = layer.load(2)
+              var self = this;
+              var index = layer.load(2)
               $.ajax({
                 url: '/admin.php/Goods/setGoods',
-                data:{id:goods_id},
+                data: {id: goods_id},
                 type: 'post',
                 dataLevel: 'json',
                 success: function (msg) {
                   if (msg.code > 0) {
                     layer.msg(msg.msg, {icon: 5});
                   } else {
-                      self.orgData(msg)
+                    self.orgData(msg)
                   }
                   layer.close(index);
                 }
               })
             },
-            setAttr: function (type_id) {
+            setAttr: function (type_id,goods_id,attr) {
               $.ajax({
                 url: '/admin.php/Type/getAttr',
                 type: 'post',
@@ -505,39 +513,95 @@
                       $.each(msg.data, function (i, el) {
                         //是单选属性
                         if (el.attr_type == 1) {
-                          str += '<div class="layui-col-lg12 layui-col-space10 attr_list" attr_id="' + el.id + '">';
-                          str += '<label class="layui-form-label">' + el.attr_name + '：</label>';
-                          var attrValuesArr = el.attr_values.split(",");
-                          str += '<div class="layui-col-lg3"><div class="layui-form-item">';
-                          str += '<select class="attr_val">';
-                          $.each(attrValuesArr, function (i, e) {
-                            str += '<option value="' + e + '">' + e + '</option>';
-                          });
-                          str += '</select>';
-                          str += '</div></div>';
-                          str += '<div class="layui-col-lg2">';
-                          str += '<input type="text" name="fullname" placeholder="价格" autocomplete="off" class="layui-input attr_price">';
-                          str += '</div><div class="layui-col-lg1"><a style="vertical-align: text-top;" class="add_attr layui-btn layui-btn-sm"><i class="layui-icon layui-icon-add-1"></i></a></div></div>';
-                        } else {
-                          //是唯一属性
-                          if (el.attr_values) {
+                          if(goods_id){
+                            $.each(attr[el.id], function (k, a) {
                             str += '<div class="layui-col-lg12 layui-col-space10 attr_list" attr_id="' + el.id + '">';
                             str += '<label class="layui-form-label">' + el.attr_name + '：</label>';
                             var attrValuesArr = el.attr_values.split(",");
-                            str += '<div class="layui-col-lg2"><div class="layui-form-item">';
+                            str += '<div class="layui-col-lg3"><div class="layui-form-item">';
+                            str += '<select class="attr_val">';
+                            $.each(attrValuesArr, function (i, e) {
+                              if(a.attr_value == e){
+                                str += '<option selected value="' + e + '">' + e + '</option>';
+                              }else{
+                                str += '<option value="' + e + '">' + e + '</option>';
+                              }
+                            });
+                            str += '</select>';
+                            str += '</div></div>';
+                            str += '<div class="layui-col-lg2">';
+                            str += '<input type="text" name="fullname" value = '+a.attr_price+' placeholder="价格" autocomplete="off" class="layui-input attr_price">';
+                            str += '</div><div class="layui-col-lg1"><a style="vertical-align: text-top;" class="add_attr layui-btn layui-btn-sm">'
+                              if(k == 0){
+                                str += '<i class="layui-icon layui-icon-add-1"></i>'
+                              }else{
+                                str += '<i class="layui-icon layui-icon-delete"></i>'
+                              }
+                            str +=  '</a></div></div>';
+                            });
+                          }else{
+                            str += '<div class="layui-col-lg12 layui-col-space10 attr_list" attr_id="' + el.id + '">';
+                            str += '<label class="layui-form-label">' + el.attr_name + '：</label>';
+                            var attrValuesArr = el.attr_values.split(",");
+                            str += '<div class="layui-col-lg3"><div class="layui-form-item">';
                             str += '<select class="attr_val">';
                             $.each(attrValuesArr, function (i, e) {
                               str += '<option value="' + e + '">' + e + '</option>';
                             });
                             str += '</select>';
                             str += '</div></div>';
-                            str += '</div>';
-                          } else {
-                            str += '<div class="layui-col-lg12 layui-col-space10 attr_list" attr_id="' + el.id + '">';
-                            str += '<label class="layui-form-label">' + el.attr_name + '：</label>';
-                            str += '<div class="layui-col-lg2"><div class="layui-form-item">';
-                            str += '<input type="text" name="fullname" placeholder="" autocomplete="off" class="layui-input attr_val">';
-                            str += '</div></div></div>';
+                            str += '<div class="layui-col-lg2">';
+                            str += '<input type="text" name="fullname" placeholder="价格" autocomplete="off" class="layui-input attr_price">';
+                            str += '</div><div class="layui-col-lg1"><a style="vertical-align: text-top;" class="add_attr layui-btn layui-btn-sm">' +
+                              '<i class="layui-icon layui-icon-add-1"></i></a></div></div>';
+                          }
+                        } else {
+                          if(goods_id) {
+                            //是唯一属性
+                            if (el.attr_values) {
+                              str += '<div class="layui-col-lg12 layui-col-space10 attr_list" attr_id="' + el.id + '">';
+                              str += '<label class="layui-form-label">' + el.attr_name + '：</label>';
+                              var attrValuesArr = el.attr_values.split(",");
+                              str += '<div class="layui-col-lg2"><div class="layui-form-item">';
+                              str += '<select class="attr_val">';
+                              $.each(attrValuesArr, function (i, e) {
+                                if(attr[el.id][0].attr_value == e){
+                                  str += '<option selected value="' + e + '">' + e + '</option>';
+                                }else{
+                                  str += '<option value="' + e + '">' + e + '</option>';
+                                }
+                              });
+                              str += '</select>';
+                              str += '</div></div>';
+                              str += '</div>';
+                            } else {
+                              str += '<div class="layui-col-lg12 layui-col-space10 attr_list" attr_id="' + el.id + '">';
+                              str += '<label class="layui-form-label">' + el.attr_name + '：</label>';
+                              str += '<div class="layui-col-lg2"><div class="layui-form-item">';
+                              str += '<input value="'+attr[el.id][0].attr_value+'" type="text" name="fullname" placeholder="" autocomplete="off" class="layui-input attr_val">';
+                              str += '</div></div></div>';
+                            }
+                          }else{
+                            //是唯一属性
+                            if (el.attr_values) {
+                              str += '<div class="layui-col-lg12 layui-col-space10 attr_list" attr_id="' + el.id + '">';
+                              str += '<label class="layui-form-label">' + el.attr_name + '：</label>';
+                              var attrValuesArr = el.attr_values.split(",");
+                              str += '<div class="layui-col-lg2"><div class="layui-form-item">';
+                              str += '<select class="attr_val">';
+                              $.each(attrValuesArr, function (i, e) {
+                                str += '<option value="' + e + '">' + e + '</option>';
+                              });
+                              str += '</select>';
+                              str += '</div></div>';
+                              str += '</div>';
+                            } else {
+                              str += '<div class="layui-col-lg12 layui-col-space10 attr_list" attr_id="' + el.id + '">';
+                              str += '<label class="layui-form-label">' + el.attr_name + '：</label>';
+                              str += '<div class="layui-col-lg2"><div class="layui-form-item">';
+                              str += '<input type="text" name="fullname" placeholder="" autocomplete="off" class="layui-input attr_val">';
+                              str += '</div></div></div>';
+                            }
                           }
                         }
                       })
@@ -550,109 +614,124 @@
               })
             },
             orgData: function (msg) {
-                  var self = this;
-                  if (msg) {
-                      $('.goods_base .item-input').each(function () {
-                          var dataName = $(this).attr('data-name');
-                          self['goods_base'][dataName] = $("input[data-name=" + dataName + "]").val(""+ msg['goods'][dataName] +"");
-                          if (dataName == 'goods_weight' && self['goods_base'][dataName] != '') {
-                              self['goods_base']['weight_unit'] = $('.weight_unit').val();
-                          }
-                      })
-
-                      self['goods_base']['goods_des'] = ue.setContent(""+msg['goods']['goods_des']+"");
-
-                    $('.goods_price .item-input').each(function () {
-                      var levelID = $(this).attr('level_id');
-                      self.goods_price[levelID] = $(this).val(msg['member_price'][levelID]);
-                    })
-
-                    self['goods_base']['og_thumb'] = $('#master_img').prop('alt',""+msg['goods']['og_thumb']+"").prop('src',""+msg['goods']['og_thumb']+"");
-
-                  $('.goods_base .item-select').each(function () {
-                      var dataName = $(this).attr('data-name');
-                      var select = 'dd[lay-value=' + msg['goods'][dataName] + ']';
-                      $(this).siblings("div.layui-form-select").find('dl').find(select).click()
-                  })
-
-                      $('.goods_base .item-checkbox').each(function () {
-                          var dataName = $(this).attr('data-name');
-                          console.log(msg['goods'][dataName]);
-                          if (msg['goods']['on_sale'] == 1) {
-                              $(this).parent().find('.layui-unselect').addClass('layui-form-onswitch');
-                              $(this).parent().find('.layui-unselect em').html('是');
-                          } else {
-                              $(this).parent().find('.layui-unselect').removeClass('layui-form-onswitch');
-                              $(this).parent().find('.layui-unselect em').html('否');
-                          }
-                      })
-
-                      $('#goods-upload-more-list .more_img_box').each(function () {
-
-                      })
-
-                  } else {
-                      $('.goods_base .item-input').each(function () {
-                          var dataName = $(this).attr('data-name');
-                          self['goods_base'][dataName] = $("input[data-name=" + dataName + "]").val();
-                          if (dataName == 'goods_weight' && self['goods_base'][dataName] != '') {
-                              self['goods_base']['weight_unit'] = $('.weight_unit').val();
-                          }
-                      })
-
-                      $('.goods_base .item-select').each(function () {
-                          var dataName = $(this).attr('data-name');
-                          self['goods_base'][dataName] = $("select[data-name=" + dataName + "]").val();
-                      })
-
-                      $('.goods_base .item-checkbox').each(function () {
-                          var dataName = $(this).attr('data-name');
-                          self['goods_base'][dataName] = $("input[data-name=" + dataName + "]").val();
-                          console.log(self['goods_base'][dataName]);
-                          if (self['goods_base'][dataName] == "true") {
-                              self['goods_base'][dataName] = 1;
-                          } else {
-                              self['goods_base'][dataName] = 0;
-                          }
-                      })
-
-                      self['goods_base']['og_thumb'] = $('#master_img').prop('alt');
-
-                      self['goods_base']['goods_des'] = ue.getContent();
-
-
-                      var type_id = $('.goods_attr .type').val();
-
-                      if (type_id) {
-                          self['goods_attr']['type_id'] = type_id
-                          self['goods_attr']['attr_lists'] = [];
-                          $('.attr_lists .attr_list').each(function () {
-                              self['attr_list'] = {};
-                              self['attr_list']['attr_id'] = $(this).attr('attr_id');
-                              self['attr_list']['attr_value'] = $(this).find('.attr_val').val();
-                              self['attr_list']['attr_price'] = $(this).find('.attr_price').val() ? $(this).find('.attr_price').val() : 0;
-                              self['goods_attr']['attr_lists'].push(self['attr_list'])
-                          })
-                      }
-
-                      var goods_pics_arrs = [];
-                      $('#goods-upload-more-list .more_img_box').each(function () {
-                          goods_pics_arrs.push($(this).find('img').prop('alt'))
-                      })
-                      self['goods_photo'] = goods_pics_arrs;
-
-
-                      $('.goods_price .item-input').each(function () {
-                          var levelID = $(this).attr('level_id');
-                          var level_val = $(this).val();
-                          self.goods_price[levelID] = $(this).val();
-                          if (level_val == '') {
-                              delete self.goods_price[levelID];
-                          }
-                      })
+              var self = this;
+              if (msg) {
+                $('.goods_base .item-input').each(function () {
+                  var dataName = $(this).attr('data-name');
+                  self['goods_base'][dataName] = $("input[data-name=" + dataName + "]").val("" + msg['goods'][dataName] + "");
+                  if (dataName == 'goods_weight' && self['goods_base'][dataName] != '') {
+                    self['goods_base']['weight_unit'] = $('.weight_unit').val();
                   }
+                })
 
+                self['goods_base']['goods_des'] = ue.setContent("" + msg['goods']['goods_des'] + "");
+
+                $('.goods_price .item-input').each(function () {
+                  var levelID = $(this).attr('level_id');
+                  self.goods_price[levelID] = $(this).val(msg['member_price'][levelID]);
+                })
+
+                self['goods_base']['og_thumb'] = $('#master_img').prop('alt', "" + msg['goods']['og_thumb'] + "").prop('src', "" + msg['goods']['og_thumb'] + "");
+
+                $('.goods_base .item-select').each(function () {
+                  var dataName = $(this).attr('data-name');
+                  var select = 'dd[lay-value=' + msg['goods'][dataName] + ']';
+                  $(this).siblings("div.layui-form-select").find('dl').find(select).click()
+                })
+
+                //保留全局的attr
+                self.goods_attr = msg.attr;
+
+                //属性的选中
+                var goods_attr_select = 'dd[lay-value=' + msg['goods']['type_id'] + ']';
+                $('.goods_attr .type').siblings("div.layui-form-select").find('dl').find(goods_attr_select).click();
+
+                $('.goods_base .item-checkbox').each(function () {
+                  var dataName = $(this).attr('data-name');
+                  console.log(msg['goods'][dataName]);
+                  if (msg['goods']['on_sale'] == 1) {
+                    $(this).parent().find('.layui-unselect').addClass('layui-form-onswitch');
+                    $(this).parent().find('.layui-unselect em').html('是');
+                  } else {
+                    $(this).parent().find('.layui-unselect').removeClass('layui-form-onswitch');
+                    $(this).parent().find('.layui-unselect em').html('否');
+                  }
+                })
+
+                //这边是商品图片的数据
+                var str = '';
+                //if(msg.photo.length > 0){
+                  $.each(msg.photo, function (i, el) {
+                    str += '<div class="more_img_box">'
+                    str += '<img src="'+el.og_photo+'" alt="'+el.og_photo+'" class="layui-upload-img">'
+                    str += '<i class="more-img-close layui-icon layui-icon-close"></i>'
+                    str += '</div>'
+                  })
+                  $('#goods-upload-more-list').html(str);
+               // }
+
+              } else {
+                $('.goods_base .item-input').each(function () {
+                  var dataName = $(this).attr('data-name');
+                  self['goods_base'][dataName] = $("input[data-name=" + dataName + "]").val();
+                  if (dataName == 'goods_weight' && self['goods_base'][dataName] != '') {
+                    self['goods_base']['weight_unit'] = $('.weight_unit').val();
+                  }
+                })
+
+                $('.goods_base .item-select').each(function () {
+                  var dataName = $(this).attr('data-name');
+                  self['goods_base'][dataName] = $("select[data-name=" + dataName + "]").val();
+                })
+
+                $('.goods_base .item-checkbox').each(function () {
+                  var dataName = $(this).attr('data-name');
+                  self['goods_base'][dataName] = $("input[data-name=" + dataName + "]").val();
+                  console.log(self['goods_base'][dataName]);
+                  if (self['goods_base'][dataName] == "true") {
+                    self['goods_base'][dataName] = 1;
+                  } else {
+                    self['goods_base'][dataName] = 0;
+                  }
+                })
+
+                self['goods_base']['og_thumb'] = $('#master_img').prop('alt');
+
+                self['goods_base']['goods_des'] = ue.getContent();
+
+
+                var type_id = $('.goods_attr .type').val();
+
+                if (type_id) {
+                  self['goods_attr']['type_id'] = type_id
+                  self['goods_attr']['attr_lists'] = [];
+                  $('.attr_lists .attr_list').each(function () {
+                    self['attr_list'] = {};
+                    self['attr_list']['attr_id'] = $(this).attr('attr_id');
+                    self['attr_list']['attr_value'] = $(this).find('.attr_val').val();
+                    self['attr_list']['attr_price'] = $(this).find('.attr_price').val() ? $(this).find('.attr_price').val() : 0;
+                    self['goods_attr']['attr_lists'].push(self['attr_list'])
+                  })
+                }
+
+                var goods_pics_arrs = [];
+                $('#goods-upload-more-list .more_img_box').each(function () {
+                  goods_pics_arrs.push($(this).find('img').prop('alt'))
+                })
+                self['goods_photo'] = goods_pics_arrs;
+
+
+                $('.goods_price .item-input').each(function () {
+                  var levelID = $(this).attr('level_id');
+                  var level_val = $(this).val();
+                  self.goods_price[levelID] = $(this).val();
+                  if (level_val == '') {
+                    delete self.goods_price[levelID];
+                  }
+                })
               }
+
+            }
           }
           new setGoods();
         });
