@@ -513,32 +513,32 @@
                       $.each(msg.data, function (i, el) {
                         //是单选属性
                         if (el.attr_type == 1) {
-                          if(goods_id){
-                            $.each(attr[el.id], function (k, a) {
-                            str += '<div class="layui-col-lg12 layui-col-space10 attr_list" attr_id="' + el.id + '">';
-                            str += '<label class="layui-form-label">' + el.attr_name + '：</label>';
-                            var attrValuesArr = el.attr_values.split(",");
-                            str += '<div class="layui-col-lg3"><div class="layui-form-item">';
-                            str += '<select class="attr_val">';
-                            $.each(attrValuesArr, function (i, e) {
-                              if(a.attr_value == e){
-                                str += '<option selected value="' + e + '">' + e + '</option>';
-                              }else{
-                                str += '<option value="' + e + '">' + e + '</option>';
-                              }
-                            });
-                            str += '</select>';
-                            str += '</div></div>';
-                            str += '<div class="layui-col-lg2">';
-                            str += '<input type="text" name="fullname" value = '+a.attr_price+' placeholder="价格" autocomplete="off" class="layui-input attr_price">';
-                            str += '</div><div class="layui-col-lg1"><a style="vertical-align: text-top;" class="add_attr layui-btn layui-btn-sm">'
-                              if(k == 0){
-                                str += '<i class="layui-icon layui-icon-add-1"></i>'
-                              }else{
-                                str += '<i class="layui-icon layui-icon-delete"></i>'
-                              }
-                            str +=  '</a></div></div>';
-                            });
+                          if(goods_id && attr[el.id]){
+                              $.each(attr[el.id], function (k, a) {
+                                  str += '<div class="layui-col-lg12 layui-col-space10 attr_list" attr_id="' + el.id + '">';
+                                  str += '<label class="layui-form-label">' + el.attr_name + '：</label>';
+                                  var attrValuesArr = el.attr_values.split(",");
+                                  str += '<div class="layui-col-lg3"><div class="layui-form-item">';
+                                  str += '<select class="attr_val">';
+                                  $.each(attrValuesArr, function (i, e) {
+                                      if (a.attr_value == e) {
+                                          str += '<option selected value="' + e + '">' + e + '</option>';
+                                      } else {
+                                          str += '<option value="' + e + '">' + e + '</option>';
+                                      }
+                                  });
+                                  str += '</select>';
+                                  str += '</div></div>';
+                                  str += '<div class="layui-col-lg2">';
+                                  str += '<input type="text" name="fullname" value = ' + a.attr_price + ' placeholder="价格" autocomplete="off" class="layui-input attr_price">';
+                                  str += '</div><div class="layui-col-lg1"><a style="vertical-align: text-top;" class="add_attr layui-btn layui-btn-sm">'
+                                  if (k == 0) {
+                                      str += '<i class="layui-icon layui-icon-add-1"></i>'
+                                  } else {
+                                      str += '<i class="layui-icon layui-icon-delete"></i>'
+                                  }
+                                  str += '</a></div></div>';
+                              });
                           }else{
                             str += '<div class="layui-col-lg12 layui-col-space10 attr_list" attr_id="' + el.id + '">';
                             str += '<label class="layui-form-label">' + el.attr_name + '：</label>';
@@ -556,7 +556,7 @@
                               '<i class="layui-icon layui-icon-add-1"></i></a></div></div>';
                           }
                         } else {
-                          if(goods_id) {
+                          if(goods_id && attr[el.id]) {
                             //是唯一属性
                             if (el.attr_values) {
                               str += '<div class="layui-col-lg12 layui-col-space10 attr_list" attr_id="' + el.id + '">';
