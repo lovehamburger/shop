@@ -212,9 +212,9 @@ class Config extends Base
                         $this->error('修改失败');
                     }
                 }
-                Db::commit();
-                $this->success('修改成功');
             }
+            Db::commit();
+            $this->success('修改成功');
         }
         $mConfig = new ConfigModel();
         //条数的限制

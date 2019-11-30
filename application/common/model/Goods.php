@@ -77,7 +77,8 @@ class Goods extends BaseModel
             ->alias($where['alias'])
             ->join($where['join'])
             ->limit(($param['curr_page'] - 1) * $param['page_count'], $param['page_count'])
-            ->order('time')
+            ->order('time desc')
+            ->group('id')
             ->select();
     }
 
@@ -89,7 +90,7 @@ class Goods extends BaseModel
             $where['id'] = ['in', $param['id']];
         }
 
-        if (!empty($param['brand_name'])) {
+        if (!empty($param['goods_name'])) {
             $where['goods_name'] = ['LIKE', "%" . $param['goods_name'] . "%"];
         }
 
@@ -110,9 +111,25 @@ class Goods extends BaseModel
             $code['join'][] = ['tp_type t', "{$prefix}.type_id = t.id",'left'];
         }
 
+        if($param['if_product']){
+            $code['field'] .= ',ifnull(goods_number,0) goods_number';
+            $code['join'][] = ['tp_product tp', "{$prefix}.id = tp.goods_id",'left'];
+        }
+
         return $code;
     }
 
+
+    /**
+     * 根据商品标识获取属性值
+     * @param $goodsAttrID
+     * @param string $field
+     * @return array
+     */
+    public function getGoodsAttrByID($goodsAttrID,$field = '*'){
+        $param['id'] = ['in',$goodsAttrID];
+        return Db::name('goods_attr')->where($param)->column($field);
+    }
 
     /**
      * 根据商品标识获取属性值
@@ -136,5 +153,16 @@ class Goods extends BaseModel
         return Db::name('goods_photo')->where($param)->column($field);
     }
 
-
+    /**
+     * 根据商品标识获取商品的库存
+     * @param $goodsID
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getGoodsProductByGoodsID($goodsID){
+        $param['goods_id'] = $goodsID;
+        return Db::name('product')->where($param)->select();
+    }
 }

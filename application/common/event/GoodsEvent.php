@@ -70,8 +70,8 @@ class GoodsEvent extends BaseEvent
      * @param $data
      * @return array
      */
-    public function editGoods($goodsID,$goodsBase, $goodsPrice, $goodsAttr) {
-        $this->_editGoods($goodsID,$goodsBase, $goodsPrice, $goodsAttr);
+    public function editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr) {
+        $this->_editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr);
     }
 
 
@@ -81,7 +81,7 @@ class GoodsEvent extends BaseEvent
      * @param $data
      * @return array
      */
-    public function _editGoods($goodsID,$goodsBase, $goodsPrice, $goodsAttr) {
+    public function _editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr) {
         $goodsBaseRes = array();
         $flag = $this->checkGoodsID($goodsID, $goodsBaseRes, true);
         if ($flag['code'] > 0) {
@@ -95,7 +95,7 @@ class GoodsEvent extends BaseEvent
 
         //比对商品数据是否需要修改
         $compareCols = 'goods_name,og_thumb,markte_price,shop_price,on_sale,category_id,brand_id,type_id,goods_des,goods_weight,weight_unit';//设置需要对比的字段
-        $this->_compareOrdInfo($goodsBaseRes,$goodsBase,$goodsID,$compareCols);
+        $this->_compareOrdInfo($goodsBaseRes, $goodsBase, $goodsID, $compareCols);
 
         //设置商品编码
         $seq = new apiUtil('GOODS_CODE', false);
@@ -120,7 +120,7 @@ class GoodsEvent extends BaseEvent
     }
 
 
-    protected function _compareOrdInfo($dbArray,$updatetArray,$goodsID,$compareCols){
+    protected function _compareOrdInfo($dbArray, $updatetArray, $goodsID, $compareCols) {
         /**
          *  * 更新比对
          * @param array $dbArray 数据表数组
@@ -130,9 +130,9 @@ class GoodsEvent extends BaseEvent
          * @return mixed 比对数组
          */
         $res = updateCompare($dbArray, $updatetArray, $goodsID, $compareCols);
-        echo'<pre>'; 
-            print_r($res);
-        echo'</pre>';
+        echo '<pre>';
+        print_r($res);
+        echo '</pre>';
     }
 
 
@@ -168,7 +168,90 @@ class GoodsEvent extends BaseEvent
         return array_err(0, '修改排序数据成功');
     }
 
-    public function addGoods($goodsBase, $goodsPrice, $goodsAttr,$goodsPhoto) {
+    /**
+     * 商品库存的设置
+     * @param $goodsID
+     * @param $productData
+     * @return array
+     */
+    public function setProduct($goodsID, $productData) {
+        $flag = $this->checkGoodsID($goodsID, $brandRes, false);
+        if ($flag['code'] > 0) {
+            return $flag;
+        }
+        $productData = json_decode_html($productData);
+        $checkProductFlag = $this->checkProduct($goodsID, $productData);
+        if ($checkProductFlag['code'] > 0) {
+            return $checkProductFlag;
+        }
+
+        $mProduct = Db::name('product');
+        $productRes = $mProduct->where('goods_id', $goodsID)->find();
+        if ($productRes) {
+            $delFlag = $mProduct->where('goods_id', $goodsID)->delete();
+            if ($delFlag === false) {
+                return array_err(2323, '设置商品库存失败');
+            }
+        }
+
+        foreach ($productData as $key => $value) {
+            $productData[$key]['goods_id'] = $goodsID;
+            $productData[$key]['goods_number'] = $value['goods_number'] ?? 0;
+        }
+        $addFlag = Db::name('product')->insertAll($productData);
+
+        if ($addFlag === false) {
+            return array_err(9877, '添加库存失败');
+        }
+        return array_err(0, '添加库存成功');
+    }
+
+    /**
+     * 校验商品库存是否正确
+     * @param $goodsID
+     * @param $productData
+     * @return array
+     */
+    public function checkProduct($goodsID, $productData) {// todo @!!!!未完待续
+        if ($productData) {
+            $mGoods = new Goods();
+            $formatProduct = [];
+            foreach ($productData as $k => $v) {
+                $formatProduct[$v['goods_attr']][] = $v;
+                if (count($formatProduct[$v['goods_attr']]) >= 2) {
+                    return array_err(985, '设置了相同的属性库存,请修改');
+                }
+            }
+
+            $productDataArr = array_unique(explode(',', implode(',', array_column($productData, 'goods_attr'))));
+
+            $goodsAttr = $mGoods->getGoodsAttrByID($productDataArr);
+
+            foreach ($productDataArr as $k => $v) {
+                if (empty($goodsAttr[$v])) {
+                    return array_err(986, '没有您要的商品属性标识,请核实');
+                }
+            }
+
+            foreach ($goodsAttr as $key => $value) {
+                if ($value['goods_id'] != $goodsID) {
+                    return array_err(987, '不是该商品的属性标识,请核实');
+                }
+            }
+
+            return array_err(0, 'success');
+        }
+    }
+
+    /**
+     * 商品添加
+     * @param $goodsBase
+     * @param $goodsPrice
+     * @param $goodsAttr
+     * @param $goodsPhoto
+     * @return array
+     */
+    public function addGoods($goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto) {
         $dataRes = $this->_addGoods($goodsBase, $goodsPrice, $goodsAttr);
         if ($dataRes['code'] > 0) {
             return $dataRes;
@@ -199,9 +282,9 @@ class GoodsEvent extends BaseEvent
         }
 
 
-        if(!empty($dataRes['goods_price'])){
+        if (!empty($dataRes['goods_price'])) {
             $allPrice = [];
-            foreach ($dataRes['goods_price'] as $k=>$v){
+            foreach ($dataRes['goods_price'] as $k => $v) {
                 $dataPrice['mprice'] = $v;
                 $dataPrice['mlevel_id'] = $k;
                 $dataPrice['goods_id'] = $mGoods->id;
@@ -215,8 +298,8 @@ class GoodsEvent extends BaseEvent
             }
         }
 
-        if(!empty($dataRes['goods_attr'])){
-            foreach ($dataRes['goods_attr']['attr_lists'] as $k=>$v){
+        if (!empty($dataRes['goods_attr'])) {
+            foreach ($dataRes['goods_attr']['attr_lists'] as $k => $v) {
                 $dataRes['goods_attr']['attr_lists'][$k]['goods_id'] = $mGoods->id;
             }
 
@@ -228,9 +311,9 @@ class GoodsEvent extends BaseEvent
         }
 
 
-        if(!empty($goodsPhoto)){
+        if (!empty($goodsPhoto)) {
             $goodsPhotoArr = [];
-            foreach ($goodsPhoto as $k=>$v){
+            foreach ($goodsPhoto as $k => $v) {
                 $pathInfo = pathinfo($v);
                 $goodsPhotoArr[$k]['goods_id'] = $mGoods->id;
                 $goodsPhotoArr[$k]['og_photo'] = $v;

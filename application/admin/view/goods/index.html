@@ -27,7 +27,7 @@
     </div>
 </div>
 
-<div class="layui-fluid">
+<div class="layui-fluid goods">
     <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">
             <div class="layui-card">
@@ -72,7 +72,16 @@
 
                     <div class="layui-card goods-product" hidden>
                         <div class="layui-card-body">
-                            <table class="layui-hide" id="goods-product" lay-filter="goods-product"></table>
+                            <table id="goods-product" class="layui-table">
+                                <thead class="title">
+                                <tr></tr>
+                                </thead>
+                                <tbody>
+                                <tr></tr>
+                                </tbody>
+
+                            </table>
+                            <button class="layui-btn send_product">确定</button>
                         </div>
                     </div>
                 </div>
@@ -81,7 +90,7 @@
     </div>
 </div>
 
-
+<script src="__PLUGINS__/jquery.min.js"></script>
 <script src="__PLUGINS__/layuiadmin/layui/layui.js"></script>
 
 <script>
@@ -188,6 +197,7 @@
           });
         } else if (obj.event === 'product') {
           self.getProduct(data.id);
+          $('.send_product').attr('goods_id', data.id);
           layer.open({
             type: 1,
             maxmin: true, //开启最大化最小化按钮
@@ -318,6 +328,23 @@
         active[type] ? active[type].call(this) : '';
       });
 
+      $('.send_product').click(function () {
+
+        var productArr = [];
+        var goodsID = $(this).attr('goods_id');
+        $('#goods-product').find('tbody tr').each(function () {
+          var productAttrArr = [];
+          var productObj = {};
+          $(this).find('.select_attr select').each(function () {
+            productAttrArr.push($(this).val());
+            productObj.goods_attr = productAttrArr.join(',')
+          })
+          productObj.goods_number = $(this).find('.product_num input').val();
+          productArr.push(productObj)
+        })
+        self.setProduct(goodsID, productArr);
+      })
+
       //提交数据
       $('.data-send').click(function () {
         var flag = false;
@@ -414,6 +441,19 @@
           });
         }
       });
+
+      $(".goods").on('click', '.productAdd,.productRemove', function () {
+        console.log(11);
+        var attrHtml = $(this).parent().parent();
+        if ($(this).hasClass("productAdd")) {
+          var cloneAttr = attrHtml.clone();
+          cloneAttr.find('.exec').html('<button type="button" class="layui-btn layui-btn-warm productRemove">删除</button>');
+          attrHtml.after(cloneAttr);
+        } else {
+          attrHtml.remove();
+        }
+
+      })
     }
 
     Goods.prototype = {
@@ -425,9 +465,9 @@
           , url: 'getData'
           , cols: [[
             {type: 'checkbox', fixed: 'left'}
-            , {field: 'id', width: 92, title: 'ID', sort: true, fixed: 'left'}
-            , {field: 'goods_code', width: 200, title: '商品编号'}
-            , {field: 'goods_name', width: 200, title: '商品名称'}
+            , {field: 'id', width: 90, title: 'ID', sort: true, fixed: 'left'}
+            , {field: 'goods_code', width: 150, title: '商品编号'}
+            , {field: 'goods_name', width: 157, title: '商品名称'}
             , {field: 'markte_price', width: 100, title: '市场价'}
             , {field: 'shop_price', width: 100, title: '零售价'}
             , {field: 'cate_name', width: 180, title: '所属栏目'}
@@ -435,6 +475,7 @@
             , {field: 'brand_name', width: 100, title: '商品品牌'}
             , {field: 'goods_weight', width: 100, title: '商品重量'}
             , {field: 'weight_unit', width: 100, title: '重量单位'}
+            , {field: 'goods_number', width: 100, title: '商品库存'}
             , {field: 'on_sale', title: '状态', width: 100, templet: '#test-table-switchTpl', unresize: true}
             , {width: 200, align: 'center', toolbar: '#goods-table-tools'}
           ]]
@@ -442,30 +483,108 @@
         })
       },
       getProduct: function (goods_id) {
-        table.render({
-          elem: '#goods-product'
-          , method: 'post'
-          , url: 'getData'
-          , where: {
+        var index = layer.load();
+        $.ajax({
+          url: "getProductData",
+          data: {
             goods_id: goods_id
+          },
+          type: 'post',
+          dataType: 'json',
+          success: function (msg) {
+            layer.close(index)
+            if (msg.code == 0 && !$.isEmptyObject(msg.data)) {
+              $('#goods-product tbody').html('<tr></tr>');
+              if (msg.product.length == 0) {
+                var str = '';
+                var str_tr = '';
+                $.each(msg.data, function (i, el) {
+                  var optionStr = '';
+                  str += "<th>" + i + "</th>";
+                  $.each(el, function (a, res) {
+                    optionStr += '<option value="' + res.id + '">' + res.attr_value + '</option>';
+                  })
+
+                  str_tr += '<td class="select_attr">' +
+                    '<select   class="item-select layui-input">' + optionStr + '</select>' +
+                    '</td>';
+                })
+
+                str += "<th>库存</th>";
+                str += "<th>操作</th>";
+                str_tr += "<td class='product_num'><input type='text' placeholder='请输入库存数量' name='fullname' lay-verify='required'  autocomplete='off' data-name='shop_price' class='layui-input item-input'></td>";
+                str_tr += "<td class='exec'><button type='button' class='layui-btn layui-btn-normal productAdd'>添加</button></td>";
+                $('#goods-product .title').find('tr').html(str);
+                $('#goods-product tbody').find('tr').html(str_tr);
+              } else {
+                var str = '';
+                var str_tr = '';
+                $.each(msg.data, function (i, el) {
+                  str += "<th>" + i + "</th>";
+                })
+
+                $.each(msg.product, function (i, val) {
+                  var attrArr = val['goods_attr'].split(',');
+                  console.log(attrArr)
+                  str_tr += '<tr>';
+                  $.each(msg.data, function (e, el) {
+                    str_tr += '<td class="select_attr">'
+                    str_tr += '<select   class="item-select layui-input">'
+                    $.each(el, function (a, res) {
+                      console.log($.inArray(String(7), attrArr))
+                      if ($.inArray(String(res.id), attrArr) != -1) {
+                        str_tr += '<option value="' + res.id + '" selected>' + res.attr_value + '</option>';
+                      } else {
+                        str_tr += '<option value="' + res.id + '">' + res.attr_value + '</option>';
+                      }
+                    })
+                    str_tr += '</td>';
+                    str_tr += '</select>'
+                  })
+
+                  str_tr += "<td class='product_num'><input type='text' value='" + val.goods_number + "' placeholder='请输入库存数量' name='fullname' " +
+                    "lay-verify='required'  autocomplete='off' data-name='shop_price' class='layui-input item-input'></td>";
+                  if (i == 0) {
+                    str_tr += "<td class='exec'><button type='button' class='layui-btn layui-btn-normal productAdd'>添加</button></td>";
+                  } else {
+                    str_tr += "<td class='exec'><button type='button' class='layui-btn layui-btn-warm productRemove'>删除</button></td>";
+                  }
+
+                  str_tr += '</tr>'
+                })
+
+                str += "<th>库存</th>";
+                str += "<th>操作</th>";
+
+                $('#goods-product .title').find('tr').html(str);
+                $('#goods-product tbody').html(str_tr);
+              }
+            }
           }
-          , cols: [[
-            {type: 'checkbox', fixed: 'left'}
-            , {field: 'id', width: 92, title: 'ID', sort: true, fixed: 'left'}
-            , {field: 'goods_code', width: 200, title: '商品编号'}
-            , {field: 'goods_name', width: 200, title: '商品名称'}
-            , {field: 'markte_price', width: 100, title: '市场价'}
-            , {field: 'shop_price', width: 100, title: '零售价'}
-            , {field: 'cate_name', width: 180, title: '所属栏目'}
-            , {field: 'type_name', width: 100, title: '所属类型'}
-            , {field: 'brand_name', width: 100, title: '商品品牌'}
-            , {field: 'goods_weight', width: 100, title: '商品重量'}
-            , {field: 'weight_unit', width: 100, title: '重量单位'}
-            , {field: 'on_sale', title: '状态', width: 100, templet: '#test-table-switchTpl', unresize: true}
-            , {width: 200, align: 'center', toolbar: '#goods-table-tools'}
-          ]]
         })
       },
+
+      setProduct: function (goods_id, goods_product) {
+        var index = layer.load();
+        $.ajax({
+          url: "setProduct",
+          data: {
+            goods_id: goods_id,
+            data: JSON.stringify(goods_product),
+          },
+          type: 'post',
+          dataType: 'json',
+          success: function (msg) {
+            layer.close(index);
+            if (msg.code > 0) {
+              layer.msg(msg.msg, {icon: 5});
+
+            } else {
+              layer.msg(msg.msg, {icon: 1});
+            }
+          }
+        })
+      }
     }
 
     new Goods();

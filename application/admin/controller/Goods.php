@@ -24,7 +24,7 @@ class Goods extends Base
 
 
     /**
-     * 获取数据
+     * 获取商品数据
      * @return mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
@@ -45,6 +45,7 @@ class Goods extends Base
         $param['if_brand'] = true;
         $param['if_category'] = true;
         $param['if_type'] = true;
+        $param['if_product'] = true;
         $count = $mGoods->getGoodsByParamCnt($param);
         $data['count'] = $count;
         $brandRes = array();
@@ -57,28 +58,75 @@ class Goods extends Base
     }
 
     /**
+     * 获取数据
+     * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getProductData() {
+        //todo权限
+        $this->_inputAjax();
+        $mGoods = new GoodsModel();
+
+        $goodsID = input('goods_id/d');
+        //条数的限制
+        //dealPage();
+        if (empty($goodsID)) {
+            return array_err(9876, '请设置合法的商品标识');
+        }
+        $where['goods_id'] = $goodsID;
+        $where['attr_type'] = 1;
+        $goodsAttr = db('goods_attr')->field('ga.*,attr.attr_name')
+            ->alias('ga')
+            ->join('attr', 'ga.attr_id = attr.id', 'left')
+            ->where($where)
+            ->select();
+        $goodsAttrFormat = [];
+        foreach ($goodsAttr as $k => $v) {
+            $goodsAttrFormat[$v['attr_name']][] = $v;
+        }
+        $goodsProduct = $mGoods->getGoodsProductByGoodsID($goodsID);
+        $data = array_err(0, 'success');
+        $data['data'] = $goodsAttrFormat;
+        $data['product'] = $goodsProduct;
+        return $data;
+    }
+
+    public function setProduct() {
+        //todo权限
+        // $this->_inputAjax();
+        $goodsID = input('goods_id/d');
+        $productData = input('data');
+        $mGoods = new GoodsEvent();
+        return $mGoods->setProduct($goodsID, $productData);
+
+    }
+
+
+    /**
      * 设置商品页面
      */
-    public function setGoods(){
+    public function setGoods() {
         //todo 权限
         $goodsID = input('id/d');
-        if($goodsID && $this->_inputAjax()['code'] == 0){
+        if ($goodsID && $this->_inputAjax()['code'] == 0) {
             $mGoods = new GoodsModel();
-            $goodsRes = array_err(0,'success');
+            $goodsRes = array_err(0, 'success');
             $goodsRes['goods'] = $mGoods->getGoodsByKV($goodsID)[$goodsID];
 
-            if(empty($goodsRes)){
-                return array_err('8989','没有您需要修改的商品');
+            if (empty($goodsRes)) {
+                return array_err('8989', '没有您需要修改的商品');
             }
             $goodsRes['attr'] = [];
-            if($goodsRes['goods']['type_id']){
-                foreach ($mGoods->getGoodsAttrByGoodsID($goodsID) as $k=>$v){
+            if ($goodsRes['goods']['type_id']) {
+                foreach ($mGoods->getGoodsAttrByGoodsID($goodsID) as $k => $v) {
                     $goodsRes['attr'][$v['attr_id']][] = $v;
                 }
             }
 
             $mMemberLevel = new MemberLevel();
-            $goodsRes['member_price'] = $mMemberLevel->getMemberPriceByGoodsID($goodsID,'mlevel_id,mprice');
+            $goodsRes['member_price'] = $mMemberLevel->getMemberPriceByGoodsID($goodsID, 'mlevel_id,mprice');
 
             $goodsRes['photo'] = $mGoods->getGoodsPhotoByGoodsID($goodsID);
             return $goodsRes;
@@ -121,7 +169,7 @@ class Goods extends Base
         Db::startTrans();
         $mGoods = new GoodsEvent();
 
-        $flag = $mGoods->editGoods($goodsID,$goodsBase,$goodsPrice,$goodsAttr);
+        $flag = $mGoods->editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr);
         if ($flag['code'] > 0) {
             Db::rollback();
         } else {
@@ -139,7 +187,7 @@ class Goods extends Base
         Db::startTrans();
         $mGoods = new GoodsEvent();
 
-        $flag = $mGoods->addGoods($goodsBase,$goodsPrice,$goodsAttr,$goodsPhoto);
+        $flag = $mGoods->addGoods($goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto);
         if ($flag['code'] > 0) {
             Db::rollback();
         } else {
@@ -209,7 +257,7 @@ class Goods extends Base
         return $categoryRes;
     }
 
-    public function cateGoryChild(){
+    public function cateGoryChild() {
         //权限
         //获取所有的商品分类列表
         $categoryData = Db::name('category')->order('sort desc')->select();
@@ -273,11 +321,11 @@ class Goods extends Base
         $categoryData = Db::name('category')->order('sort desc')->select();
         $mCateTree = new cateTreeUtil();
 
-        if($state == 1){
+        if ($state == 1) {
             $categoryRes = $mCateTree->getParent($categoryData, $categoryID);
-        }else{
+        } else {
             $categoryRes = $mCateTree->setSort($categoryData, $categoryID);
-            $categoryRes = array_merge(['0'=>['id'=>$categoryID]], $categoryRes);
+            $categoryRes = array_merge(['0' => ['id' => $categoryID]], $categoryRes);
         }
 
         $cateArrID = array();
@@ -310,14 +358,14 @@ class Goods extends Base
         $eGoods = new GoodsEvent();
         $cateGoryRes = array();
         Db::startTrans();
-        $checkCateFlag = $eGoods->checkCateGoryID($cateGoryID,true,$cateGoryRes);
-        if($checkCateFlag['code'] > 0){
+        $checkCateFlag = $eGoods->checkCateGoryID($cateGoryID, true, $cateGoryRes);
+        if ($checkCateFlag['code'] > 0) {
             Db::rollback();
             return $checkCateFlag;
         }
 
-        $flag = $eGoods->editCateGory($cateGoryData,$cateGoryID);
-        if($flag['code'] > 0){
+        $flag = $eGoods->editCateGory($cateGoryData, $cateGoryID);
+        if ($flag['code'] > 0) {
             Db::rollback();
 
         }
