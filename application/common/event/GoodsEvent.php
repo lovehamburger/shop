@@ -70,53 +70,118 @@ class GoodsEvent extends BaseEvent
      * @param $data
      * @return array
      */
-    public function editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr) {
-        $this->_editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr);
+    public function editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto) {
+        return $this->_editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto);
     }
 
-
     /**
-     * 修改品牌数据
+     * 修改商品数据
      * @param $goodsID
-     * @param $data
+     * @param $goodsBase
+     * @param $goodsPrice
+     * @param $goodsAttr
+     * @param $goodsPhoto
      * @return array
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
      */
-    public function _editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr) {
+    public function _editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto) {
         $goodsBaseRes = array();
         $flag = $this->checkGoodsID($goodsID, $goodsBaseRes, true);
         if ($flag['code'] > 0) {
             return $flag;
         }
 
-        $checkGoodsFlag = $this->checkGoodsData($goodsBase);
-        if ($checkGoodsFlag['code'] > 0) {
-            return $checkGoodsFlag;
+        //检查商品基础数据是否存在变化
+        foreach ($goodsBase as $k => $v) {
+            if ($v == $goodsBaseRes[$goodsID][$k]) {
+                unset($goodsBase[$k]);
+            }
         }
 
-        //比对商品数据是否需要修改
-        $compareCols = 'goods_name,og_thumb,markte_price,shop_price,on_sale,category_id,brand_id,type_id,goods_des,goods_weight,weight_unit';//设置需要对比的字段
-        $this->_compareOrdInfo($goodsBaseRes, $goodsBase, $goodsID, $compareCols);
+        if (!empty($goodsBase)) {
+            $checkGoodsFlag = $this->checkGoodsData($goodsBase, $goodsID);
+            if ($checkGoodsFlag['code'] > 0) {
+                return $checkGoodsFlag;
+            }
+            $mGoods = new Goods();
+            $alterGoodsFlag = $mGoods->alterGoods($goodsBase, $goodsID);
+            if($alterGoodsFlag['code'] > 0){
+                return $alterGoodsFlag;
+            }
+        }
 
-        //设置商品编码
-        $seq = new apiUtil('GOODS_CODE', false);
-        $goodsBase['goods_code'] = $seq->next_val();
-
-        $checkGoodsPriceFlag = $this->checkGoodsPrice($goodsPrice);
+        $checkGoodsPriceFlag = $this->checkGoodsPrice($goodsPrice, $goodsID);
         if ($checkGoodsPriceFlag['code'] > 0) {
             return $checkGoodsPriceFlag;
         }
+
+        //比对商品价格数据是否发生变化
+        $compareCols = ['mprice'];//设置需要对比的字段
+        $goodsPriceRes = Db::name('member_price')->where('goods_id', '=', $goodsID)->select();
+        $goodsPriceArr = [];
+
+        foreach ($goodsPrice as $k => $res) {
+            $res['mlevel_id'] = $k;
+            $res['goods_id'] = $goodsID;
+            $goodsPriceArr[] = $res;
+        }
+
+        $arrPriceUpdate = updateCompare($goodsPriceRes, $goodsPriceArr, 'id', $compareCols);
+
+        //对数据进行修改
+        if (!empty($arrPriceUpdate)) {
+            $mGoods = new Goods();
+            $alterGoodsPriceFlag = $mGoods->alterGoodsPrice($arrPriceUpdate);
+            if ($alterGoodsPriceFlag['code'] > 0) {
+                return $alterGoodsPriceFlag;
+            }
+        }
+
         $checkGoodsAttrFlag = $this->checkGoodsAttr($goodsAttr);
 
         if ($checkGoodsAttrFlag['code'] > 0) {
             return $checkGoodsAttrFlag;
         }
-        $data = array_err(0, 'success');
 
-        $data['goods_base'] = $goodsBase;
-        $data['goods_price'] = $goodsPrice;
-        $data['goods_attr'] = $goodsAttr;
+        //比对商品价格数据是否发生变化
+        $compareCols = ['attr_id', 'attr_value', 'attr_price'];//设置需要对比的字段
+        $goodsAttrRes = Db::name('goods_attr')->where('goods_id', '=', $goodsID)->select();
+        $goodsAttrArr = [];
+        foreach ($goodsAttr['attr_lists'] as $k => $res) {
+            $res['goods_id'] = $goodsID;
+            $goodsAttrArr[] = $res;
+        }
 
-        return $data;
+        $arrPriceUpdate = updateCompare($goodsAttrRes, $goodsAttrArr, 'id', $compareCols);
+
+        //对数据进行修改
+        if (!empty($arrPriceUpdate)) {
+            $mGoods = new Goods();
+            $alterGoodsAttrFlag = $mGoods->alterGoodsAttr($arrPriceUpdate);
+            if ($alterGoodsAttrFlag['code'] > 0) {
+                return $alterGoodsAttrFlag;
+            }
+        }
+
+        $goodsPhotoRes = Db::name('goods_photo')->where('goods_id', '=', $goodsID)->find();
+        if ($goodsPhotoRes) {
+            $delPhotoFlag = Db::name('goods_photo')->where('goods_id', '=', $goodsID)->delete();
+            if ($delPhotoFlag === false) {
+                return array_err(8876, '设置商品图片失败,请稍后再试');
+            }
+        }
+        if (!empty($goodsPhoto)) {
+            $goodsPhotoFlag = $this->goodsPhoto($goodsPhoto, $goodsID);
+            if ($goodsPhotoFlag['code'] > 0) {
+                return $goodsPhotoFlag;
+            }
+        }
+
+        return array_err(0, 'success');
     }
 
 
@@ -285,7 +350,7 @@ class GoodsEvent extends BaseEvent
         if (!empty($dataRes['goods_price'])) {
             $allPrice = [];
             foreach ($dataRes['goods_price'] as $k => $v) {
-                $dataPrice['mprice'] = $v;
+                $dataPrice['mprice'] = $v['mprice'];
                 $dataPrice['mlevel_id'] = $k;
                 $dataPrice['goods_id'] = $mGoods->id;
                 $allPrice[] = $dataPrice;
@@ -311,11 +376,26 @@ class GoodsEvent extends BaseEvent
         }
 
 
+        $goodsPhotoFlag = $this->goodsPhoto($goodsPhoto, $mGoods->id);
+        if ($goodsPhotoFlag['code'] > 0) {
+            return $goodsPhotoFlag;
+        }
+
+        return array_err(0, '添加商品数据成功');
+    }
+
+    /**
+     * 公用设置商品图片
+     * @param $goodsPhoto
+     * @param $goodsID
+     * @return array
+     */
+    public function goodsPhoto($goodsPhoto, $goodsID) {
         if (!empty($goodsPhoto)) {
             $goodsPhotoArr = [];
             foreach ($goodsPhoto as $k => $v) {
                 $pathInfo = pathinfo($v);
-                $goodsPhotoArr[$k]['goods_id'] = $mGoods->id;
+                $goodsPhotoArr[$k]['goods_id'] = $goodsID;
                 $goodsPhotoArr[$k]['og_photo'] = $v;
                 $goodsPhotoArr[$k]['sm_photo'] = $pathInfo['dirname'] . '/sm_' . $pathInfo['basename'];
                 $goodsPhotoArr[$k]['mid_photo'] = $pathInfo['dirname'] . '/mid_' . $pathInfo['basename'];
@@ -329,7 +409,7 @@ class GoodsEvent extends BaseEvent
             }
         }
 
-        return array_err(0, '添加商品数据成功');
+        return array_err(0, 'success');
     }
 
     /**
@@ -416,25 +496,36 @@ class GoodsEvent extends BaseEvent
 
     /**
      * 检查商品数据
-     * @param $goodsBase [] 商品基础数据
-     * @param $goodsAttr 商品属性数据
+     * @param $goodsBase
+     * @param string $goodsID
      * @return array
      */
-    public function checkGoodsData($goodsBase) {
-        if (empty($goodsBase['goods_name'])) {
+    public function checkGoodsData($goodsBase, $goodsID = '') {
+        if (empty($goodsBase['goods_name']) && isset($goodsBase['goods_name'])) {
             return array_err(92299, '商品名称不能为空');
         }
 
-        if (empty($goodsBase['markte_price'])) {
+        if (empty($goodsBase['markte_price']) && isset($goodsBase['markte_price'])) {
             return array_err(92299, '市场价格为必填');
         }
 
-        if (empty($goodsBase['shop_price'])) {
+        if (empty($goodsBase['shop_price']) && isset($goodsBase['shop_price'])) {
             return array_err(92299, '零售价格为必填');
         }
 
+        //判断商品名称是否重复
+        $mGoods = new Goods();
+        if ($goodsID) {
+            $where['id'] = ['neq', $goodsID];
+        }
+        $where['goods_name'] = $goodsBase['goods_name'];
+        $goodsRes = $mGoods->getGoodsByName($where, 'id');
+
+        if ($goodsRes) {
+            return array_err(987, '存在相同的商品名称,请更换');
+        }
+
         if (isset($goodsBase['category_id'])) {
-            $mGoods = new Goods();
             if (!empty($goodsBase['category_id'])) {
                 $cateRes = $mGoods->getGoodsCateByKV($goodsBase['category_id'], false, 'id,show_cate');
                 if (empty($cateRes)) {
@@ -465,11 +556,19 @@ class GoodsEvent extends BaseEvent
             return array_err(197317, '商品重量必须是数字');
         }
 
-        if (!is_numeric($goodsBase['markte_price']) || !is_numeric($goodsBase['shop_price'])) {
-            return array_err(197317, '价格必须是数字');
+        if (isset($goodsBase['shop_price'])) {
+            if (!is_numeric($goodsBase['shop_price'])) {
+                return array_err(197319, '价格必须是数字');
+            }
         }
 
-        if ($goodsBase['on_sale'] != 1 && $goodsBase['on_sale'] != 0) {
+        if (isset($goodsBase['markte_price'])) {
+            if (!is_numeric($goodsBase['markte_price'])) {
+                return array_err(197317, '价格必须是数字');
+            }
+        }
+
+        if ($goodsBase['on_sale'] != 1 && $goodsBase['on_sale'] != 0 && isset($goodsBase['on_sale'])) {
             return array_err(197317, '是否上下架标识错误');
         }
 
@@ -480,7 +579,8 @@ class GoodsEvent extends BaseEvent
      * @param $goodsPrice
      * @return array
      */
-    public function checkGoodsPrice($goodsPrice) {
+    public function checkGoodsPrice($goodsPrice, $goodsID = '') {
+
         if (!empty($goodsPrice)) {
             $eMemberEvent = new MemberEvent();
             $checkLevelFlag = $eMemberEvent->checkLevelID(array_keys($goodsPrice), $levelRes);
@@ -489,12 +589,13 @@ class GoodsEvent extends BaseEvent
             }
 
             foreach ($goodsPrice as $k => $v) {
-                if (!is_numeric($v)) {
+                if (!is_numeric($v['mprice'])) {
                     return array_err(9777, '等级价格必须为数字');
                 }
             }
-
         }
+
+
         return array_err(0, 'success');
     }
 

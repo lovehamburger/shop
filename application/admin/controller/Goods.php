@@ -126,7 +126,7 @@ class Goods extends Base
             }
 
             $mMemberLevel = new MemberLevel();
-            $goodsRes['member_price'] = $mMemberLevel->getMemberPriceByGoodsID($goodsID, 'mlevel_id,mprice');
+            $goodsRes['member_price'] = $mMemberLevel->getMemberPriceByGoodsID($goodsID, 'mlevel_id,mprice,id');
 
             $goodsRes['photo'] = $mGoods->getGoodsPhotoByGoodsID($goodsID);
             return $goodsRes;
@@ -166,10 +166,11 @@ class Goods extends Base
         $goodsBase = json_decode_html(input('goods_base'));
         $goodsPrice = json_decode_html(input('goods_price'));
         $goodsAttr = json_decode_html(input('goods_attr'));
+        $goodsPhoto = json_decode_html(input('goods_photo'));
         Db::startTrans();
         $mGoods = new GoodsEvent();
 
-        $flag = $mGoods->editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr);
+        $flag = $mGoods->editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr,$goodsPhoto);
         if ($flag['code'] > 0) {
             Db::rollback();
         } else {
