@@ -71,7 +71,11 @@ class GoodsEvent extends BaseEvent
      * @return array
      */
     public function editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto) {
-        return $this->_editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto);
+        $flag = $this->_editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto);
+        if ($flag['code'] == 0) {
+            return array_err(0, '修改商品成功');
+        }
+        return $flag;
     }
 
     /**
@@ -109,7 +113,7 @@ class GoodsEvent extends BaseEvent
             }
             $mGoods = new Goods();
             $alterGoodsFlag = $mGoods->alterGoods($goodsBase, $goodsID);
-            if($alterGoodsFlag['code'] > 0){
+            if ($alterGoodsFlag['code'] > 0) {
                 return $alterGoodsFlag;
             }
         }
@@ -146,14 +150,15 @@ class GoodsEvent extends BaseEvent
         if ($checkGoodsAttrFlag['code'] > 0) {
             return $checkGoodsAttrFlag;
         }
-
         //比对商品价格数据是否发生变化
         $compareCols = ['attr_id', 'attr_value', 'attr_price'];//设置需要对比的字段
         $goodsAttrRes = Db::name('goods_attr')->where('goods_id', '=', $goodsID)->select();
         $goodsAttrArr = [];
-        foreach ($goodsAttr['attr_lists'] as $k => $res) {
-            $res['goods_id'] = $goodsID;
-            $goodsAttrArr[] = $res;
+        if ($goodsAttr['attr_lists']) {
+            foreach ($goodsAttr['attr_lists'] as $k => $res) {
+                $res['goods_id'] = $goodsID;
+                $goodsAttrArr[] = $res;
+            }
         }
 
         $arrPriceUpdate = updateCompare($goodsAttrRes, $goodsAttrArr, 'id', $compareCols);
@@ -244,11 +249,15 @@ class GoodsEvent extends BaseEvent
         if ($flag['code'] > 0) {
             return $flag;
         }
+
         $productData = json_decode_html($productData);
-        $checkProductFlag = $this->checkProduct($goodsID, $productData);
-        if ($checkProductFlag['code'] > 0) {
-            return $checkProductFlag;
+        if ($productData['goods_attr']) {
+            $checkProductFlag = $this->checkProduct($goodsID, $productData);
+            if ($checkProductFlag['code'] > 0) {
+                return $checkProductFlag;
+            }
         }
+
 
         $mProduct = Db::name('product');
         $productRes = $mProduct->where('goods_id', $goodsID)->find();
@@ -612,10 +621,20 @@ class GoodsEvent extends BaseEvent
                 return $checkTypeFlag;
             }
 
-
             $arrAttrID = array_unique(array_column($goodsAttr['attr_lists'], 'attr_id'));
             $attrRes = [];
             $checkAttrFlag = $mTypeEvent->checkAttrID($arrAttrID, $attrRes);
+            //校验商品属性是否重复设置
+            foreach ($goodsAttr['attr_lists'] as $k => $v) {
+                if ($attrRes[$v['attr_id']]['attr_type'] == 1) {
+                    foreach ($goodsAttr['attr_lists'] as $k1 => $v1) {
+                        if ($v['attr_value'] == $v1['attr_value'] && $k1 != $k) {
+                            return array_err(7765, '存在相同商品的属性,请重置');
+                        }
+                    }
+                }
+            }
+
             if ($checkAttrFlag['code'] > 0) {
                 return $checkAttrFlag;
             }

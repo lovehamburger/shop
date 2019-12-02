@@ -493,7 +493,6 @@
           dataType: 'json',
           success: function (msg) {
             layer.close(index)
-            if (msg.code == 0 && !$.isEmptyObject(msg.data)) {
               $('#goods-product tbody').html('<tr></tr>');
               if (msg.product.length == 0) {
                 var str = '';
@@ -559,7 +558,6 @@
                 $('#goods-product .title').find('tr').html(str);
                 $('#goods-product tbody').html(str_tr);
               }
-            }
           }
         })
       },
