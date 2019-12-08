@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>商品导航</title>
+    <title>推荐位</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport"
@@ -34,10 +34,10 @@
                 <div class="layui-card-header">数据操作</div>
                 <div class="layui-card-body">
                     <div class="layui-btn-group test-table-operate-btn" style="margin-bottom: 10px;">
-                        <button class="layui-btn" data-type="delNav">删除导航</button>
+                        <button class="layui-btn" data-type="delRecpos">删除推荐位</button>
 
-                        <button class="layui-btn layui-btn-normal" data-type="addNav">新增导航</button>
-                        <button class="layui-btn layui-btn-danger" data-type="setSort">保存排序</button>
+                        <button class="layui-btn layui-btn-normal" data-type="addRecpos">新增推荐位</button>
+<!--                        <button class="layui-btn layui-btn-danger" data-type="setSort">保存排序</button>-->
                         <!--                        <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>-->
                         <!--                        <button class="layui-btn" data-type="isAll">验证是否全选</button>-->
                     </div>
@@ -46,14 +46,14 @@
                         <div class="layui-inline">
                             <input class="layui-input item-input" name="id" id="id" autocomplete="off">
                         </div>
-                        导航名称：
+                        推荐位名称：
                         <div class="layui-inline">
-                            <input class="layui-input item-input" name="id" id="nav_name" autocomplete="off">
+                            <input class="layui-input item-input" name="id" id="rec_name" autocomplete="off">
                         </div>
 
                         <button class="layui-btn" id="search" data-type="reload">搜索</button>
                     </div>
-                    <table class="layui-hide" id="nav-data" lay-filter="nav-data"></table>
+                    <table class="layui-hide" id="brand-data" lay-filter="brand-data"></table>
 
 
                     <script type="text/html" id="test-table-switchTpl">
@@ -71,77 +71,40 @@
                         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
                     </script>
 
-                    <div class="layui-card nav-input" hidden>
+                    <div class="layui-card recpos-input" hidden>
                         <div class="layui-card-body">
                             <from class="layui-form" lay-filter="component-form-element">
-                                <input type="hidden" value="" name="nav_id" data-name="id"
-                                       class="layui-input nav_id">
+                                <input type="hidden" value="" name="brand_id" data-name="id"
+                                       class="layui-input brand_id">
                                 <div class="layui-row layui-col-space10 layui-form-item">
-
-                                    <div class="layui-form-item layui-col-lg6">
-                                        <label class="layui-form-label">导航位置：</label>
-                                        <div class="layui-input-block">
-                                            <select name="brand" class="pos item-select" data-name="pos"
-                                                    lay-filter="pos">
-                                                <option value="top">顶部</option>
-                                                <option value="mid">中部</option>
-                                                <option value="bottom">尾部</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
                                     <div class="layui-col-lg6">
-                                        <label class="layui-form-label">打开方式：</label>
+                                        <label class="layui-form-label">推荐位名称：</label>
                                         <div class="layui-input-block">
-                                            <select name="brand" class="open item-select" data-name="open"
-                                                    lay-filter="open">
-                                                <option value="1">新标签</option>
-                                                <option value="2">当前页</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="layui-form-item layui-col-lg6">
-                                        <label class="layui-form-label">导航名称：</label>
-                                        <div class="layui-input-block">
-                                            <input type="text" value="" name="nav_name" lay-verify="required"
-                                                   placeholder="" autocomplete="off" data-name="nav_name"
+                                            <input type="text" value="" name="brand_name" lay-verify="required"
+                                                   placeholder="" autocomplete="off" data-name="rec_name"
                                                    class="layui-input item-input">
                                         </div>
                                     </div>
                                     <div class="layui-col-lg6">
-                                        <label class="layui-form-label">导航链接：</label>
+                                        <label class="layui-form-label">是否开启：</label>
                                         <div class="layui-input-block">
-                                            <input type="text" name="nav_url" data-name="nav_url"
-                                                   placeholder="" autocomplete="off"
-                                                   class="layui-input item-input nav_url">
+                                            <input type="checkbox" class="item-checkbox" name="status"
+                                                   data-name="status"
+                                                   lay-skin="switch" lay-filter="status" lay-text="是|否">
+                                            <div class="layui-unselect layui-form-switch layui-form-onswitch"
+                                                 lay-skin="_switch"><em>是</em><i></i></div>
                                         </div>
+
                                     </div>
                                 </div>
 
-                                <div class="layui-form-item layui-col-lg6">
-                                    <label class="layui-form-label">是否开启：</label>
-                                    <div class="layui-input-block">
-                                        <input type="checkbox" class="item-checkbox" name="status" data-name="status"
-                                               lay-skin="switch" lay-filter="nav-status" lay-text="是|否">
-                                        <div class="layui-unselect layui-form-switch layui-form-onswitch"
-                                             lay-skin="_switch"><em>是</em><i></i></div>
-                                    </div>
-
-
-                                    <!-- 这里的 checked 的状态只是演示 -->
-
-                                </div>
-                                <div class="layui-col-lg6">
-                                    <label class="layui-form-label">导航排序：</label>
-                                    <div class="layui-input-block" style="width: 20%">
-                                        <input type="text" name="sort" data-name="sort"
-                                               placeholder="" autocomplete="off" class="layui-input item-input">
+                                <div class="layui-row layui-col-space12 layui-form-item">
+                                    <div class="layui-col-lg6" >
+                                        <label class="layui-form-label"> 推荐位类型：</label>
+                                        <input type="radio" data-name="rec_type" class="item-checkradio" name="type" value="1" title="商品">
+                                        <input type="radio" data-name="rec_type" class="item-checkradio" name="type" value="2" title="分类">
                                     </div>
                                 </div>
-
-
                                 <div class="layui-form-item">
                                     <div class="layui-input-block">
                                         <button class="layui-btn data-send" lay-submit="">立即提交</button>
@@ -172,7 +135,7 @@
       , admin = layui.admin;
 
 
-    function Nav() {
+    function Recpos() {
       var self = this;
       self.param = {}
       self.data = {}
@@ -182,12 +145,12 @@
       });
 
       //监听表格复选框选择
-      table.on('checkbox(nav-data)', function (obj) {
+      table.on('checkbox(brand-data)', function (obj) {
         console.log(obj)
       });
 
       //弹出新增 修改框中checkbox的状态
-      form.on('switch(nav-status)', function (data) {
+      form.on('switch(status)', function (data) {
         $('.item-checkbox').val(data.elem.checked);
       });
 
@@ -222,13 +185,14 @@
                 obj.othis.parent().find('.layui-unselect em').html('开')
               }
             }
+            self.getList();
             layer.close(index)
           }
         });
       });
 
       //监听工具条
-      table.on('tool(nav-data)', function (obj) {
+      table.on('tool(brand-data)', function (obj) {
         var data = obj.data;
         if (obj.event === 'detail') {
           layer.msg('ID：' + data.id + ' 的查看操作');
@@ -238,7 +202,7 @@
             $delArr = [];
             $delArr.push(obj['data']['id']);
             $.ajax({
-              url: 'delNav',
+              url: 'delRecpos',
               data: {
                 id: JSON.stringify($delArr),
               },
@@ -256,37 +220,28 @@
             layer.close(index);
           });
         } else if (obj.event === 'edit') {
-          $('.nav-input .item-input').each(function () {
+          $('.recpos-input .item-input').each(function () {
             var dataName = $(this).attr('data-name');
             $("input[data-name=" + dataName + "]").val(data[dataName]);
           })
 
-          $('.nav-input .item-textarea').each(function () {
+          $('.recpos-input .item-textarea').each(function () {
             var dataName = $(this).attr('data-name');
             $("textarea[data-name=" + dataName + "]").val(data[dataName]);
           })
 
-          $('.nav-input #nav_img').prop('src', data['nav_img']);
 
-          $('.nav-input .nav_id').val(data['id']);
-          // if (data['status'] == 1) {
-          //   $('.nav-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
-          //   $('.nav-input .item-checkbox').parent().find('.layui-unselect em').html('是');
-          // } else {
-          //   $('.nav-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
-          //   $('.nav-input .item-checkbox').parent().find('.layui-unselect em').html('否');
-          // }
+
+           $("input[data-name=rec_type][value="+data.rec_type_key+"]").prop("checked", true);
+
+          $('.recpos-input .brand_id').val(data['id']);
+
           if (data['status'] == 1) {
             $("input[data-name='status']").prop('checked', true).prop('value', true);
           } else {
             $("input[data-name='status']").prop('checked', false).prop('value', false);
           }
           form.render()
-          $('.nav-input .item-select').each(function () {
-            var dataName = $(this).attr('data-name');
-            var select = 'dd[lay-value=' + data[dataName] + ']';
-            $(this).siblings("div.layui-form-select").find('dl').find(select).click()
-          })
 
 
           // $('.data-search .item-input').each(function () {
@@ -299,12 +254,12 @@
           // })
           layer.open({
             type: 1,
-            title: '导航修改',
+            title: '推荐位修改',
             area: ['50%'],
             closeBtn: 0,
             shadeClose: true,
             skin: 'yourClass',
-            content: $(".nav-input"),
+            content: $(".recpos-input"),
           });
         }
       });
@@ -320,7 +275,7 @@
             }
           })
           //执行重载
-          table.reload('nav-data', {
+          table.reload('brand-data', {
             page: {
               curr: 1 //重新从第 1 页开始
             }
@@ -329,9 +284,9 @@
             }
           });
         }
-        , delNav: function () { //获取选中数据
+        , delRecpos: function () { //获取选中数据
           layer.confirm('真的删除全部吗?', function (index) {
-            var checkStatus = table.checkStatus('nav-data')
+            var checkStatus = table.checkStatus('brand-data')
               , data = checkStatus.data;
             var $id = [];
             $.each(data, function (i, el) {
@@ -339,7 +294,7 @@
             })
             if ($id) {
               $.ajax({
-                url: 'delNav',
+                url: 'delRecpos',
                 data: {
                   id: JSON.stringify($id),
                 },
@@ -359,10 +314,10 @@
           })
         }
         , setSort: function () { //获取选中数据
-          var allNavData = table.cache['nav-data']
+          var allRecposData = table.cache['brand-data']
           var $id = {};
 
-          $.each(allNavData, function (i, el) {
+          $.each(allRecposData, function (i, el) {
             $id[el.id] = el.sort;
           })
 
@@ -386,37 +341,35 @@
             });
           }
         }
-        , addNav: function () {
-          $('.nav-input .item-input').each(function () {
+        , addRecpos: function () {
+          $('.recpos-input .item-input').each(function () {
             var dataName = $(this).attr('data-name');
             $("input[data-name=" + dataName + "]").val('');
           })
 
-          $('.nav-input .item-textarea').each(function () {
+          $('.recpos-input .item-textarea').each(function () {
             var dataName = $(this).attr('data-name');
             $("textarea[data-name=" + dataName + "]").val('');
           })
 
-          $('.nav-input #nav_img').prop('src', '/public/static/common/img/default.png');
-
-          $('.nav-input .nav_id').val('');
+          $('.recpos-input .brand_id').val('');
           layer.open({
             type: 1,
-            title: '导航新增',
+            title: '推荐位新增',
             area: ['50%'],
             closeBtn: 0,
             shadeClose: true,
             skin: 'yourClass',
-            content: $(".nav-input"),
+            content: $(".recpos-input"),
           });
         }
         , getCheckLength: function () { //获取选中数目
-          var checkStatus = table.checkStatus('nav-data')
+          var checkStatus = table.checkStatus('brand-data')
             , data = checkStatus.data;
           layer.msg('选中了：' + data.length + ' 个');
         }
         , isAll: function () { //验证是否全选
-          var checkStatus = table.checkStatus('nav-data');
+          var checkStatus = table.checkStatus('brand-data');
           layer.msg(checkStatus.isAll ? '全选' : '未全选')
         }
       };
@@ -430,16 +383,16 @@
       $('.data-send').click(function () {
         var flag = false;
 
-        $('.nav-input .item-input').each(function () {
+        $('.recpos-input .item-input').each(function () {
           var dataName = $(this).attr('data-name');
           self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
-          if (dataName == 'nav_name' && self['data'][dataName] == '') {
+          if (dataName == 'brand_name' && self['data'][dataName] == '') {
             $("input[data-name=" + dataName + "]").addClass('layui-form-danger');
             flag = true;
           }
         })
 
-        $('.nav-input .item-checkbox').each(function () {
+        $('.recpos-input .item-checkbox').each(function () {
           var dataName = $(this).attr('data-name');
           self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
           console.log(self['data'][dataName]);
@@ -451,25 +404,24 @@
         })
 
 
-        $('.nav-input .item-select').each(function () {
-          var dataName = $(this).attr('data-name');
-          self['data'][dataName] = $("select[data-name=" + dataName + "]").val();
-        })
-
-
-        $('.nav-input .item-textarea').each(function () {
+        $('.recpos-input .item-textarea').each(function () {
           var dataName = $(this).attr('data-name');
           self['data'][dataName] = $("textarea[data-name=" + dataName + "]").val();
         })
 
-        self['data']['nav_img'] = $('.nav-input #nav_img').attr('src');
+        $('.recpos-input .item-checkradio').each(function () {
+          var dataName = $(this).attr('data-name');
+          self['data'][dataName] = $("input[data-name=" + dataName + "]:checked").val();
+        })
 
-        var $nav_id = $('.nav_id').val();
+        self['data']['logo'] = $('.recpos-input #logo').attr('src');
 
-        if ($nav_id) {
-          var $url = 'editNav';
+        var $brand_id = $('.brand_id').val();
+
+        if ($brand_id) {
+          var $url = 'editRecpos';
         } else {
-          var $url = 'addNav';
+          var $url = 'addRecpos';
         }
 
         if (flag) {
@@ -480,7 +432,7 @@
           url: $url,
           data: {
             data: JSON.stringify(self.data),
-            id: $nav_id,
+            id: $brand_id,
           },
           type: 'post',
           dataType: 'json',
@@ -503,21 +455,18 @@
 
     }
 
-    Nav.prototype = {
-      constructor: Nav,
+    Recpos.prototype = {
+      constructor: Recpos,
       getList: function () {
         table.render({
-          elem: '#nav-data'
+          elem: '#brand-data'
           , method: 'post'
           , url: 'getData'
           , cols: [[
             {type: 'checkbox', fixed: 'left'}
             , {field: 'id', width: 92, title: 'ID', sort: true, fixed: 'left'}
-            , {field: 'nav_name', width: 250, title: '导航名称'}
-            , {field: 'nav_url', width: 450, title: '导航地址'}
-            , {field: 'pos', width: 250, title: '导航位置'}
-            , {field: 'open', width: 150, title: '打开方式'}
-            , {field: 'sort', width: 80, title: '排序', sort: true, edit: 'text'}
+            , {field: 'rec_name', width: 1100, title: '推荐位名称'}
+            , {field: 'rec_type', width: 80, title: '类型', sort: true}
             , {field: 'status', title: '状态', width: 100, templet: '#test-table-switchTpl', unresize: true}
             , {width: 210, align: 'center', toolbar: '#test-table-operate-barDemo'}
           ]]
@@ -526,7 +475,7 @@
       },
     }
 
-    new Nav();
+    new Recpos();
   });
 </script>
 </body>
