@@ -139,7 +139,12 @@ return [
     ],
 
     // 视图输出字符串内容替换
-    'view_replace_str'       => [],
+    'view_replace_str' => [
+        '__PUBLIC__'=>'/public',
+        '__ROOT__' => '/',
+        '__PLUGINS__'=>'/public/plugins',//插件目录
+        '__SKIN__' => '/public/static/index',//静态模块目录
+    ],
     // 默认跳转页面对应的模板文件
     'dispatch_success_tmpl'  => APP_PATH . 'admin' . DS . 'view/common/success.tpl',
     'dispatch_error_tmpl'    => APP_PATH . 'admin' . DS . 'view/common/success.html',
