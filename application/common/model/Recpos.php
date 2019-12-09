@@ -1,17 +1,19 @@
 <?php
 
 namespace app\common\model;
+use think\Db;
+
 /**
  * 推荐位模型
  */
 class Recpos extends BaseModel
 {
 
-    public function getrectypeAttr($value)
-    {
-        $type = [1=>'商品',2=>'分类'];
+    public function getrectypeAttr($value) {
+        $type = [1 => '商品', 2 => '分类'];
         return $type[$value];
     }
+
     /**
      * 根据主键查询推荐位数据
      * @param $brandID
@@ -24,6 +26,15 @@ class Recpos extends BaseModel
             return $this->where($where)->master()->lock($lock)->column($field);
         }
         return $this->where($where)->column($field);
+    }
+
+    public function getRecTtim($valueID, $type = 1, $lock = false, $field = '*') {
+        $where['value_id'] = $valueID;
+        $where['value_type'] = $type;
+        if ($lock) {
+            return Db::name('rec_item')->where($where)->master()->lock($lock)->column($field);
+        }
+        return Db::name('rec_item')->where($where)->column($field);
     }
 
     /**
@@ -48,8 +59,8 @@ class Recpos extends BaseModel
     public function getRecposByParam($param = array(), $field = '*,rec_type rec_type_key') {
         $where = $this->_makeParam($param);
         return $this->where($where)->field($field)
-                                ->limit(($param['curr_page'] - 1) * $param['page_count'], $param['page_count'])
-                                ->select();
+            ->limit(($param['curr_page'] - 1) * $param['page_count'], $param['page_count'])
+            ->select();
     }
 
 
@@ -61,6 +72,14 @@ class Recpos extends BaseModel
 
         if (!empty($param['rec_name'])) {
             $where['rec_name'] = ['LIKE', "%" . $param['rec_name'] . "%"];
+        }
+
+        if (!empty($param['rec_type'])) {
+            $where['rec_type'] = $param['rec_type'];
+        }
+
+        if ($param['status'] == 1) {
+            $where['status'] = $param['status'];
         }
 
         return $where;

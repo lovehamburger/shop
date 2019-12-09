@@ -9,6 +9,7 @@ use app\common\model\MemberLevel;
 use app\common\util\cateTreeUtil;
 use think\Db;
 use app\common\model\Goods as GoodsModel;
+use app\common\model\Recpos;
 use app\common\event\GoodsEvent;
 use app\common\util\FilesUtil;
 
@@ -110,6 +111,7 @@ class Goods extends Base
     public function setGoods() {
         //todo 权限
         $goodsID = input('id/d');
+        $mRecpos = new Recpos();
         if ($goodsID && $this->_inputAjax()['code'] == 0) {
             $mGoods = new GoodsModel();
             $goodsRes = array_err(0, 'success');
@@ -129,8 +131,16 @@ class Goods extends Base
             $goodsRes['member_price'] = $mMemberLevel->getMemberPriceByGoodsID($goodsID, 'mlevel_id,mprice,id');
 
             $goodsRes['photo'] = $mGoods->getGoodsPhotoByGoodsID($goodsID);
+
+
+            $goodsRes['recpos'] = $mRecpos->getRecTtim($goodsID,1,true);
             return $goodsRes;
         }
+
+        $param['rec_type'] = 1;
+        $param['status'] = 1;
+        $recposRes = $mRecpos->getRecposByParam($param);
+        $this->assign('recposRes',$recposRes);
         return $this->fetch();
     }
 
@@ -167,10 +177,11 @@ class Goods extends Base
         $goodsPrice = json_decode_html(input('goods_price'));
         $goodsAttr = json_decode_html(input('goods_attr'));
         $goodsPhoto = json_decode_html(input('goods_photo'));
+        $recposRes = json_decode_html(input('goods_recpos'));
         Db::startTrans();
         $mGoods = new GoodsEvent();
 
-        $flag = $mGoods->editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr,$goodsPhoto);
+        $flag = $mGoods->editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto,$recposRes);
         if ($flag['code'] > 0) {
             Db::rollback();
         } else {
@@ -185,10 +196,11 @@ class Goods extends Base
         $goodsPrice = json_decode_html(input('goods_price'));
         $goodsAttr = json_decode_html(input('goods_attr'));
         $goodsPhoto = json_decode_html(input('goods_photo'));
+        $recposRes = json_decode_html(input('goods_recpos'));
         Db::startTrans();
         $mGoods = new GoodsEvent();
 
-        $flag = $mGoods->addGoods($goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto);
+        $flag = $mGoods->addGoods($goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto,$recposRes);
         if ($flag['code'] > 0) {
             Db::rollback();
         } else {

@@ -65,13 +65,22 @@ class GoodsEvent extends BaseEvent
     }
 
     /**
-     * 修改品牌数据
+     * 修改数据
      * @param $goodsID
-     * @param $data
+     * @param $goodsBase
+     * @param $goodsPrice
+     * @param $goodsAttr
+     * @param $goodsPhoto
+     * @param $recposRes
      * @return array
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
      */
-    public function editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto) {
-        $flag = $this->_editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto);
+    public function editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto,$recposRes) {
+        $flag = $this->_editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto,$recposRes);
         if ($flag['code'] == 0) {
             return array_err(0, '修改商品成功');
         }
@@ -85,6 +94,7 @@ class GoodsEvent extends BaseEvent
      * @param $goodsPrice
      * @param $goodsAttr
      * @param $goodsPhoto
+     * @param $recposRes
      * @return array
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
@@ -92,7 +102,7 @@ class GoodsEvent extends BaseEvent
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
-    public function _editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto) {
+    public function _editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto,$recposRes) {
         $goodsBaseRes = array();
         $flag = $this->checkGoodsID($goodsID, $goodsBaseRes, true);
         if ($flag['code'] > 0) {
@@ -183,6 +193,30 @@ class GoodsEvent extends BaseEvent
             $goodsPhotoFlag = $this->goodsPhoto($goodsPhoto, $goodsID);
             if ($goodsPhotoFlag['code'] > 0) {
                 return $goodsPhotoFlag;
+            }
+        }
+
+
+//        $goodsPhotoRes = Db::name('goods_photo')->where('goods_id', '=', $goodsID)->find();
+//        if ($goodsPhotoRes) {
+//            $delPhotoFlag = Db::name('rec_item')->where('goods_id', '=', $goodsID)->delete();
+//            if ($delPhotoFlag === false) {
+//                return array_err(8876, '设置商品图片失败,请稍后再试');
+//            }
+//        }//todo
+        if (!empty($recposRes)) {
+            $recposData = [];
+            foreach ($recposRes as $k => $v) {
+                $dataRecpos['recpos_id'] = $v;
+                $dataRecpos['value_type'] = 1;
+                $dataRecpos['value_id'] = $goodsID;
+                $recposData[] = $dataRecpos;
+            }
+
+            $addRecposDataFlag = Db::name('rec_item')->insertAll($recposData);
+
+            if ($addRecposDataFlag === false) {
+                return array_err(92499, '推荐位设置失败');
             }
         }
 
@@ -323,9 +357,10 @@ class GoodsEvent extends BaseEvent
      * @param $goodsPrice
      * @param $goodsAttr
      * @param $goodsPhoto
+     * @param $recposRes
      * @return array
      */
-    public function addGoods($goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto) {
+    public function addGoods($goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto,$recposRes) {
         $dataRes = $this->_addGoods($goodsBase, $goodsPrice, $goodsAttr);
         if ($dataRes['code'] > 0) {
             return $dataRes;
@@ -369,6 +404,22 @@ class GoodsEvent extends BaseEvent
 
             if ($addGoodsPriceFlag === false) {
                 return array_err(92499, '增加商品基础数据失败');
+            }
+        }
+
+        if (!empty($recposRes)) {
+            $recposData = [];
+            foreach ($recposRes as $k => $v) {
+                $dataRecpos['recpos_id'] = $v;
+                $dataRecpos['value_type'] = 1;
+                $dataRecpos['value_id'] = $mGoods->id;
+                $recposData[] = $dataRecpos;
+            }
+
+            $addRecposDataFlag = Db::name('rec_item')->insertAll($recposData);
+
+            if ($addRecposDataFlag === false) {
+                return array_err(92499, '推荐位设置失败');
             }
         }
 

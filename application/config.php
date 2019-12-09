@@ -253,7 +253,7 @@ return [
             'thumb' =>false,
         ],
         'goods' => [
-            'size' =>'1242880',
+            'size' =>'9242880',
             'save_dir' =>'goods',
             'ext' =>'png,jpg,jpeg',
             'thumb' =>true,
