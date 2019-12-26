@@ -79,8 +79,8 @@ class GoodsEvent extends BaseEvent
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
-    public function editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto,$recposRes) {
-        $flag = $this->_editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto,$recposRes);
+    public function editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto, $recposRes) {
+        $flag = $this->_editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto, $recposRes);
         if ($flag['code'] == 0) {
             return array_err(0, '修改商品成功');
         }
@@ -102,7 +102,7 @@ class GoodsEvent extends BaseEvent
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
-    public function _editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto,$recposRes) {
+    public function _editGoods($goodsID, $goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto, $recposRes) {
         $goodsBaseRes = array();
         $flag = $this->checkGoodsID($goodsID, $goodsBaseRes, true);
         if ($flag['code'] > 0) {
@@ -135,7 +135,7 @@ class GoodsEvent extends BaseEvent
 
         //比对商品价格数据是否发生变化
         $compareCols = ['mprice'];//设置需要对比的字段
-        $goodsPriceRes = Db::name('member_price')->where('goods_id', '=', $goodsID)->select();
+        $goodsPriceRes = Db::name('member_price')->lock(true)->where('goods_id', '=', $goodsID)->select();
         $goodsPriceArr = [];
 
         foreach ($goodsPrice as $k => $res) {
@@ -162,7 +162,7 @@ class GoodsEvent extends BaseEvent
         }
         //比对商品价格数据是否发生变化
         $compareCols = ['attr_id', 'attr_value', 'attr_price'];//设置需要对比的字段
-        $goodsAttrRes = Db::name('goods_attr')->where('goods_id', '=', $goodsID)->select();
+        $goodsAttrRes = Db::name('goods_attr')->lock(true)->where('goods_id', '=', $goodsID)->select();
         $goodsAttrArr = [];
         if ($goodsAttr['attr_lists']) {
             foreach ($goodsAttr['attr_lists'] as $k => $res) {
@@ -182,7 +182,7 @@ class GoodsEvent extends BaseEvent
             }
         }
 
-        $goodsPhotoRes = Db::name('goods_photo')->where('goods_id', '=', $goodsID)->find();
+        $goodsPhotoRes = Db::name('goods_photo')->lock(true)->where('goods_id', '=', $goodsID)->find();
         if ($goodsPhotoRes) {
             $delPhotoFlag = Db::name('goods_photo')->where('goods_id', '=', $goodsID)->delete();
             if ($delPhotoFlag === false) {
@@ -196,14 +196,15 @@ class GoodsEvent extends BaseEvent
             }
         }
 
-
-//        $goodsPhotoRes = Db::name('goods_photo')->where('goods_id', '=', $goodsID)->find();
-//        if ($goodsPhotoRes) {
-//            $delPhotoFlag = Db::name('rec_item')->where('goods_id', '=', $goodsID)->delete();
-//            if ($delPhotoFlag === false) {
-//                return array_err(8876, '设置商品图片失败,请稍后再试');
-//            }
-//        }//todo
+        $where['value_id'] = $goodsID;
+        $where['value_type'] = 1;
+        $recItemRes = Db::name('rec_item')->lock(true)->where($where)->find();
+        if ($recItemRes) {
+            $delRecItemFlag = Db::name('rec_item')->where($where)->delete();
+            if ($delRecItemFlag === false) {
+                return array_err(8876, '设置推荐位失败,请稍后再试');
+            }
+        }
         if (!empty($recposRes)) {
             $recposData = [];
             foreach ($recposRes as $k => $v) {
@@ -222,23 +223,6 @@ class GoodsEvent extends BaseEvent
 
         return array_err(0, 'success');
     }
-
-
-    protected function _compareOrdInfo($dbArray, $updatetArray, $goodsID, $compareCols) {
-        /**
-         *  * 更新比对
-         * @param array $dbArray 数据表数组
-         * @param array $updatetArray 待更新数组
-         * @param string $key 主键
-         * @param array $compareCols 需比对的字段
-         * @return mixed 比对数组
-         */
-        $res = updateCompare($dbArray, $updatetArray, $goodsID, $compareCols);
-        echo '<pre>';
-        print_r($res);
-        echo '</pre>';
-    }
-
 
     /**
      * 数据排序
@@ -360,7 +344,7 @@ class GoodsEvent extends BaseEvent
      * @param $recposRes
      * @return array
      */
-    public function addGoods($goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto,$recposRes) {
+    public function addGoods($goodsBase, $goodsPrice, $goodsAttr, $goodsPhoto, $recposRes) {
         $dataRes = $this->_addGoods($goodsBase, $goodsPrice, $goodsAttr);
         if ($dataRes['code'] > 0) {
             return $dataRes;
@@ -696,17 +680,36 @@ class GoodsEvent extends BaseEvent
     /**
      * 添加商品分类数据
      * @param $data
+     * @param $recposRes
      * @return array
      */
-    public function addCateGory($data) {
+    public function addCateGory($data,$recposRes) {
         $checkFlag = $this->_checkCateGory($data);
         if ($checkFlag['code'] > 0) {
             return $checkFlag;
         }
 
         $flag = Db::name('category')->insert($data);
+
         if ($flag === false) {
             return array_err(197315, '添加分类失败');
+        }
+
+        if (!empty($recposRes)) {
+            $cateID = Db::name('category')->getLastInsID();
+            $recposData = [];
+            foreach ($recposRes as $k => $v) {
+                $dataRecpos['recpos_id'] = $v;
+                $dataRecpos['value_type'] = 2;
+                $dataRecpos['value_id'] = $cateID;
+                $recposData[] = $dataRecpos;
+            }
+
+            $addRecposDataFlag = Db::name('rec_item')->insertAll($recposData);
+
+            if ($addRecposDataFlag === false) {
+                return array_err(92499, '推荐位设置失败');
+            }
         }
 
         return array_err(0, '添加分类数据成功');
@@ -716,12 +719,13 @@ class GoodsEvent extends BaseEvent
      * 修改商品分类数据
      * @param $data
      * @param $cateGoryID
+     * @param $recposRes
      * @return array
      * @throws \think\Exception
      * @throws \think\exception\PDOException
      */
-    public function editCateGory($data, $cateGoryID) {
-        $checkFlag = $this->_checkCateGory($data, $cateGoryID);
+    public function editCategory($data, $cateGoryID,$recposRes) {
+        $checkFlag = $this->_checkCategory($data, $cateGoryID);
         if ($checkFlag['code'] > 0) {
             return $checkFlag;
         }
@@ -731,10 +735,35 @@ class GoodsEvent extends BaseEvent
             return array_err(197315, '修改分类失败');
         }
 
+        $where['value_id'] = $cateGoryID;
+        $where['value_type'] = 2;
+        $recItemRes = Db::name('rec_item')->lock(true)->where($where)->find();
+        if ($recItemRes) {
+            $delrecItemFlag = Db::name('rec_item')->where($where)->delete();
+            if ($delrecItemFlag === false) {
+                return array_err(8876, '设置推荐位失败');
+            }
+        }
+        if (!empty($recposRes)) {
+            $recposData = [];
+            foreach ($recposRes as $k => $v) {
+                $dataRecpos['recpos_id'] = $v;
+                $dataRecpos['value_type'] = 2;
+                $dataRecpos['value_id'] = $cateGoryID;
+                $recposData[] = $dataRecpos;
+            }
+
+            $addRecposDataFlag = Db::name('rec_item')->insertAll($recposData);
+
+            if ($addRecposDataFlag === false) {
+                return array_err(92499, '推荐位设置失败');
+            }
+        }
+
         return array_err(0, '修改分类数据成功');
     }
 
-    protected function _checkCateGory(&$data, $cateID = '') {
+    protected function _checkCategory(&$data, $cateID = '') {
         if (empty($data['cate_name'])) {
             return array_err(197319, '分类名称不能为空');
         }

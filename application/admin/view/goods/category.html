@@ -112,7 +112,14 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">推荐位：</label>
+                                    <div class="layui-input-block recpos">
+                                        {volist name="recposRes" id="vo"}
+                                        <input value="{$vo.id}" type="checkbox" data-name="recpos" title="{$vo.rec_name}">
+                                        {/volist}
+                                    </div>
+                                </div>
                                 <div class="layui-form-item layui-col-lg6">
                                     <label class="layui-form-label">是否开启：</label>
                                     <div class="layui-input-block">
@@ -202,6 +209,7 @@
       var self = this;
       self.param = {}
       self.data = {}
+      self.recpos = []
 
       layer.ready(function () {
         self.getList();
@@ -307,16 +315,18 @@
             $('.category-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
             $('.category-input .item-checkbox').parent().find('.layui-unselect em').html('否');
           }
-
-
-          // $('.data-search .item-input').each(function () {
-          //   var dataName = $(this).attr('id');
-          //   var val = $.trim($(this).val());
-          //   self.param[dataName] = val
-          //   if (self.param[dataName] == '') {
-          //     delete self.param[dataName];
-          //   }
-          // })
+          if(data['recpos_id']){
+            var recposArr = data['recpos_id'].split(',');
+            console.log(recposArr)
+            $('.category-input').find('input[data-name="recpos"]').each(function(){
+              if($.inArray($(this).val(),recposArr) >= 0){
+                $(this).prop('checked',true)
+              }
+            });
+          }else{
+            $('.category-input').find('input[data-name="recpos"]').prop('checked',false)
+          }
+          form.render() //重新渲染
           layer.open({
             type: 1,
             title: '商品分类修改',
@@ -497,6 +507,12 @@
           }
         })
 
+        var recpos = [];
+        $('.category-input').find('input[data-name="recpos"]:checked').each(function(){
+          recpos.push($(this).val());
+        });
+        self['recpos'] = recpos;
+
 
         $('.category-input .item-textarea').each(function () {
           var dataName = $(this).attr('data-name');
@@ -511,7 +527,7 @@
         if ($category_id) {
           var $url = 'editCategory';
         } else {
-          var $url = 'addCategory';
+          var $url = 'addCateGory';
         }
 
         if (flag) {
@@ -522,6 +538,7 @@
           url: $url,
           data: {
             data: JSON.stringify(self.data),
+            recpos: JSON.stringify(self['recpos']),
             id: $category_id,
           },
           type: 'post',

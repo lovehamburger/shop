@@ -254,6 +254,11 @@ class Goods extends Base
         $mCateTree = new cateTreeUtil();
         $categoryRes = $mCateTree->setSort($categoryData);
         $this->assign('categoryRes', $categoryRes);
+        $mRecpos = new Recpos();
+        $param['rec_type'] = 2;
+        $param['status'] = 1;
+        $recposRes = $mRecpos->getRecposByParam($param);
+        $this->assign('recposRes',$recposRes);
         return $this->fetch('goods/category');
     }
 
@@ -263,7 +268,11 @@ class Goods extends Base
     public function cateGory() {
         //权限
         //获取所有的商品分类列表
-        $categoryData = Db::name('category')->order('sort desc')->select();
+        $categoryData = Db::name('category')->alias('c')->join('rec_item', 'c.id = rec_item.value_id and value_type = 2', 'left')
+            ->field('*,group_concat(recpos_id) recpos_id')
+            ->order('sort desc')
+            ->group('c.id')
+            ->select();
         $mCateTree = new cateTreeUtil();
         $categoryRes = array_err(0, 'success');
         $categoryRes['data'] = $mCateTree->setSort($categoryData);
@@ -288,9 +297,10 @@ class Goods extends Base
         //todo权限
         $this->_inputAjax();
         $cateGoryData = json_decode_html(input('data'));
+        $recposRes = json_decode_html(input('recpos'));
 
         $eGoods = new GoodsEvent();
-        $flag = $eGoods->addCateGory($cateGoryData);
+        $flag = $eGoods->addCateGory($cateGoryData,$recposRes);
         return $flag;
     }
 
@@ -363,9 +373,10 @@ class Goods extends Base
     /**
      * 修改商品分类
      */
-    public function editCateGory() {
+    public function editCategory() {
         $this->_inputAjax();
         $cateGoryData = json_decode_html(input('data'));
+        $recposRes = json_decode_html(input('recpos'));
         $cateGoryID = input('id');
 
         $eGoods = new GoodsEvent();
@@ -377,10 +388,10 @@ class Goods extends Base
             return $checkCateFlag;
         }
 
-        $flag = $eGoods->editCateGory($cateGoryData, $cateGoryID);
+        $flag = $eGoods->editCategory($cateGoryData, $cateGoryID,$recposRes);
         if ($flag['code'] > 0) {
             Db::rollback();
-
+            return $flag;
         }
         Db::commit();
         return $flag;
