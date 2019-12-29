@@ -4,6 +4,7 @@ namespace app\index\controller;
 
 use app\common\model\Config as ConfigModel;
 use app\common\model\Nav;
+use app\common\model\Category;
 use think\Controller;
 use think\Request;
 
@@ -28,7 +29,10 @@ class Base extends Controller
         }
 
         $this->configRes = $config;
-        
+
+        $mCategory = new Category();
+        $mCategory->getCategoryLevelTwo();
+
         $this->globalAssign();
     }
 
