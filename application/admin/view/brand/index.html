@@ -14,6 +14,17 @@
             width: 92px;
             height: 92px;
             margin: 0 10px 10px 0;
+
+        }
+        #cate_tree{
+            position: absolute;
+            z-index: 1;
+            border: 1px solid #ccc;
+            left: 0px;
+            top: 37px;
+            background-color: #eee;
+            display: none;
+            width: 100%;
         }
     </style>
 <body layadmin-themealias="default">
@@ -115,7 +126,7 @@
                                                placeholder="" autocomplete="off" class="layui-input item-input">
                                     </div>
                                 </div>
-                                <div class="layui-form-item layui-col-lg12">
+                                <div class="layui-form-item layui-col-lg6">
                                     <label class="layui-form-label">品牌图片：</label>
                                     <div class="layui-col-md12">
                                         <div class="layui-card">
@@ -132,6 +143,20 @@
 
                                         </div>
                                     </div>
+                                </div>
+                                <div class="layui-col-lg6">
+                                    <label class="layui-form-label">关联分类：</label>
+
+                                    <div class="layui-input-block">
+                                        <div id="cate_gory">
+                                            <input type="text" value="顶级分类" readonly  name="cate_gory" data-name="category_id"
+                                                   placeholder="" autocomplete="off"
+                                                   class="layui-input item-input" cate_id="0">
+                                            <div id="cate_tree"></div>
+                                        </div>
+
+                                    </div>
+
                                 </div>
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">品牌描述：</label>
@@ -256,7 +281,12 @@
         } else if (obj.event === 'edit') {
           $('.brand-input .item-input').each(function () {
             var dataName = $(this).attr('data-name');
-            $("input[data-name=" + dataName + "]").val(data[dataName]);
+            if(dataName == 'category_id'){
+              var _html = $("#cate_tree").find("div[data-id=" + data[dataName] + "]").find('.layui-tree-txt').html();
+              $("input[data-name=" + dataName + "]").val(_html).attr('cate_id',data[dataName]);
+            }else{
+              $("input[data-name=" + dataName + "]").val(data[dataName]);
+            }
           })
 
           $('.brand-input .item-textarea').each(function () {
@@ -419,7 +449,13 @@
 
         $('.brand-input .item-input').each(function () {
           var dataName = $(this).attr('data-name');
-          self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
+
+          if(dataName == 'category_id'){
+            self['data'][dataName] = $("input[data-name=" + dataName + "]").attr('cate_id');
+          }else{
+            self['data'][dataName] = $("input[data-name=" + dataName + "]").val();
+          }
+
           if (dataName == 'brand_name' && self['data'][dataName] == '') {
             $("input[data-name=" + dataName + "]").addClass('layui-form-danger');
             flag = true;
@@ -509,7 +545,57 @@
           });
         }
       });
+
+      $('.layui-card-body').on('click','#cate_gory',function(e){
+
+        e.stopPropagation();//阻止冒泡
+        $(this).parent().find('#cate_tree').show();
+      })
+
+      $('.layui-card-body').on('click','#cate_tree',function(e){
+        e.stopPropagation();//阻止冒泡
+      })
+
+      $(document).on('click','body',function(e){
+        $(this).parent().find('#cate_tree').hide();
+        e.stopPropagation();//阻止冒泡
+      })
+
+
+      getChild();
+      function getChild() {
+        var index = layer.load(2);
+        $.ajax({
+          url: '/admin.php/Goods/cateGoryChild',
+          data: {
+
+          },
+          type: 'post',
+          dataType: 'json',
+          success: function (msg) {
+            if (msg.code == 0) {
+              layui.use(['tree'], function(){
+                var tree = layui.tree
+                  //模拟数据1
+                  ,data = msg.data;
+                //无连接线风格
+                tree.render({
+                  elem: '#cate_tree'
+                  ,data: data
+                  ,onlyIconControl: true  //是否仅允许节点左侧图标控制展开收缩
+                  ,click: function(obj){
+                    $("input[data-name=category_id]").val(obj.data.cate_name).attr("cate_id",obj.data.id);
+                  }
+                });
+              });
+            }
+            layer.close(index)
+          }
+        });
+      }
     }
+
+
 
     Brand.prototype = {
       constructor: Brand,

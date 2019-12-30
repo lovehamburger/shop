@@ -39,7 +39,7 @@ class Brand extends BaseModel
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function getBrandByParam($param = array(), $field = 'id,brand_name,brand_url,brand_img,brand_description,sort,status') {
+    public function getBrandByParam($param = array(), $field = 'id,brand_name,brand_url,brand_img,brand_description,sort,status,category_id') {
         $where = $this->_makeParam($param);
         return $this->where($where)->field($field)
             ->limit(($param['curr_page'] - 1) * $param['page_count'], $param['page_count'])
