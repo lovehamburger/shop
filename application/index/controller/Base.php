@@ -12,6 +12,7 @@ class Base extends Controller
 {
     protected $nav = [];
     protected $configRes = [];
+    protected $recommendCat = [];
     public function __construct(Request $request = null) {
         parent::__construct($request);
     }
@@ -31,7 +32,7 @@ class Base extends Controller
         $this->configRes = $config;
 
         $mCategory = new Category();
-        $mCategory->getCategoryLevelTwo();
+        $this->recommendCat = $mCategory->getRecommendCategory(2,5);
 
         $this->globalAssign();
     }
@@ -62,5 +63,6 @@ class Base extends Controller
     public function globalAssign(){
         $this->assign('nav',$this->nav);
         $this->assign('configRes',$this->configRes);
+        $this->assign('recommendCat',$this->recommendCat);
     }
 }
