@@ -308,13 +308,14 @@
           $('.category-input #iconfont').prop('src', data['iconfont']);
 
           $('.category-input .category_id').val(data['id']);
-          if (data['show_cate'] == 1) {
-            $('.category-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
-            $('.category-input .item-checkbox').parent().find('.layui-unselect em').html('是');
-          } else {
-            $('.category-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
-            $('.category-input .item-checkbox').parent().find('.layui-unselect em').html('否');
-          }
+
+        if (data['show_cate'] == 1) {
+            $("input[data-name='show_cate']").prop('checked', true).prop('value', true);
+        } else {
+            $("input[data-name='show_cate']").prop('checked', false).prop('value', false);
+        }
+        form.render();
+
           if(data['recpos_id']){
             var recposArr = data['recpos_id'].split(',');
             console.log(recposArr)

@@ -297,13 +297,13 @@
           $('.brand-input #brand_img').prop('src', data['brand_img']);
 
           $('.brand-input .brand_id').val(data['id']);
-          if (data['status'] == 1) {
-            $('.brand-input .item-checkbox').parent().find('.layui-unselect').addClass('layui-form-onswitch');
-            $('.brand-input .item-checkbox').parent().find('.layui-unselect em').html('是');
-          } else {
-            $('.brand-input .item-checkbox').parent().find('.layui-unselect').removeClass('layui-form-onswitch');
-            $('.brand-input .item-checkbox').parent().find('.layui-unselect em').html('否');
-          }
+
+            if (data['status'] == 1) {
+                $("input[data-name='status']").prop('checked', true).prop('value', true);
+            } else {
+                $("input[data-name='status']").prop('checked', false).prop('value', false);
+            }
+            form.render()
 
 
           // $('.data-search .item-input').each(function () {
