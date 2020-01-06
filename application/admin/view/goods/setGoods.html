@@ -662,13 +662,12 @@
                 $('.goods_base .item-checkbox').each(function () {
                   var dataName = $(this).attr('data-name');
                   console.log(msg['goods'][dataName]);
-                  if (msg['goods']['on_sale'] == 1) {
-                    $(this).parent().find('.layui-unselect').addClass('layui-form-onswitch');
-                    $(this).parent().find('.layui-unselect em').html('是');
-                  } else {
-                    $(this).parent().find('.layui-unselect').removeClass('layui-form-onswitch');
-                    $(this).parent().find('.layui-unselect em').html('否');
-                  }
+                    //存在多个checkbox的时候需要修改下面的写法
+                    if (msg['goods']['on_sale'] == 1) {
+                        $("input[data-name='on_sale']").prop('checked', true).prop('value', true);
+                    } else {
+                        $("input[data-name='on_sale']").prop('checked', false).prop('value', false);
+                    }
                 })
 
                 $('.goods_base').find('input[data-name="recpos"]').each(function(){
