@@ -654,7 +654,6 @@
 
                 //保留全局的attr
                 self.goods_attr = msg.attr;
-
                 //属性的选中
                 var goods_attr_select = 'dd[lay-value=' + msg['goods']['type_id'] + ']';
                 $('.goods_attr .type').siblings("div.layui-form-select").find('dl').find(goods_attr_select).click();
