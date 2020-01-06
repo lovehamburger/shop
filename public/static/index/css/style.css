@@ -177,10 +177,10 @@ Date:2017-02-06 11:22:00
 .floor-hd{ width:100%; height:58px; color:#fff; position:relative;}
 .floor-hd .hd-tit{ font-size:21px; line-height:58px; padding-left:25px; float:left;}
 .floor-hd .hd-tags{ float:right; padding-right:5px;}
-.floor-hd .hd-tags li{ float:left; width:98px; height:28px; line-height:28px; border:1px solid rgba(255,255,255,.5); background-color:rgba(255,255,255,.1); border:1px solid #f9f9f9\0; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#19ffffff,endColorstr=#19ffffff); margin:14px 10px 14px 0; font-size:14px; text-align:center; position:relative; cursor:pointer;}
+.floor-hd .hd-tags li{ float:left; width:98px; height:28px; line-height:28px;  background-color:rgba(255,255,255,.1); border:1px solid #f9f9f9\0; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#19ffffff,endColorstr=#19ffffff); margin:14px 10px 14px 0; font-size:14px; text-align:center; position:relative; cursor:pointer;}
 .floor-hd .hd-tags li span{ display:block; width:88px; height:28px; padding:0 5px; overflow:hidden;}
 .floor-hd .hd-tags li .arrowImg{ position:absolute; left:-1px; display:none;}
-.floor-hd .hd-tags li.current{ border-bottom:0;}
+.floor-hd .hd-tags li.current{ border:1px solid rgba(255,255,255,.5);}
 .floor-hd .hd-tags li.current .arrowImg{ display:block;}
 .floor-bd{ margin-top:10px; overflow:hidden; height:570px;}
 .floor-bd .bd-left{ float:left; width:475px; height:100%;}
@@ -3607,17 +3607,17 @@ a.browse:hover,a.comment:hover{ color:#f42424;}
 /*category-top-default end*/
 
 /*catogory-top-cloth start*/
-.catetop-cloth .dsc-search .search-text{ border-color: #FD5F8E; }
-.catetop-cloth .dsc-search .button{ background-color: #FD5F8E; }
+.catetop-cloth .dsc-search .search-text{ border-color: #f42424; }
+.catetop-cloth .dsc-search .button{ background-color: #f42424; }
 .catetop-cloth .dsc-search .button-store{ background-color: #BD1044; }
-.catetop-cloth .dsc-zoom{ border-bottom-color: #EE356C; }
+.catetop-cloth .dsc-zoom{ border-bottom-color: #f42424; }
 /*tree*/
 .catetop-cloth .nav .nav-main{ width: 940px; }
 .catetop-cloth .nav .categorys{ width: 250px; }
-.catetop-cloth .nav .categorys .categorys-type{ background-color: #EE356C; }
-.catetop-cloth .categorys-tab-content{ background-color: #FD5F8E; height: 450px;}
-.catetop-cloth .categorys-tab-content .categorys-item{ height:90px; cursor: default; border-bottom: 1px dashed #FE8FB0;}
-.catetop-cloth .categorys-tab-content .categorys-item:hover{ background-color: #E02B61; }
+.catetop-cloth .nav .categorys .categorys-type{ background-color: #f42424; }
+.catetop-cloth .categorys-tab-content{ background-color: #333; height: 516px;}
+.catetop-cloth .categorys-tab-content .categorys-item{ height:85px; cursor: default; border-bottom: 1px dashed #333;}
+.catetop-cloth .categorys-tab-content .categorys-item:hover{  background-color:rgba(0,0,0,1);}
 .catetop-cloth .categorys-tab-content .item-content{ position: relative; padding: 14.5px 0; margin: 0 10px; width: 230px; background:none;}
 .catetop-cloth .categorys-tab-content .categorys-item:last-child .item-content{ border-bottom: 0 none; }
 .catetop-cloth .categorys-tab-content .item-content:hover{ background-color: transparent; }
@@ -3629,7 +3629,7 @@ a.browse:hover,a.comment:hover{ color:#f42424;}
 .catetop-cloth .categorys-tab-content .categorys-title span a{ color: #fff; font-size: 12px; display: block; float: left; height: 18px; width: 64px; word-break: break-all; overflow: hidden;}
 .catetop-cloth .categorys-tab-content .categorys-title span a:hover, 
 .catetop-cloth .categorys-tab-content .categorys-title strong a:hover{ color: #fff; }
-.catetop-cloth .categorys-items-layer{ border: 1px solid #E02B61; border-left: 0 none; width: 420px; min-height: 448px; left: 250px;}
+.catetop-cloth .categorys-items-layer{  border-left: 0 none; width: 420px; min-height: 514px; left: 250px;}
 .catetop-cloth .catetop-layer-con{ padding: 20px 20px 0; }
 .catetop-cloth .catetop-layer-con h3{ font-size: 14px; font-weight: 700; padding-bottom: 10px; border-bottom: 1px dashed #eaeaea; margin-bottom: 10px; }
 .catetop-cloth .catetop-layer-con .cate-list{ overflow: hidden; margin-bottom: 40px; width:190px; float:left;}
