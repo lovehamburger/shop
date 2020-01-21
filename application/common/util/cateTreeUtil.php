@@ -11,10 +11,14 @@ class cateTreeUtil extends BaseUtil
      * @param $data
      * @param int $parent_id
      * @param int $level
+     * @param bool $clear 是否删除静态变量的值
      * @return array
      */
-    public function setSort($data, $parent_id = 0, $level = 0) {
+    public function setSort($data, $parent_id = 0, $level = 0,$clear = false) {
         static $res = array();
+        if ($clear) {
+            $res = array();
+        }
         foreach ($data as $k => $v) {
             if ($v['pid'] == $parent_id) {
                 // 把level值放到这个分类里，这样就可以知道这个分类是第几级的

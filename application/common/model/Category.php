@@ -34,23 +34,22 @@ class Category extends BaseModel
             ->field('category.*,ri.recpos_id')
             ->join('Category c', 'category.pid = c.id', 'left')
             ->join('rec_item ri', "category.id = ri.value_id")
-            ->cache('recommend_cate')
             ->where($where)
             ->group('Category.id')
             ->select()->toArray();
 
-        $oneCate = [];
+        $commendCate = [];
         foreach ($res as $k => $v) {
             if ($v['pid'] == 0) {
-                $oneCate[$v['id']] = $v;
+                $commendCate[$v['id']] = $v;
                 foreach ($res as $k1 => $v1) {
                     if ($v1['pid'] == $v['id']) {
-                        $oneCate[$v['id']]['child'][] = $v1;
+                        $commendCate[$v['id']]['child'][$v1['id']] = $v1;
                     }
                 }
             }
         }
-        return $oneCate;
+        return $commendCate;
     }
 
     /**
@@ -78,4 +77,22 @@ class Category extends BaseModel
         $data['brand'] = Db::name('brand')->where('category_id','in',$childCateID)->where('status','=','1')->select();
         return $data;
     }
+
+    public function getCommendPosGoods($value_type = 2, $recpos_id = 5){
+        $recommendCate = $this->getRecommendCategory($value_type,$recpos_id);
+        if($recommendCate){
+            $categoryData = Db::name('category')->order('sort desc')->where('show_cate','=','1')->select();
+            $recommendCateChild = [];
+            $uCateTreeUtil = new  cateTreeUtil();
+            foreach ($recommendCate as $k =>$v){
+                $recommendCateChild[$v['id']] = $uCateTreeUtil->setSort($categoryData,$v['id'],0,true);
+                $recommendCateChild[$k][] = ['id'=>$v['id'],'cate_name'=>$v['cate_name'],'pid'=>$v['pid']];
+
+            }
+            echo'<pre>';
+            print_r($recommendCateChild);
+            echo'</pre>';
+        }
+    }
+
 }
