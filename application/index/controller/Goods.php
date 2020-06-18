@@ -4,7 +4,8 @@ namespace app\index\controller;
 class Goods extends Base
 {
     public function index() {
-        echo "55";
+        echo "777";
+        echo "555";
         return $this->fetch();
     }
 
