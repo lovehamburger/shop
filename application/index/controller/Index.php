@@ -7,6 +7,7 @@ class Index extends Base
 {
     public function index() {
         $mCategory = new Category();
+        echo "999";
         $this->recommendCat = $mCategory->getCommendPosGoods(2,5);
         return $this->fetch();
     }
