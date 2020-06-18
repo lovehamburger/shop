@@ -5,7 +5,7 @@ class Goods extends Base
 {
     public function index() {
         echo "777";
-        echo "555";
+        echo "666";
         return $this->fetch();
     }
 
